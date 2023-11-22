@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .tool-primary {
+    @apply w-full h-auto flex flex-col justify-center items-center m-5;
+  }
+  .dial-content {
+    @apply rounded-md p-2 bg-white border-2 border-white shadow-xl shadow-black/10 flex justify-center items-center;
+  }
+  .tool-button {
+    @apply rounded-full w-5 h-5 m-0 p-0 flex justify-center;
+  }
+  .tool-icon {
+    @apply w-5 h-5 transition-transform group-hover:rotate-45;
+  }
+}
