@@ -1,10 +1,14 @@
 # CS-554 Final Project
 
 ## To run
+hmu for firebase config
+
 ```
 npm i
 npm run dev
 ```
+
+
 
 ## Reference
 HTML Canvas:
