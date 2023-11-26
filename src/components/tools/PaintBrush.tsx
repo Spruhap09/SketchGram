@@ -21,7 +21,7 @@ export default function PaintBrush({ value, setValue }: PaintBrushProps) {
             <PaintBrushIcon className="tool-icon" />
           </IconButton>
         </SpeedDialHandler>
-        <SpeedDialContent className="rounded-md p-2 bg-white border-2 border-white shadow-xl shadow-black/10 flex justify-center items-center">
+        <SpeedDialContent className="rounded-full p-2 bg-white border-2 border-white shadow-xl shadow-black/10 flex justify-center items-center">
           <Slider
             className="w-12 h-4"
             size="md"

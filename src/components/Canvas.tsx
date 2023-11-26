@@ -24,7 +24,7 @@ export default function Canvas() {
 
       context.fillStyle = lineColor;
       context.beginPath();
-      context.arc(startPoint.x, startPoint.y, lineWidth/2, 0, 2 * Math.PI);
+      context.arc(startPoint.x, startPoint.y, Math.floor(lineWidth/2), 0, 2 * Math.PI);
       context.fill();
     },
     [color, lineWidth]
@@ -41,7 +41,7 @@ export default function Canvas() {
         height={750}
         className="border-2 border-black rounded-3xl"
       ></canvas>
-      <div className="w-15 h-1/2 m-2 flex flex-col justify-start items-center rounded-3xl border-2 border-black ">
+      <div className="w-15 h-1/2 m-2 flex flex-col justify-center items-center rounded-full border-2 border-black ">
         <ColorPicker color={color} setColor={setColor} />
         <ClearScreen onClick={clear} />
         <PaintBrush value={lineWidth} setValue={setLineWidth} />

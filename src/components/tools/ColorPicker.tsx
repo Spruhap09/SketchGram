@@ -24,7 +24,7 @@ export default function ColorPicker({ color, setColor }: ColorPickerProps) {
             <SwatchIcon className="tool-icon" />
           </IconButton>
         </SpeedDialHandler>
-        <SpeedDialContent className="dial-content">
+        <SpeedDialContent className="dial-content" >
           <GithubPicker
             className="w-12 h-24"
             color={color}
