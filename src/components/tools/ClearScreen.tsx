@@ -9,7 +9,7 @@ export default function ClearScreen({ onClick }: ClearScreenProps) {
   return (
     <div className="tool-primary">
       <IconButton
-        size="lg"
+        variant="gradient"
         className="tool-button"
         onClick={onClick}
       >

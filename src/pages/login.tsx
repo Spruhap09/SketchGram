@@ -36,10 +36,12 @@ export default function Login() {
 
   return (
     <div className="primary">
-      <Card shadow={true}>
-        <CardHeader>
-          <Typography variant="h1">Log In</Typography>
-          <Typography variant="h2" color="gray">
+      <Card color="transparent" shadow={false}>
+        <CardHeader className="p-5">
+          <Typography variant="h4" color="blue-gray">
+            Log In
+          </Typography>
+          <Typography color="gray" className="mt-1 font-normal">
             Log into your account.
           </Typography>
         </CardHeader>
@@ -56,7 +58,7 @@ export default function Login() {
                 name="email"
                 size="lg"
                 placeholder="name@mail.com"
-                className="rounded-full p-3 !border-t-blue-gray-200 focus:!border-t-gray-900"
+                className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
                 labelProps={{
                   className: "before:content-none after:content-none",
                 }}
@@ -70,7 +72,7 @@ export default function Login() {
                 type="password"
                 size="lg"
                 placeholder="********"
-                className="rounded-full p-3 !border-t-blue-gray-200 focus:!border-t-gray-900"
+                className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
                 labelProps={{
                   className: "before:content-none after:content-none",
                 }}
@@ -78,21 +80,12 @@ export default function Login() {
               />
             </div>
 
-            <Button
-              color="blue"
-              fullWidth
-              className="mt-5 rounded-full border border-black flex text-center items-center justify-start text-black"
-              type="submit"
-              variant="outlined"
-            >
-              <div className="w-5 h-5 ml-10 mt-2 mb-2">
-                <HomeIcon />
-              </div>
-              <div className="w-full flex justify-center">Log In</div>
+            <Button className="mt-6" fullWidth type="submit">
+              Log In
             </Button>
           </form>
         </CardBody>
-        <CardFooter className="mt-10 p-2 rounded-xl border-2 border-blue-gray-200">
+        <CardFooter>
           <GoogleButton />
           <Typography color="gray" className="mt-4 text-center font-normal">
             Don&apos;t have an account?{" "}

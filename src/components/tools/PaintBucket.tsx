@@ -9,7 +9,7 @@ export default function PaintBucket({ onClick }: PaintBucketProps) {
   return (
     <div className="tool-primary">
 
-        <IconButton size="lg" className="tool-button" onClick={onClick}>
+        <IconButton variant="gradient" className="tool-button" onClick={onClick}>
           <BeakerIcon className="tool-icon" />
         </IconButton>
 

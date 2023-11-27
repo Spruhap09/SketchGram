@@ -14,7 +14,7 @@ export default function GoogleButton() {
     <Button
       onClick={signOn}
       fullWidth
-      className="p-5 h-1/6 rounded-full border border-black flex text-center items-center justify-start text-black"
+      className="p-5 h-1/6 rounded-full border border-black flex text-center items-center justify-start text-white"
     >
       <div className="w-5 h-5 m-5">
         <svg

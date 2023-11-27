@@ -17,14 +17,12 @@ export default function PaintBrush({ value, setValue }: PaintBrushProps) {
     <div className="tool-primary">
       <SpeedDial placement="top" className="w-full h-full">
         <SpeedDialHandler>
-          <IconButton size="lg" className="tool-button">
+          <IconButton variant="gradient" className="tool-button">
             <PaintBrushIcon className="tool-icon" />
           </IconButton>
         </SpeedDialHandler>
-        <SpeedDialContent className="rounded-full p-2 bg-white border-2 border-white shadow-xl shadow-black/10 flex justify-center items-center">
+        <SpeedDialContent >
           <Slider
-            className="w-12 h-4"
-            size="md"
             defaultValue={value}
             onChange={(e) => {
               setValue(parseInt(e.target.value));

@@ -18,16 +18,17 @@ export default function ColorPicker({ color, setColor }: ColorPickerProps) {
 
   return (
     <div className="tool-primary">
-      <SpeedDial placement="bottom">
+      <SpeedDial placement="top">
         <SpeedDialHandler>
-          <IconButton size="lg" className="tool-button">
+          <IconButton variant="gradient" className="tool-button">
             <SwatchIcon className="tool-icon" />
           </IconButton>
         </SpeedDialHandler>
-        <SpeedDialContent className="dial-content" >
+        <SpeedDialContent>
           <GithubPicker
             className="w-12 h-24"
             color={color}
+            triangle="hide"
             onChange={(e) => setColor(e.hex)}
             colors={[
               "#000000FF", // black

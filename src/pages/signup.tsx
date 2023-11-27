@@ -57,9 +57,11 @@ export default function SignUp() {
   return (
     <div className="primary">
       <Card color="transparent" shadow={true}>
-        <CardHeader>
-          <Typography variant="h1">Sign Up</Typography>
-          <Typography variant="h2" color="gray">
+        <CardHeader className="p-5">
+          <Typography variant="h4" color="blue-gray">
+            Sign Up
+          </Typography>
+          <Typography color="gray" className="mt-1 font-normal">
             Enter your details to continue to your canvas.
           </Typography>
         </CardHeader>
@@ -76,7 +78,7 @@ export default function SignUp() {
                 name="displayName"
                 size="lg"
                 placeholder="Your Name"
-                className="rounded-full p-3 !border-t-blue-gray-200 focus:!border-t-gray-900"
+                className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
                 labelProps={{
                   className: "before:content-none after:content-none",
                 }}
@@ -89,7 +91,7 @@ export default function SignUp() {
                 name="email"
                 size="lg"
                 placeholder="name@mail.com"
-                className="rounded-full p-3 !border-t-blue-gray-200 focus:!border-t-gray-900"
+                className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
                 labelProps={{
                   className: "before:content-none after:content-none",
                 }}
@@ -103,7 +105,7 @@ export default function SignUp() {
                 type="password"
                 size="lg"
                 placeholder="********"
-                className="rounded-full p-3 !border-t-blue-gray-200 focus:!border-t-gray-900"
+                className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
                 labelProps={{
                   className: "before:content-none after:content-none",
                 }}
@@ -125,21 +127,12 @@ export default function SignUp() {
               />
             </div>
 
-            <Button
-              color="blue"
-              fullWidth
-              className="mt-5 rounded-full border border-black flex text-center items-center justify-start text-black"
-              type="submit"
-              variant="outlined"
-            >
-              <div className="w-5 h-5 ml-10 mt-2 mb-2">
-                <HomeModernIcon/>
-              </div>
-              <div className="w-full flex justify-center">Sign Up</div>
+            <Button className="mt-6" fullWidth type="submit">
+              Sign Up
             </Button>
           </form>
         </CardBody>
-        <CardFooter className="mt-10 p-2 h-fit rounded-xl border-2 border-blue-gray-200">
+        <CardFooter>
           <GoogleButton />
           <Typography color="gray" className="mt-4 text-center font-normal">
             Already have an account?{" "}
