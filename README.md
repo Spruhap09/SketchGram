@@ -19,3 +19,6 @@ https://casesandberg.github.io/react-color/
 
 Material Tailwind:
 https://www.material-tailwind.com/
+
+Firestore:
+https://firebase.google.com/docs/firestore/quickstart

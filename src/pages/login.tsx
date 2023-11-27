@@ -11,8 +11,9 @@ import {
   CardBody,
   CardFooter,
 } from "@material-tailwind/react";
-import SocialSignIn from "@/components/SocialSignIn";
 import { HomeIcon } from "@heroicons/react/24/solid";
+import GoogleButton from "@/components/GoogleButton";
+import Link from "next/link";
 
 export default function Login() {
   const user = useContext(AuthContext);
@@ -92,12 +93,12 @@ export default function Login() {
           </form>
         </CardBody>
         <CardFooter className="mt-10 p-2 rounded-xl border-2 border-blue-gray-200">
-          <SocialSignIn />
+          <GoogleButton />
           <Typography color="gray" className="mt-4 text-center font-normal">
             Don&apos;t have an account?{" "}
-            <a href="/signup" className="font-medium text-gray-900">
+            <Link href="/signup" className="font-medium text-gray-900">
               Sign Up
-            </a>
+            </Link>
           </Typography>
         </CardFooter>
       </Card>

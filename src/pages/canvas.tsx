@@ -14,8 +14,9 @@ export default function CanvasPage() {
 
     return (
         <div className="primary">
-            <div className="w-full h-1/12 flex justify-end">
-            <Button onClick={doSignOut} color="blue-gray" variant="gradient" className="m-5 p-1 w-1/12 h-1/12 rounded-full border-2 border-black">Sign Out</Button>
+            <div className="w-full h-1/12 flex flex-col items-end">
+            <Button onClick={doSignOut} color="blue-gray" variant="gradient" className="m-2 p-1 w-1/12 h-1/12 rounded-full border-2 border-black">Sign Out</Button>
+            <Button onClick={() => router.push('/profile')} color="blue-gray" variant="gradient" className="m-2 p-1 w-1/12 h-1/12 rounded-full border-2 border-black">Profile</Button>
             </div>
             <Canvas/>
 

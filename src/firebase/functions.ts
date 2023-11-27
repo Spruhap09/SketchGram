@@ -13,6 +13,7 @@ import {
   User,
   Auth,
 } from "firebase/auth";
+import { addDoc, collection, getFirestore } from "firebase/firestore";
 
 async function doCreateUserWithEmailAndPassword(
   email: string,
@@ -23,10 +24,24 @@ async function doCreateUserWithEmailAndPassword(
   if (!auth) {
     throw new Error("Auth is not initialized");
   }
+  // Create user
   await createUserWithEmailAndPassword(auth, email, password);
   if(!auth.currentUser)
     throw new Error("User unable to be created");
-    await updateProfile(auth.currentUser, { displayName: displayName });
+
+  // Update user profile
+  await updateProfile(auth.currentUser, { displayName: displayName });
+  
+  // (testing) Add user to databse
+  try {
+    const db = getFirestore();
+    const docRef = await addDoc(collection(db, "users"), {displayName, email, uid: auth.currentUser.uid});
+    console.log("Document written with ID: ", docRef.id)
+    console.log("docRef", docRef, typeof docRef)
+  } catch (e) {
+    console.error("Error adding document: ", e);
+    throw e;
+  }
 }
 
 async function doChangePassword(
@@ -51,10 +66,22 @@ async function doSignInWithEmailAndPassword(email: string, password: string) {
   await signInWithEmailAndPassword(auth, email, password);
 }
 
-async function doSocialSignIn() {
+async function doGoogleSignIn() {
   let auth: Auth = getAuth();
   let socialProvider = new GoogleAuthProvider();
   await signInWithPopup(auth, socialProvider);
+  if(!auth.currentUser)
+    throw new Error("User unable to be created");
+
+  try {
+    const db = getFirestore();
+    const docRef = await addDoc(collection(db, "users"), {displayName: auth?.currentUser?.displayName, email: auth?.currentUser?.email, uid: auth?.currentUser?.uid});
+    console.log("SSO Document written with ID: ", docRef.id)
+    console.log("docRef", docRef, typeof docRef)
+  } catch (e) {
+    console.error("SSO Error adding document: ", e);
+    throw e;
+  }
 }
 
 async function doPasswordReset(email: string) {
@@ -69,7 +96,7 @@ async function doSignOut() {
 
 export {
   doCreateUserWithEmailAndPassword,
-  doSocialSignIn,
+  doGoogleSignIn,
   doSignInWithEmailAndPassword,
   doPasswordReset,
   doSignOut,

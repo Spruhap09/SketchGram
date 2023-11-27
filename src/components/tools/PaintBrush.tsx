@@ -27,7 +27,6 @@ export default function PaintBrush({ value, setValue }: PaintBrushProps) {
             size="md"
             defaultValue={value}
             onChange={(e) => {
-              console.log("targetE", e.target);
               setValue(parseInt(e.target.value));
             }}
             min={5}

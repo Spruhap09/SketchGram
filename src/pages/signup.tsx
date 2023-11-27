@@ -1,4 +1,4 @@
-import SocialSignIn from "@/components/SocialSignIn";
+import GoogleButton from "@/components/GoogleButton";
 import { AuthContext } from "@/context/AuthContext";
 import { doCreateUserWithEmailAndPassword } from "@/firebase/functions";
 import { HomeModernIcon } from "@heroicons/react/24/solid";
@@ -12,6 +12,7 @@ import {
   CardBody,
   CardFooter,
 } from "@material-tailwind/react";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useContext, useState } from "react";
 
@@ -139,12 +140,12 @@ export default function SignUp() {
           </form>
         </CardBody>
         <CardFooter className="mt-10 p-2 h-fit rounded-xl border-2 border-blue-gray-200">
-          <SocialSignIn />
+          <GoogleButton />
           <Typography color="gray" className="mt-4 text-center font-normal">
             Already have an account?{" "}
-            <a href="/login" className="font-medium text-gray-900">
+            <Link href="/login" className="font-medium text-gray-900">
               Log In
-            </a>
+            </Link>
           </Typography>
         </CardFooter>
       </Card>

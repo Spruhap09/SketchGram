@@ -1,13 +1,18 @@
 import { Button } from "@material-tailwind/react";
+import { doGoogleSignIn } from "@/firebase/functions";
 
-interface GoogleButtonProps {
-  onClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
+export default function GoogleButton() {
+
+  const signOn = async () => {
+    try {
+        await doGoogleSignIn();
+    } catch (error) {
+        alert(error);
+    }
 }
-
-export default function GoogleButton({ onClick }: GoogleButtonProps) {
   return (
     <Button
-      onClick={onClick}
+      onClick={signOn}
       fullWidth
       className="p-5 h-1/6 rounded-full border border-black flex text-center items-center justify-start text-black"
     >
