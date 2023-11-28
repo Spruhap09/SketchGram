@@ -1,6 +1,7 @@
 import GoogleButton from "@/components/GoogleButton";
+import Layout from "@/components/Layout";
 import { AuthContext } from "@/context/AuthContext";
-import { doCreateUserWithEmailAndPassword } from "@/firebase/functions";
+import { signUpWithEmailAndPassword } from "@/firebase/functions";
 import { HomeModernIcon } from "@heroicons/react/24/solid";
 import {
   Card,
@@ -21,9 +22,13 @@ export default function SignUp() {
   const [pwMatch, setPwMatch] = useState("");
   const router = useRouter();
 
+  // Redirect to canvas if user is logged in
+  if (user) router.push("/canvas");
+
   // Triggered on form submission
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Extract form data
     const form = e.target as HTMLFormElement;
     const displayName = form.elements.namedItem(
       "displayName"
@@ -34,13 +39,15 @@ export default function SignUp() {
       "passwordConfirmation"
     ) as HTMLInputElement;
 
+    // Check if passwords match
     if (password.value !== passwordConfirmation.value) {
       setPwMatch("Passwords do not match");
       return false;
     }
 
+    // Sign up
     try {
-      await doCreateUserWithEmailAndPassword(
+      await signUpWithEmailAndPassword(
         email.value,
         password.value,
         displayName.value
@@ -51,12 +58,11 @@ export default function SignUp() {
     }
   };
 
-  // Redirect to canvas if user is logged in
-  if (user) router.push("/canvas");
+
 
   return (
-    <div className="primary">
-      <Card color="transparent" shadow={true}>
+    <Layout>
+      <Card color="transparent" shadow={true} className="p-20">
         <CardHeader className="p-5">
           <Typography variant="h4" color="blue-gray">
             Sign Up
@@ -100,6 +106,7 @@ export default function SignUp() {
               <Typography variant="h6" color="blue-gray" className="-mb-3">
                 Password
               </Typography>
+              {pwMatch.length > 0 && <Typography color="red">{pwMatch}</Typography>}
               <Input
                 name="password"
                 type="password"
@@ -142,6 +149,6 @@ export default function SignUp() {
           </Typography>
         </CardFooter>
       </Card>
-    </div>
+    </Layout>
   );
 }

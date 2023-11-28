@@ -41,6 +41,21 @@ export default function useCanvas(
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   };
 
+  const download = () => {
+    // Get the canvas context
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    ctx.save()
+
+    // Fill all contents with selected color
+    const link = document.createElement("a");
+    link.download = "canvas.png";
+    link.href = canvas.toDataURL();
+    link.click();
+  }
+
   // 
   useEffect(() => {
     // Mouse move event listeners
@@ -86,5 +101,5 @@ export default function useCanvas(
     return cleanup;
   }, [onDraw, mouseDown]);
 
-  return { canvasRef, onMouseDown, clear, fill };
+  return { canvasRef, onMouseDown, clear, fill, download };
 }

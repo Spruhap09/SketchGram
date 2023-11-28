@@ -13,92 +13,134 @@ import {
   User,
   Auth,
 } from "firebase/auth";
-import { addDoc, collection, getFirestore } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getFirestore,
+  doc,
+  query,
+  where,
+  getDocs,
+  getDoc,
+} from "firebase/firestore";
 
-async function doCreateUserWithEmailAndPassword(
+// Create user with email and password
+// Called from signup page
+async function signUpWithEmailAndPassword(
   email: string,
   password: string,
   displayName: string
 ) {
-  const auth: Auth = getAuth();
+  const auth = getAuth();
   if (!auth) {
     throw new Error("Auth is not initialized");
   }
   // Create user
   await createUserWithEmailAndPassword(auth, email, password);
-  if(!auth.currentUser)
-    throw new Error("User unable to be created");
+  if (!auth.currentUser) throw new Error("User unable to be created");
 
   // Update user profile
   await updateProfile(auth.currentUser, { displayName: displayName });
-  
-  // (testing) Add user to databse
+
+  // Add user to databse
   try {
     const db = getFirestore();
-    const docRef = await addDoc(collection(db, "users"), {displayName, email, uid: auth.currentUser.uid});
-    console.log("Document written with ID: ", docRef.id)
-    console.log("docRef", docRef, typeof docRef)
+    const docRef = await addDoc(collection(db, "users"), {
+      uid: auth.currentUser.uid,
+      displayName,
+      email,
+      followers: [],
+      following: [],
+      posts: []
+    });
   } catch (e) {
     console.error("Error adding document: ", e);
     throw e;
   }
 }
 
-async function doChangePassword(
+// Change user password
+// Not implemented anywhere yet
+async function changePassword(
   email: string,
   oldPassword: string,
   newPassword: string
 ) {
-  const auth: Auth = getAuth();
-  if (!auth || !auth.currentUser) {
+  const auth = getAuth();
+  if (!auth) 
     throw new Error("Auth is not initialized");
-  }
+  if(!auth.currentUser)
+    throw new Error("No user is logged in");
+
   let credential = EmailAuthProvider.credential(email, oldPassword);
-  console.log(credential);
   await reauthenticateWithCredential(auth.currentUser, credential);
 
   await updatePassword(auth.currentUser, newPassword);
-  await doSignOut();
+  await logOutUser();
 }
 
-async function doSignInWithEmailAndPassword(email: string, password: string) {
-  let auth: Auth = getAuth();
+// Sign in with email and password
+// Called from login page
+async function logInWithEmailAndPassword(email: string, password: string) {
+  let auth = getAuth();
   await signInWithEmailAndPassword(auth, email, password);
 }
 
+// Sign-up/Log-in with Google
+// Called from login/signup page
 async function doGoogleSignIn() {
-  let auth: Auth = getAuth();
-  let socialProvider = new GoogleAuthProvider();
-  await signInWithPopup(auth, socialProvider);
-  if(!auth.currentUser)
-    throw new Error("User unable to be created");
+  let auth = getAuth();
+  let googleProvider = new GoogleAuthProvider();
+  await signInWithPopup(auth, googleProvider);
+  if (!auth.currentUser) throw new Error("User unable to be created");
 
   try {
     const db = getFirestore();
-    const docRef = await addDoc(collection(db, "users"), {displayName: auth?.currentUser?.displayName, email: auth?.currentUser?.email, uid: auth?.currentUser?.uid});
-    console.log("SSO Document written with ID: ", docRef.id)
-    console.log("docRef", docRef, typeof docRef)
+    // Check if user already exists in database (logging in)
+    const usersRef = collection(db, "users");
+    const q = query(usersRef, where("email", "==", auth.currentUser.email));
+    const querySnapshot = await getDocs(q);
+
+    // If user exists don't add to database
+    if (!querySnapshot.empty) {
+      console.log("User already exists in database");
+      await updateProfile(auth.currentUser, querySnapshot.docs[0].data());
+    }
+    // User doesn't exist so add to database (signing up)
+    else {
+      console.log("Creating user in database");
+      const insert = await addDoc(usersRef, {
+        displayName: auth.currentUser.displayName,
+        email: auth.currentUser.email,
+        uid: auth.currentUser.uid,
+      });
+
+    }
   } catch (e) {
-    console.error("SSO Error adding document: ", e);
+    console.error("Error adding document: ", e);
     throw e;
   }
 }
 
-async function doPasswordReset(email: string) {
+// Reset user password
+// Not implemented anywhere yet
+async function resetPassword(email: string) {
   let auth: Auth = getAuth();
   await sendPasswordResetEmail(auth, email);
 }
 
-async function doSignOut() {
+// Sign out user
+// Called from canvas page
+async function logOutUser() {
   let auth: Auth = getAuth();
   await signOut(auth);
 }
 
 export {
-  doCreateUserWithEmailAndPassword,
+  signUpWithEmailAndPassword,
   doGoogleSignIn,
-  doSignInWithEmailAndPassword,
-  doPasswordReset,
-  doSignOut,
-  doChangePassword,
+  logInWithEmailAndPassword,
+  resetPassword,
+  logOutUser,
+  changePassword,
 };

@@ -1,19 +1,21 @@
+import Layout from "@/components/Layout";
 import { AuthContext } from "@/context/AuthContext";
-import { Button, Typography } from "@material-tailwind/react";
+import { Avatar, Button, Typography } from "@material-tailwind/react";
 import { useRouter } from "next/router";
 import { useContext } from "react";
 
 export default function Profile() {
     const user = useContext(AuthContext);
+    console.log('pu', user)
     const router = useRouter();
-    console.log('user', user)
+    if(!user) router.push('/login');
 
     return (
-        <div className="primary">
-            <Typography variant="h1" prefix="Hello" className="underline"> Profile </Typography>
-            <Typography variant="h2" className=""> {user?.displayName} </Typography>
-            <Typography variant="h3" className=""> {user?.email} </Typography>
+        <Layout>
+            <Avatar src={user?.photoURL || ""} alt="avatar" size="xxl"/>
+            <Typography variant="h2" className="">{user?.displayName} </Typography>
+            <Typography variant="h3" className="">{user?.email} </Typography>
             <Button color="blue-gray" variant="gradient" onClick={() => router.push('/canvas')}>Back to Canvas</Button>
-        </div>
+        </Layout>
     )
 }

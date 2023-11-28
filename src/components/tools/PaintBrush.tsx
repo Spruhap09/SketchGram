@@ -21,14 +21,16 @@ export default function PaintBrush({ value, setValue }: PaintBrushProps) {
             <PaintBrushIcon className="tool-icon" />
           </IconButton>
         </SpeedDialHandler>
-        <SpeedDialContent >
+        <SpeedDialContent>
           <Slider
-            defaultValue={value}
-            onChange={(e) => {
-              setValue(parseInt(e.target.value));
-            }}
             min={5}
-            max={50}
+            max={100}
+            value={value}
+            defaultValue={value}
+            onChange={(e) => 
+              setValue(parseInt(e.target.value))
+            }
+            size="lg"
           />
         </SpeedDialContent>
       </SpeedDial>

@@ -1,6 +1,6 @@
 import { useContext } from "react";
 import { AuthContext } from "@/context/AuthContext";
-import { doSignInWithEmailAndPassword } from "@/firebase/functions";
+import { logInWithEmailAndPassword } from "@/firebase/functions";
 import { useRouter } from "next/router";
 import {
   Card,
@@ -14,29 +14,34 @@ import {
 import { HomeIcon } from "@heroicons/react/24/solid";
 import GoogleButton from "@/components/GoogleButton";
 import Link from "next/link";
+import Layout from "@/components/Layout";
 
 export default function Login() {
   const user = useContext(AuthContext);
   const router = useRouter();
 
+  // Called on form submission
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    // Extract form data
     const form = e.target as HTMLFormElement;
     const email = form.elements.namedItem("email") as HTMLInputElement;
     const password = form.elements.namedItem("password") as HTMLInputElement;
 
+    // Log in
     try {
-      await doSignInWithEmailAndPassword(email.value, password.value);
+      await logInWithEmailAndPassword(email.value, password.value);
     } catch (error) {
       alert(error);
     }
   };
 
+  // Redirect to canvas if user is logged in
   if (user) router.push("/canvas");
 
   return (
-    <div className="primary">
-      <Card color="transparent" shadow={false}>
+    <Layout >
+      <Card color="transparent" shadow={false} className="p-20">
         <CardHeader className="p-5">
           <Typography variant="h4" color="blue-gray">
             Log In
@@ -95,6 +100,6 @@ export default function Login() {
           </Typography>
         </CardFooter>
       </Card>
-    </div>
+    </Layout>
   );
 }

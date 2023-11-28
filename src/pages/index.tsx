@@ -1,24 +1,19 @@
-import Canvas from "@/components/Canvas";
-import { Button, IconButton, Typography } from "@material-tailwind/react";
+import { Button, Typography } from "@material-tailwind/react";
 import Link from "next/link";
-import { ArrowRightIcon } from "@heroicons/react/24/solid";
+import Layout from "@/components/Layout";
+import { useRouter } from "next/router";
 
 export default function Home() {
+  const router = useRouter();
   return (
-    <div className="primary">
+    <Layout>
       <Typography variant="h1">Landing Page</Typography>
-      <Button color="blue-gray" variant="gradient" className="m-5">
-        <Link href="/login">
-          <ArrowRightIcon />
-          <Typography>Log In</Typography>
-        </Link>
+      <Button className="m-5" onClick={() => router.push("/login")}>
+        Log In
       </Button>
-      <Button color="blue-gray" variant="gradient" className="m-5">
-        <Link href="/signup">
-          <ArrowRightIcon />
-          <Typography>Sign Up</Typography>
-        </Link>
+      <Button className="m-5" onClick={() => router.push("/signup")}>
+        Sign Up
       </Button>
-    </div>
+    </Layout>
   );
 }

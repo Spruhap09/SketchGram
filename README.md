@@ -22,3 +22,10 @@ https://www.material-tailwind.com/
 
 Firestore:
 https://firebase.google.com/docs/firestore/quickstart
+
+can probably use this function for the drafts:
+https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/save
+
+and these ones for uploading images to bucket (uploadBytes):
+https://firebase.google.com/docs/storage/web/upload-files
+https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob
