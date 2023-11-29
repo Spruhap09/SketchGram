@@ -40,6 +40,7 @@ export default function Canvas() {
         ref={canvasRef}
         width={750}
         height={750}
+        id="canvas"
         className="border-4 border-blue-gray-800 rounded-3xl"
       ></canvas>
       <div className="w-15 h-1/2 m-2 flex flex-col justify-center items-center rounded-full border-4 border-blue-gray-800 ">

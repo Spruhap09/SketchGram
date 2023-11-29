@@ -58,8 +58,6 @@ export default function SignUp() {
     }
   };
 
-
-
   return (
     <Layout>
       <Card color="transparent" shadow={true} className="p-20">

@@ -4,7 +4,7 @@
 
 @layer components {
   .primary {
-    @apply w-screen h-screen flex flex-col justify-center items-center;
+    @apply w-screen h-screen m-0 p-20 flex flex-col justify-center items-center overflow-scroll;
   }
   .tool-primary {
     @apply w-full h-auto flex flex-col justify-center items-center m-3;

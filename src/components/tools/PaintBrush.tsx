@@ -26,7 +26,6 @@ export default function PaintBrush({ value, setValue }: PaintBrushProps) {
             min={5}
             max={100}
             value={value}
-            defaultValue={value}
             onChange={(e) => 
               setValue(parseInt(e.target.value))
             }
