@@ -42,9 +42,10 @@ export default function PostButton() {
         <form onSubmit={handlePost} className="flex flex-col justify-center">
           <Input
             name="description"
-            label="Description"
+            label="Title"
             crossOrigin="use-credentials"
             className="p-2"
+            autoComplete="off"
           />
           <Button type="submit" className="m-2">
             Post
