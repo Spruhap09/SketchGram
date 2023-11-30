@@ -55,6 +55,7 @@ export default function SignUp() {
     } catch (error) {
       console.log(error, typeof error, "error");
       alert(error);
+      return
     }
   };
 
