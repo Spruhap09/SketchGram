@@ -122,7 +122,7 @@ async function changePassword(
     const auth = getAuth();
     if (!auth) throw "Auth is not initialized";
     if (!auth.currentUser) throw "No user is logged in";
-  
+
     // Reauthenticate user
     let credential = EmailAuthProvider.credential(email, oldPassword);
     await reauthenticateWithCredential(auth.currentUser, credential);
@@ -576,6 +576,39 @@ async function getBytesFromUrl(url: string) {
   }
 }
 
+async function getUserStats(uid: string){
+  try{
+    // Get Firebase Firestore
+    const db = getFirestore();
+    if(!db) throw "Database is null";
+
+    // Find user in database
+    const q = query(collection(db, "users"), where("uid", "==", uid));
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) throw "User does not exist in database";
+    const userRef = doc(db, "users", querySnapshot.docs[0].id);
+
+    // Get user's stat details
+    const docSnapshot = await getDoc(userRef);
+
+    const drafts = docSnapshot.data()?.drafts
+    const followers = docSnapshot.data()?.followers
+    const following = docSnapshot.data()?.following
+    const posts = docSnapshot.data()?.posts
+    const data = {
+      drafts: drafts,
+      followers: followers,
+      following: following,
+      posts: posts,
+    }
+    return data;
+  }
+  catch(e) {
+    console.error("Error getting user drafts: ", e);
+    throw e;
+  }
+}
+
 export {
   signUpWithEmailAndPassword,
   doGoogleSignIn,
@@ -593,5 +626,6 @@ export {
   saveDraft,
   getUserDrafts,
   getBytesFromUrl,
-  deleteDraft
+  deleteDraft, 
+  getUserStats,
 };
