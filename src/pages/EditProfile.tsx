@@ -1,28 +1,27 @@
-import Layout from "@/components/Layout";
-import UserPosts from "@/components/UserPosts";
 import { AuthContext } from "@/context/AuthContext";
-import { updateDisplayName } from "@/firebase/functions";
-import { FaceFrownIcon } from "@heroicons/react/24/outline";
+import { changePassword, updateDisplayName } from "@/firebase/functions";
 import { Avatar, Button, Input, Typography } from "@material-tailwind/react";
 import { useRouter } from "next/router";
-import { useContext, useEffect, useState } from "react";
-import {useNavigate} from 'react-router-dom';
+import { useContext, useState } from "react";
+
 
 export default function EditProfile (){
     const user = useContext(AuthContext);
     const [editName, setEditName] = useState(false);
     const [editPassword, setEditPassword] = useState(false);
     const [displayName, setDisplayName] = useState(user?.displayName || '');
+    const [oldPassword, setOldPassword] = useState('');
+    const [newPassword, setNewPassword] = useState('');
+    const router = useRouter();
+    if(!user) router.push('/login');
     
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
-        if(editName){
-            const form = e.target as HTMLFormElement;
-            const displayName = form.elements.namedItem("displayName") as HTMLInputElement;
+        const form = e.target as HTMLFormElement;
+        if(editName){ 
             try{
-
-                await updateDisplayName(displayName.value)
+                await updateDisplayName(displayName)
                 setEditName(false)          
             }
             catch(error){
@@ -30,20 +29,34 @@ export default function EditProfile (){
             }
         }
         else if (editPassword){
-            
-            setEditPassword(false)
-        }
         
+            const email = form.elements.namedItem("email") as HTMLInputElement;
+            try{
+                await updateDisplayName(displayName)
+                await changePassword(email.value, oldPassword, newPassword)
+                setEditPassword(false)
+            }
+            catch(error){
+                alert(error)
+            }     
+        }
     }
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setDisplayName(e.target.value)
     }
 
+    const handleOldPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setOldPassword(e.target.value)
+    }
+    const handleNewPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setNewPassword(e.target.value)
+    }
+
     if(editName){
         return(
             <div className="flex-grow box-border w-32 p-4 border-4 mr-4 rounded-lg flex flex-col items-center justify-center">
-                <Avatar className="my-2"src={user?.photoURL || ""} alt="avatar" size="xxl"/>
+                <Avatar className="my-2" src={user?.photoURL || ""} alt="avatar" size="xxl"/>
                 <form onSubmit={handleSubmit}>
                     <Typography variant="h6" color="blue-gray" className="my-2">Your Name</Typography>
                     <Input
@@ -81,7 +94,8 @@ export default function EditProfile (){
                     <Input
                         name="displayName" 
                         size="lg"
-                        value={user?.displayName || ''}
+                        value={displayName || ''}
+                        onChange={handleNameChange}
                         crossOrigin="anonymous"
                         className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
                         labelProps={{
@@ -100,7 +114,9 @@ export default function EditProfile (){
                     <Typography variant="h6" color="blue-gray" className="my-2">Old Password</Typography>
                     <Input
                         name="oldPassword" 
+                        type="password"
                         size="lg"
+                        onChange={handleOldPasswordChange}
                         placeholder="************"
                         crossOrigin="anonymous"
                         className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
@@ -110,7 +126,9 @@ export default function EditProfile (){
                     <Typography variant="h6" color="blue-gray" className="my-2">New Password</Typography>
                     <Input
                         name="newPassword" 
+                        type="password"
                         size="lg"
+                        onChange={handleNewPasswordChange}
                         placeholder="************"
                         crossOrigin="anonymous"
                         className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
