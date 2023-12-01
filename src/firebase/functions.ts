@@ -67,6 +67,49 @@ async function signUpWithEmailAndPassword(
   }
 }
 
+async function updateDisplayName(newDisplayName: string){
+  
+  try{
+    const auth = getAuth();
+    if (!auth){
+      throw "Auth is not initialized";
+    }
+    if (!auth.currentUser) {
+      throw "No user is logged in";
+    }
+
+    // Get Firebase Firestore
+    const db = getFirestore();
+
+    //get the user collection reference
+    const usersCollectionRef = collection(db, "users"); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference
+
+    // Check if user already exists in database 
+    const q = query(usersCollectionRef, where("uid", "==", auth.currentUser.uid));
+    const querySnapshot = await getDocs(q); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.QuerySnapshot
+    
+    // If user exists then update the details
+    if (!querySnapshot.empty) {
+
+      const userDocRef = querySnapshot.docs[0].ref;
+      //update the profile for auth
+      await updateProfile(auth.currentUser, { displayName: newDisplayName });
+      //update the db for the collection
+      await updateDoc (userDocRef, {displayName: newDisplayName});
+
+    }
+    else {
+      throw "This user does not exist";
+    }
+    
+  }
+  catch(e){
+    console.error("Error updating the display name: ", e);
+    throw e;
+  }
+
+}
+
 // Change user password
 // Not implemented anywhere yet
 async function changePassword(
@@ -216,7 +259,7 @@ async function postCanvasToProfile(
           if (querySnapshot.empty)
             throw "User does not exist in database";
           const userRef = doc(db, "users", querySnapshot.docs[0].id);
-  
+
           // Add post to user's posts array
           await updateDoc(userRef, {
             posts: arrayUnion(postRef.id),
@@ -544,6 +587,7 @@ export {
   getUserPosts,
   getPost,
   getImageFromUrl,
+  updateDisplayName,
   deletePost,
   getDraftUrl,
   saveDraft,
