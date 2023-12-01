@@ -52,9 +52,9 @@ export default function SignUp() {
         password.value,
         displayName.value
       );
-    } catch (error) {
-      console.log(error, typeof error, "error");
-      alert(error);
+    } catch (e) {
+      console.log('Error signing up:', e);
+      alert(e);
     }
   };
 
