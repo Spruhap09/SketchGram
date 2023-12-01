@@ -7,6 +7,7 @@ import { Button } from "@material-tailwind/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useContext } from "react";
+import UserDrafts from "@/components/UserDrafts";
 import PostButton from "@/components/PostButton";
 
 export default function CanvasPage() {
@@ -15,10 +16,13 @@ export default function CanvasPage() {
   return (
     <Layout>
       <Canvas />
-      {user && 
-      <div className="w-full flex justify-end pr-20 pb-20">
-        <PostButton/>
-      </div>}
+      {user && (
+        <>
+          <UserDrafts />
+          
+          <PostButton />
+        </>
+      )}
     </Layout>
   );
 }

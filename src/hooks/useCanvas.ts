@@ -6,8 +6,8 @@ import { useEffect, useRef, useState } from "react";
 // Takes in a function onDraw used for drawing lines to canvas
 // Takes in a string that is a hex value representing a color
 export default function useCanvas(
-  onDraw: ({ context, currentPoint, prevPoint }: Draw) => void,
-  color: string
+  onDraw?: ({ context, currentPoint, prevPoint }: Draw) => void,
+  color?: string
 ) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const prevPoint = useRef<null | Point>(null);
@@ -34,7 +34,7 @@ export default function useCanvas(
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    if (!ctx || !color) return;
 
     // Fill all contents with selected color
     ctx.fillStyle = color;
@@ -56,16 +56,16 @@ export default function useCanvas(
     link.click();
   }
 
-  // 
   useEffect(() => {
     // Mouse move event listeners
     const handler = (e: MouseEvent) => {
+      if (!onDraw) return;
       if (!mouseDown) return;
       
       // Get the canvas context
       const currentPoint = computePointOnCanvas(e);
       const context = canvasRef.current?.getContext("2d");
-      if (!context || !currentPoint) return;
+      if (!context || !currentPoint ) return;
 
       onDraw({ context, currentPoint, prevPoint: prevPoint.current });
       prevPoint.current = currentPoint;

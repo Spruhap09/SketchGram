@@ -1,8 +1,10 @@
 # CS-554 Final Project
 
 ## To run
-hmu for firebase config
+Create a config file in the firebase directory (@/firebase/config.ts)
+Place your Firebase config in here which you can get from Firebase Console
 
+Then install node modules and run the web server
 ```
 npm i
 npm run dev
@@ -22,10 +24,3 @@ https://www.material-tailwind.com/
 
 Firestore:
 https://firebase.google.com/docs/firestore/quickstart
-
-can probably use this function for the drafts:
-https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/save
-
-and these ones for uploading images to bucket (uploadBytes):
-https://firebase.google.com/docs/storage/web/upload-files
-https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob

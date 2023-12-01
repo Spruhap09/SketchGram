@@ -23,7 +23,7 @@ export default function UserPosts() {
         <div className="w-full h-full flex flex-row justify-evenly flex-wrap">
             {posts.map((post) => {
                 return (
-                    <Post key={post} id={post}/>
+                    <Post key={post} id={post} setPosts={setPosts}/>
                 )
             })}
         </div>

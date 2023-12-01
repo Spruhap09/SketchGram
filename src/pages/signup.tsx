@@ -52,9 +52,11 @@ export default function SignUp() {
         password.value,
         displayName.value
       );
-    } catch (error) {
+    }
+    catch (error) {
       console.log(error, typeof error, "error");
       alert(error);
+      return
     }
   };
 
