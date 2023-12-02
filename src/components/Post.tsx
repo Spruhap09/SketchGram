@@ -5,22 +5,26 @@ import { DocumentData } from "firebase/firestore";
 import { Button, IconButton } from "@material-tailwind/react";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import { AuthContext } from "@/context/AuthContext";
+import { usePostsContext } from "@/context/PostsContext";
+
 
 
 export default function Post({
   id,
-  setPosts,
 }: {
   id: string;
-  setPosts: Function;
 }) {
+  const { state, dispatch } = usePostsContext();
+
   const [src, setSrc] = useState<string>("");
   const [post, setPost] = useState<DocumentData | undefined>();
   const user = useContext(AuthContext);
   useEffect(() => {
     const getSrc = async () => {
+      console.log("from Post, id = " + id)
       // Get firebase bucket url
       const post = await getPost(id);
+      console.log(post);
 
       // Get displayable url from api
       const res = await fetch(`/api/image?url=${post?.imageURL}`)
@@ -73,8 +77,10 @@ export default function Post({
           className="m-2"
           onClick={async () => {
             const posts = await deletePost(id);
-            setPosts(posts);
-      }}
+            console.log("from delete " + posts);
+            dispatch({ type: "REMOVE_POST", payload: id });
+            console.log(state.posts);
+          }}
         >
           <TrashIcon title="Delete Post" className="w-full h-full p-0 m-0" />
         </IconButton>

@@ -10,7 +10,7 @@ export default function AuthProvider({ children }: { children: React.ReactNode})
     const auth = getAuth();
 
     useEffect(() => {
-        let listener = onAuthStateChanged(auth, (user: User|null) => {
+        let listener = onAuthStateChanged(auth, (user: User|null)=> {
             setUser(user)
             setLoading(false);
         })

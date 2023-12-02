@@ -360,12 +360,12 @@ async function getUserPostsLimit(uid: string, limitValue: number | null = null) 
     const querySnapshot = await getDocs(q);
     if (querySnapshot.empty) throw "No posts exist in database";
     const posts = querySnapshot.docs.map((doc) => {
-      console.log(JSON.stringify(doc));
+      //console.log(JSON.stringify(doc));
       let ret = doc.data();
       ret.post_id = doc.id
       return ret
     });
-    console.log(posts)
+    //console.log(posts)
     if (!posts) throw "User has no posts";
     return posts;
   } catch (error) {
