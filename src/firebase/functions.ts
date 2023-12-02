@@ -331,7 +331,12 @@ async function getUserPosts(uid: string) {
 
     // Get user's posts array
     const docSnapshot = await getDoc(userRef);
-    const posts = docSnapshot.data()?.posts;
+    const posts = querySnapshot.docs.map((doc) => {
+      console.log(JSON.stringify(doc));
+      let ret = doc.data();
+      ret.post_id = doc.id
+      return ret
+    });
     if (!posts) throw "User has no posts";
     return posts;
 
