@@ -1,9 +1,11 @@
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { getPost, deletePost } from "@/firebase/functions";
 import { DocumentData } from "firebase/firestore";
 import { IconButton } from "@material-tailwind/react";
 import { TrashIcon } from "@heroicons/react/20/solid";
+import { AuthContext } from "@/context/AuthContext";
+
 
 export default function Post({
   id,
@@ -14,7 +16,7 @@ export default function Post({
 }) {
   const [src, setSrc] = useState<string>("");
   const [post, setPost] = useState<DocumentData | undefined>();
-
+  const user = useContext(AuthContext);
   useEffect(() => {
     const getSrc = async () => {
       // Get firebase bucket url
@@ -26,6 +28,8 @@ export default function Post({
 
       // Set state
       setPost(post);
+      console.log('here is the post')
+      console.log(post)
       setSrc(imageUrl);
     };
     getSrc();
