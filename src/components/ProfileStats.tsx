@@ -1,7 +1,6 @@
 import { AuthContext } from "@/context/AuthContext";
-import { changePassword, getUserStats, updateDisplayName } from "@/firebase/functions";
-import { Avatar, Button, Input, Typography } from "@material-tailwind/react";
-import { useRouter } from "next/router";
+import { getUserStats } from "@/firebase/functions";
+import { Typography } from "@material-tailwind/react";
 import { useContext, useEffect, useState } from "react";
 
 export default function ProfileStats () {
