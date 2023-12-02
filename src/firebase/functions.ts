@@ -25,6 +25,7 @@ import {
   getDoc,
   arrayUnion,
   updateDoc,
+  limit,
   deleteDoc,
 } from "firebase/firestore";
 import { ref, getStorage, uploadBytes, getDownloadURL, deleteObject, getBytes, getBlob } from "firebase/storage";
@@ -330,7 +331,12 @@ async function getUserPosts(uid: string) {
 
     // Get user's posts array
     const docSnapshot = await getDoc(userRef);
-    const posts = docSnapshot.data()?.posts;
+    const posts = querySnapshot.docs.map((doc) => {
+      console.log(JSON.stringify(doc));
+      let ret = doc.data();
+      ret.post_id = doc.id
+      return ret
+    });
     if (!posts) throw "User has no posts";
     return posts;
 
@@ -340,19 +346,47 @@ async function getUserPosts(uid: string) {
   }
 }
 
+//getUserPosts iwth limit option
+async function getUserPostsLimit(uid: string, limitValue: number) {
+  try {
+    const db = getFirestore();
+    if (!db) throw "Database is null";
+
+    // Find posts in database
+    const q = query(collection(db, "posts"), where("userid", "==", uid), limit(limitValue));
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) throw "User does not exist in database";
+    const posts = querySnapshot.docs.map((doc) => {
+      console.log(JSON.stringify(doc));
+      let ret = doc.data();
+      ret.post_id = doc.id
+      return ret
+    });
+    if (!posts) throw "User has no posts";
+    return posts;
+  } catch (error) {
+    console.error("Error getting user posts:", error);
+    throw error;
+  }
+}
+
+
 // Get post from database
 // Called from post component
 async function getPost(postId: string) {
-  try{
+  try {
     // Get Firebase Firestore
     const db = getFirestore();
     if (!db) throw "Database is null";
-  
+
     // Get post from database
     const postRef = doc(db, "posts", postId);
     const post = await getDoc(postRef);
     if (!post || !post.data()) throw "Post does not exist in database";
-    return post.data();
+    const ret = post.data();
+    if (!ret) throw "Post data is undefined";
+    ret.post_id = postId;
+    return ret;
   }
   catch(e) {
     console.error("Error getting post: ", e);
@@ -618,6 +652,7 @@ export {
   changePassword,
   postCanvasToProfile,
   getUserPosts,
+  getUserPostsLimit,
   getPost,
   getImageFromUrl,
   updateDisplayName,

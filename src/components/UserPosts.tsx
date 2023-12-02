@@ -11,7 +11,8 @@ export default function UserPosts() {
     useEffect(() => {
         const getPosts = async () => {
             if(user){
-                const posts = await getUserPosts(user.uid);
+                const postsData = await getUserPosts(user.uid);
+                const posts = postsData.map((post) => post.toString());
                 setPosts(posts);
             }
         }
