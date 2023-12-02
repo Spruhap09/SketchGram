@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
-import { getPost, deletePost } from "@/firebase/functions";
+import { getPost, deletePost, updatePostLikes, updatePostUnLikes } from "@/firebase/functions";
 import { DocumentData } from "firebase/firestore";
-import { IconButton } from "@material-tailwind/react";
+import { Button, IconButton } from "@material-tailwind/react";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import { AuthContext } from "@/context/AuthContext";
 import { usePostsContext } from "@/context/PostsContext";
@@ -32,12 +32,22 @@ export default function Post({
 
       // Set state
       setPost(post);
-      console.log('here is the post')
-      console.log(post)
       setSrc(imageUrl);
     };
     getSrc();
-  }, [id]);
+  }, [id, user]);
+
+  const handleLike = async () => {
+    if (user){
+      await updatePostLikes (post?.post_id, post?.userid, user?.uid)
+    }
+  }
+
+  const handleUnLike = async () => {
+    if (user){
+      await updatePostUnLikes (post?.post_id, post?.userid, user?.uid)
+    }
+  }
 
   return (
     <div className="w-fit h-fit m-5 p-5 flex flex-col justify-center items-center border-blue-gray-500 rounded-md border-2">
@@ -53,6 +63,14 @@ export default function Post({
         <div>loading</div>
       )}
       {post?.description && <div>{post.description}</div>}
+      {(post?.likes ? 
+        <div>{`Total Number of Likes: ${post?.likes.length}`}</div> 
+        : <div>{`Total Number of Likes: 0`}</div>)}
+
+      {(post?.userid !== user?.uid) && (!post?.likes.includes(user?.uid) 
+      ? <Button className="mt-6" fullWidth type="submit" onClick={handleLike}>Like Me!</Button> :
+      <Button className="mt-6" fullWidth type="submit" onClick={handleUnLike}>Unlike Me</Button>)}
+      {(post?.userid !== user?.uid) && <div>Me Commenty</div>}
       {post && (
         <IconButton
           variant="outlined"

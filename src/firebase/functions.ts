@@ -647,6 +647,80 @@ async function getUserStats(uid: string){
   }
 }
 
+async function updatePostLikes(postId: string, userUid: string, likerUid: string){
+  try{
+    // Get Firebase Firestore
+    const db = getFirestore();
+    if(!db) throw "Database is null";
+
+    //get the post id from the database and update it
+    const q = query(collection(db, "posts"), where ("userid", "==", userUid));
+    //this will be all the posts for this user id
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) throw "User does not exist in database";
+
+    //gets the particular doc that matches the post id
+    let postRef;
+    for (let doc of querySnapshot.docs){
+      if (doc.id === postId){
+        postRef = doc
+        break;
+      }
+    }
+    //if present, the reference is updates with a new like
+    if (postRef){
+      const oldLikes = postRef.data()?.likes
+      const newLikes = [...oldLikes, likerUid];
+      await updateDoc(postRef.ref, {likes: newLikes})
+
+    }
+    else{
+      throw 'Post not found'
+    }
+  }
+  catch(e){
+    console.error("Error getting the post for the user: ", e);
+    throw e;
+  }
+}
+
+async function updatePostUnLikes(postId: string, userUid: string, likerUid: string){
+  try{
+    // Get Firebase Firestore
+    const db = getFirestore();
+    if(!db) throw "Database is null";
+
+    //get the post id from the database and update it
+    const q = query(collection(db, "posts"), where ("userid", "==", userUid));
+    //this will be all the posts for this user id
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) throw "User does not exist in database";
+
+    //gets the particular doc that matches the post id
+    let postRef;
+    for (let doc of querySnapshot.docs){
+      if (doc.id === postId){
+        postRef = doc
+        break;
+      }
+    }
+    //if present, the reference is updates with a new like
+    if (postRef){
+      const oldLikes = postRef.data()?.likes
+      const newLikes = oldLikes.filter((myUid: string) => myUid !== likerUid);
+      await updateDoc(postRef.ref, {likes: newLikes})
+
+    }
+    else{
+      throw 'Post not found'
+    }
+  }
+  catch(e){
+    console.error("Error getting the post for the user: ", e);
+    throw e;
+  }
+}
+
 export {
   signUpWithEmailAndPassword,
   doGoogleSignIn,
@@ -667,4 +741,6 @@ export {
   getBytesFromUrl,
   deleteDraft, 
   getUserStats,
+  updatePostLikes, 
+  updatePostUnLikes
 };
