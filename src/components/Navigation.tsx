@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { PencilSquareIcon, RectangleStackIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, PencilSquareIcon, RectangleStackIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import {
   Navbar,
   Typography,
@@ -34,6 +34,9 @@ export default function Navigation() {
         <div className="ml-auto flex gap-1 md:mr-4">
           <IconButton title="Feed" variant="text" color="white" onClick={() => router.push('/feed')}>
             <RectangleStackIcon className="h-4 w-4" />
+          </IconButton>
+          <IconButton title="Search" variant="text" color="white" onClick={() => router.push('/search')}>
+            <MagnifyingGlassIcon className="h-4 w-4" />
           </IconButton>
           <IconButton title="Profile" variant="text" color="white" onClick={() => router.push('/profile')}>
             <UserCircleIcon className="h-4 w-4" />

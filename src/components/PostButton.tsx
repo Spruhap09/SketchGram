@@ -19,7 +19,9 @@ export default function PostButton() {
 
     // Extract the form data
     const form = e.target as HTMLFormElement;
-    const description = form.elements.namedItem("description") as HTMLInputElement;
+    const description = form.elements.namedItem(
+      "description"
+    ) as HTMLInputElement;
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
     if (!canvas) throw "Canvas is null";
     if (!description || !description.value) throw "Description is null";
@@ -28,30 +30,32 @@ export default function PostButton() {
     await postCanvasToProfile(canvas, description.value);
 
     // Send user to profile page to see new post
-    router.push("profile");
+    router.push("/profile");
   };
 
   return (
-    <SpeedDial placement="top">
-      <SpeedDialHandler>
-        <IconButton size="lg" className="rounded-full">
-          <PlusIcon className="h-5 w-5 transition-transform group-hover:rotate-45" />
-        </IconButton>
-      </SpeedDialHandler>
-      <SpeedDialContent>
-        <form onSubmit={handlePost} className="flex flex-col justify-center">
-          <Input
-            name="description"
-            label="Title"
-            crossOrigin="use-credentials"
-            className="p-2"
-            autoComplete="off"
-          />
-          <Button type="submit" className="m-2">
-            Post
-          </Button>
-        </form>
-      </SpeedDialContent>
-    </SpeedDial>
+    <div className="w-full flex flex-col items-end ">
+      <SpeedDial placement="top">
+        <SpeedDialHandler>
+          <IconButton size="lg" className="rounded-full">
+            <PlusIcon className="h-5 w-5 transition-transform group-hover:rotate-45" />
+          </IconButton>
+        </SpeedDialHandler>
+        <SpeedDialContent className="bg-white rounded-full">
+          <form onSubmit={handlePost} className="flex flex-col justify-center">
+            <Input
+              name="description"
+              label="Title"
+              crossOrigin="use-credentials"
+              className="p-2"
+              autoComplete="off"
+            />
+            <Button type="submit" className="m-2">
+              Post
+            </Button>
+          </form>
+        </SpeedDialContent>
+      </SpeedDial>
+    </div>
   );
 }
