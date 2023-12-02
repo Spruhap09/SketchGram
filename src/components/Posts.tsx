@@ -16,7 +16,7 @@ export default function Posts(){
         const getPosts = async () => {
                 if(user){
                     const userPosts = await getUserPostsLimit(user.uid, 50);
-                    setPosts(userPosts);
+                    setPosts(userPosts || null);
                 }
             }
             getPosts();

@@ -332,11 +332,12 @@ async function getUserPosts(uid: string) {
     // Get user's posts array
     const docSnapshot = await getDoc(userRef);
     const posts = querySnapshot.docs.map((doc) => {
-      console.log(JSON.stringify(doc));
       let ret = doc.data();
+      console.log(ret)
       ret.post_id = doc.id
       return ret
     });
+    console.log(posts)
     if (!posts) throw "User has no posts";
     return posts;
 
@@ -347,26 +348,29 @@ async function getUserPosts(uid: string) {
 }
 
 //getUserPosts iwth limit option
-async function getUserPostsLimit(uid: string, limitValue: number) {
+async function getUserPostsLimit(uid: string, limitValue: number | null = null) {
   try {
     const db = getFirestore();
     if (!db) throw "Database is null";
 
+    let q;
     // Find posts in database
-    const q = query(collection(db, "posts"), where("userid", "==", uid), limit(limitValue));
+    if (!limitValue) q = query(collection(db, "posts"), where("userid", "==", uid));
+    else q = query(collection(db, "posts"), where("userid", "==", uid), limit(limitValue));
     const querySnapshot = await getDocs(q);
-    if (querySnapshot.empty) throw "User does not exist in database";
+    if (querySnapshot.empty) throw "No posts exist in database";
     const posts = querySnapshot.docs.map((doc) => {
       console.log(JSON.stringify(doc));
       let ret = doc.data();
       ret.post_id = doc.id
       return ret
     });
+    console.log(posts)
     if (!posts) throw "User has no posts";
     return posts;
   } catch (error) {
-    console.error("Error getting user posts:", error);
-    throw error;
+    console.log("Error getting user posts:", error);
+    //throw error;
   }
 }
 
