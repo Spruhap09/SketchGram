@@ -8,8 +8,8 @@ import EditProfile from "../components/EditProfile";
 import ProfileStats from "../components/ProfileStats";
 
 export default function Profile() {
-
-    const user = useState(useContext(AuthContext));
+    // Redirect to login if user is not logged in
+    const user = useContext(AuthContext);
     const router = useRouter();
     if(!user) router.push('/login');
 
