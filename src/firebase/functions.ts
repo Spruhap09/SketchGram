@@ -370,6 +370,7 @@ async function getUserPostsLimit(uid: string, limitValue: number | null = null) 
     return posts;
   } catch (error) {
     console.log("Error getting user posts:", error);
+    return []
     //throw error;
   }
 }

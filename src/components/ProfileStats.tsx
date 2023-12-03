@@ -2,16 +2,14 @@ import { AuthContext } from "@/context/AuthContext";
 import { getUserStats } from "@/firebase/functions";
 import { Typography } from "@material-tailwind/react";
 import { useContext, useEffect, useState } from "react";
-import { usePostsContext } from "@/context/PostsContext";
 
-export default function ProfileStats () {
+export default function ProfileStats ({posts}: { posts: any }) {
     const user = useContext(AuthContext);
     const [following, setFollowing] = useState<string[]>([]);
     const [followers, setFollowers] = useState<string[]>([]);
     const [drafts, setDrafts] = useState<string[]>([]);
 
     
-    const { state, dispatch } = usePostsContext();
 
     useEffect(() => {
         const getStats = async () => {
@@ -31,7 +29,7 @@ export default function ProfileStats () {
             <Typography variant="h5" color="blue-gray" className="my-2">Here are your profile stats!</Typography>
             <Typography className="h6">{`Total Followers: ${followers.length}`}</Typography>
             <Typography className="h6">{`Total Following: ${following.length}`}</Typography>
-            <Typography className="h6">{`Total Posts: ${state.posts.length}`}</Typography>
+            <Typography className="h6">{`Total Posts: ${posts.length}`}</Typography>
             <Typography className="h6">{`Total drafts: ${drafts.length}`}</Typography>
         </div>  
     )
