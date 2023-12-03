@@ -722,6 +722,45 @@ async function updatePostUnLikes(postId: string, userUid: string, likerUid: stri
   }
 }
 
+async function updatePostComments(postId: string, comment: string, userUid: string){
+  //TODO: Do we need to store the post comments as post id, and the comment?
+  try{
+    // Get Firebase Firestore
+    const db = getFirestore();
+    if(!db) throw "Database is null";
+
+    //get the post id from the database and update it
+    const q = query(collection(db, "posts"), where ("userid", "==", userUid));
+    //this will be all the posts for this user id
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) throw "User does not exist in database";
+
+    //gets the particular doc that matches the post id
+    let postRef;
+    for (let doc of querySnapshot.docs){
+      if (doc.id === postId){
+        postRef = doc
+        break;
+      }
+    }
+
+    //if present, the reference is updates with a new like
+    if (postRef){
+      const oldComments = postRef.data()?.comments
+      const newComments = [...oldComments, comment];
+      await updateDoc(postRef.ref, {comments: newComments})
+
+    }
+    else{
+      throw 'Post not found'
+    }
+  }
+  catch(e){
+    console.error("Error getting the post for the user: ", e);
+    throw e;
+  }
+}
+
 export {
   signUpWithEmailAndPassword,
   doGoogleSignIn,
@@ -743,5 +782,6 @@ export {
   deleteDraft, 
   getUserStats,
   updatePostLikes, 
-  updatePostUnLikes
+  updatePostUnLikes,
+  updatePostComments
 };
