@@ -21,6 +21,8 @@ import {
   doc,
   query,
   where,
+  or,
+  orderBy,
   getDocs,
   getDoc,
   arrayUnion,
@@ -721,6 +723,50 @@ async function updatePostUnLikes(postId: string, userUid: string, likerUid: stri
   }
 }
 
+async function searchUsers(searchTerm: string) {
+  try {
+
+    // Get Firebase Firestore
+    const db = getFirestore();
+    if (!db) throw "Database is null";
+
+    const searchArray = searchTerm.split("");
+
+    let users: any = [] // todo figure out proper typescript
+
+    // Find users by display name
+    const nameQ = query(
+      collection(db, "users"),
+      where("displayName", ">=", searchTerm),
+      where("displayName", "<=", searchTerm + "\uf8ff"),
+      orderBy("displayName")
+    );    
+    const nameSnapshot = await getDocs(nameQ);
+    nameSnapshot.forEach((doc) => {
+      users.push(doc.data());
+    });
+
+    // Find users by email
+    const emailQ = query(
+      collection(db, "users"),
+      where("email", ">=", searchTerm),
+      where("email", "<=", searchTerm + "\uf8ff"),
+      orderBy("email")
+    );
+    const emailSnapshot = await getDocs(emailQ);
+    emailSnapshot.forEach((doc) => {
+      if(!users.includes(doc.data()))
+        users.push(doc.data());
+    });
+    
+    return users;
+  }
+  catch (e) {
+    console.error("Error searching for users: ", e);
+    throw e;
+  }
+}
+
 async function updatePostComments(postId: string, comment: string, userUid: string){
   //TODO: Do we need to store the post comments as post id, and the comment?
   try{
@@ -782,5 +828,6 @@ export {
   getUserStats,
   updatePostLikes, 
   updatePostUnLikes,
+  searchUsers,
   updatePostComments
 };

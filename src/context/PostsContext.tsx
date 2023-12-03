@@ -1,5 +1,5 @@
 // postsContext.js
-import React, { createContext, useContext, useReducer } from 'react';
+import React, { ReactNode, createContext, useContext, useReducer } from 'react';
 
 // Initial state for posts
 const initialState = {
@@ -75,7 +75,7 @@ const postsReducer = (state: { posts: any[]; }, action: { type: any; payload: an
 };
 
 // Create a context provider component
-export const PostsProvider = ({ children }) => {
+export const PostsProvider = ({ children }: {children: ReactNode}) => {
   const [state, dispatch] = useReducer(postsReducer, initialState);
 
   return (
