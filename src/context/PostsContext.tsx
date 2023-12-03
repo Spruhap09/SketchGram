@@ -41,6 +41,23 @@ const postsReducer = (state: { posts: any[]; }, action: { type: any; payload: an
         posts: [],
       };
 
+      case 'UPDATE_POST':
+        const updatedPost = action.payload;
+        const existingPostIndexToUpdate = state.posts.findIndex(
+          (post: { post_id: any; }) => post.post_id === updatedPost.post_id
+        );
+
+        if (existingPostIndexToUpdate !== -1) {
+          // If exists, update the existing post
+          const updatedPosts = [...state.posts];
+          updatedPosts[existingPostIndexToUpdate] = updatedPost;
+
+        return {
+          ...state,
+          posts: updatedPosts,
+        };
+      };
+
     case 'REMOVE_POST':
       const postIdToRemove = action.payload;
 

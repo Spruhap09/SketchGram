@@ -1,32 +1,34 @@
 import Image from "next/image";
 import { useContext, useEffect, useState } from "react";
-import { getPost, deletePost, updatePostLikes, updatePostUnLikes } from "@/firebase/functions";
+import { getPost, deletePost, updatePostLikes, updatePostUnLikes, updatePostComments } from "@/firebase/functions";
 import { DocumentData } from "firebase/firestore";
-import { Button, IconButton } from "@material-tailwind/react";
+import { Button, IconButton, Input, Typography } from "@material-tailwind/react";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import { AuthContext } from "@/context/AuthContext";
 import { usePostsContext } from "@/context/PostsContext";
-
-
+import router from "next/router";
 
 export default function Post({
   id,
 }: {
   id: string;
 }) {
-  const { state, dispatch } = usePostsContext();
 
+  const { state, dispatch } = usePostsContext();
   const [src, setSrc] = useState<string>("");
   const [post, setPost] = useState<DocumentData | undefined>();
   const user = useContext(AuthContext);
+  const [comment, setComment] = useState('');
+
+  if(!user) router.push('/login');
   useEffect(() => {
     const getSrc = async () => {
       console.log("from Post, id = " + id)
       // Get firebase bucket url
       const post = await getPost(id);
-      console.log(post);
+      // const posts = state.posts
+      console.log('these are the posts')
 
-      // Get displayable url from api
       const res = await fetch(`/api/image?url=${post?.imageURL}`)
       const {imageUrl} = await res.json();
 
@@ -35,7 +37,10 @@ export default function Post({
       setSrc(imageUrl);
     };
     getSrc();
-  }, [id, user]);
+
+    console.log(post?.userid === user?.uid)
+
+  }, [id, user, post]);
 
   const handleLike = async () => {
     if (user){
@@ -46,6 +51,20 @@ export default function Post({
   const handleUnLike = async () => {
     if (user){
       await updatePostUnLikes (post?.post_id, post?.userid, user?.uid)
+    }
+  }
+
+  const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setComment(e.target.value)
+  }
+
+  const handleSubmit= async (e: React.FormEvent) => {
+    e.preventDefault();
+    try{
+      await updatePostComments(post?.post_id, comment, user?.uid)
+    }
+    catch(e){
+      alert(e);
     }
   }
 
@@ -66,11 +85,29 @@ export default function Post({
       {(post?.likes ? 
         <div>{`Total Number of Likes: ${post?.likes.length}`}</div> 
         : <div>{`Total Number of Likes: 0`}</div>)}
-
-      {(post?.userid !== user?.uid) && (!post?.likes.includes(user?.uid) 
-      ? <Button className="mt-6" fullWidth type="submit" onClick={handleLike}>Like Me!</Button> :
-      <Button className="mt-6" fullWidth type="submit" onClick={handleUnLike}>Unlike Me</Button>)}
-      {(post?.userid !== user?.uid) && <div>Me Commenty</div>}
+      {(!post?.likes.includes(user?.uid) 
+      ? <Button className="m-6" type="submit" onClick={handleLike}>Like Me!</Button> :
+      <Button className="m-6" type="submit" onClick={handleUnLike}>Unlike Me</Button>)}
+      {(post && post?.comments) && (
+        <div>
+          {post.comments.map((postComment: string) => (
+            <Typography>{postComment}</Typography>
+          ))}
+        </div>
+)}
+      <form onSubmit={handleSubmit}>
+          <Input
+            name="comment" 
+            size="lg"
+            placeholder="Your comment..."
+            onChange={handleCommentChange}
+            crossOrigin="anonymous"
+            className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
+            labelProps={{
+            className: "before:content-none after:content-none",
+        }}/>
+        <Button className="mt-6" fullWidth type="submit">Submit</Button>
+      </form>
       {post && (
         <IconButton
           variant="outlined"
