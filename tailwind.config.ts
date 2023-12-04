@@ -16,7 +16,9 @@ const config: object = withMT({
       },
     },
   },
-  plugins: [],
+  plugins: [
+    require('tailwind-scrollbar')
+  ],
 })
 
 export default config

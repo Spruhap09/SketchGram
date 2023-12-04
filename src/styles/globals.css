@@ -19,4 +19,9 @@
   .tool-icon {
     @apply w-5 h-5 transition-transform group-hover:rotate-45;
   }
+
+  .btn{
+    @apply h-7 hover:scale-125 cursor-pointer transition-all duration-150 ease-out;
+  }
+
 }
