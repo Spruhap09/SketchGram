@@ -5,16 +5,18 @@ import { DocumentData } from "firebase/firestore";
 import { Button, IconButton, Input, Typography } from "@material-tailwind/react";
 import { TrashIcon } from "@heroicons/react/20/solid";
 import { AuthContext } from "@/context/AuthContext";
-import { usePostsContext } from "@/context/PostsContext";
 import router from "next/router";
 
 export default function Post({
   id,
+  setPosts,
+  posts,
 }: {
   id: string;
+  setPosts: any;
+  posts: any;
 }) {
 
-  const { state, dispatch } = usePostsContext();
   const [src, setSrc] = useState<string>("");
   const [post, setPost] = useState<DocumentData | undefined>();
   const user = useContext(AuthContext);
@@ -25,9 +27,9 @@ export default function Post({
     const getSrc = async () => {
       console.log("from Post, id = " + id)
       // Get firebase bucket url
-      const post = await getPost(id);
-      // const posts = state.posts
-      console.log('these are the posts')
+      //get post from posts context
+      const post = posts.find((post: { post_id: string; }) => post.post_id === id);
+      console.log(post);
 
       const res = await fetch(`/api/image?url=${post?.imageURL}`)
       const {imageUrl} = await res.json();
@@ -55,18 +57,19 @@ export default function Post({
   }
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setComment(e.target.value)
-  }
+    setComment(e.target.value);
+  };
 
-  const handleSubmit= async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try{
-      await updatePostComments(post?.post_id, comment, user?.uid)
-    }
-    catch(e){
+    try {
+      if (comment && user?.uid) {
+        await updatePostComments(post?.post_id, comment, user?.uid);
+      }
+    } catch (e) {
       alert(e);
     }
-  }
+  };
 
   return (
     <div className="w-fit h-fit m-5 p-5 flex flex-col justify-center items-center border-blue-gray-500 rounded-md border-2">
@@ -115,8 +118,9 @@ export default function Post({
           onClick={async () => {
             const posts = await deletePost(id);
             console.log("from delete " + posts);
-            dispatch({ type: "REMOVE_POST", payload: id });
-            console.log(state.posts);
+            //remove post from posts context
+            const newPosts = posts.filter((post: { post_id: string; }) => post.post_id !== id);
+            setPosts(newPosts);
           }}
         >
           <TrashIcon title="Delete Post" className="w-full h-full p-0 m-0" />

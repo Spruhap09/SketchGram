@@ -89,3 +89,4 @@ export const PostsProvider = ({ children }: {children: ReactNode}) => {
 export const usePostsContext = () => {
   return useContext(PostsContext);
 };
+

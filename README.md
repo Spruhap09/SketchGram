@@ -4,10 +4,10 @@
 Create a config file in the firebase directory (@/firebase/config.ts)
 Place your Firebase config in here which you can get from Firebase Console
 
-Then install node modules and run the web server
+Then install node modules and run all servers
 ```
 npm i
-npm run dev
+npm start
 ```
 
 

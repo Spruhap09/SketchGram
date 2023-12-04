@@ -372,6 +372,7 @@ async function getUserPostsLimit(uid: string, limitValue: number | null = null) 
     return posts;
   } catch (error) {
     console.log("Error getting user posts:", error);
+    return []
     //throw error;
   }
 }
@@ -522,42 +523,47 @@ async function saveDraft(canvas: HTMLCanvasElement) {
     const storage = getStorage();
     if (!storage) throw "Storage is null";
 
+    console.log('a');
     let path;
     //Wrap in new Promise to synchronize operation
     await new Promise<void>((resolve, reject) => {
+      console.log('b');
       // Convert canvas to blob
       canvas.toBlob(async (blob) => { // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob
         try {
+          console.log('c');
           // Ensure blob was created
           if (!blob) throw new Error("Blob is null");
-  
+          
           // Store canvas blob in Firebase Storage
           const storageRef = ref(
             storage,
             `drafts/${auth.currentUser?.uid}/${Date.now()}`
-          );
-          const snapshot = await uploadBytes(storageRef, blob);
-          if (!snapshot) throw new Error("Snapshot is null");
-  
-          // Get path to image in storage bucket
-          path = snapshot.ref.fullPath;
-  
-          // Find user in database
-          const q = query(
-            collection(db, "users"),
-            where("uid", "==", auth?.currentUser?.uid)
-          );
-          const querySnapshot = await getDocs(q);
-          if (querySnapshot.empty)
-            throw "User does not exist in database";
-          const userRef = doc(db, "users", querySnapshot.docs[0].id);
-  
-          // Add draft to user's draft array
-          await updateDoc(userRef, {
-            drafts: arrayUnion(path),
-          });
-  
-          // Resolve the promise to indicate completion
+            );
+            const snapshot = await uploadBytes(storageRef, blob);
+            if (!snapshot) throw new Error("Snapshot is null");
+            
+            console.log('d');
+            // Get path to image in storage bucket
+            path = snapshot.ref.fullPath;
+            
+            // Find user in database
+            const q = query(
+              collection(db, "users"),
+              where("uid", "==", auth?.currentUser?.uid)
+              );
+              const querySnapshot = await getDocs(q);
+              if (querySnapshot.empty)
+              throw "User does not exist in database";
+            const userRef = doc(db, "users", querySnapshot.docs[0].id);
+            
+            // Add draft to user's draft array
+            await updateDoc(userRef, {
+              drafts: arrayUnion(path),
+            });
+            console.log('e');
+            
+            // Resolve the promise to indicate completion
           resolve();
         } catch (error) {
           // Reject the promise in case of an error
