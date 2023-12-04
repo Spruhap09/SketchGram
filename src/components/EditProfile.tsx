@@ -1,8 +1,8 @@
 import { AuthContext } from "@/context/AuthContext";
-import { changePassword, updateDisplayName } from "@/firebase/functions";
+import { changePassword, updateDisplayName, getUserbyUid } from "@/firebase/functions";
 import { Avatar, Button, Input, Typography } from "@material-tailwind/react";
 import { useRouter } from "next/router";
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import noAvatar from 'public/noAvatar.jpeg'
 
 
@@ -13,8 +13,25 @@ export default function EditProfile (){
     const [displayName, setDisplayName] = useState(user?.displayName || '');
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
+    const [ready, setReady] = useState(false);
+    const [userObj, setUserObj] = useState<any | any >();
     const router = useRouter();
     if(!user) router.push('/login');
+
+    useEffect(() => {
+        setReady(false);
+        const getUser = async () => {
+            if (user?.uid) {
+              const ret_user = await getUserbyUid(user.uid);
+              if (ret_user){
+              setUserObj(ret_user);
+              setReady(true);
+              }
+            }
+          }
+          getUser();
+           
+    }, [user])
     
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -57,7 +74,7 @@ export default function EditProfile (){
     if(editName){
         return(
             <div className="flex-grow box-border w-32 p-4 border-4 mr-4 rounded-lg flex flex-col items-center justify-center">
-                <Avatar className="my-2" src={user?.photoURL|| noAvatar.src} alt="avatar" size="xxl"/>
+                <Avatar className="my-2" src={userObj?.profile_img|| noAvatar.src} alt="avatar" size="xxl"/>
                 <form onSubmit={handleSubmit}>
                     <Typography variant="h6" color="blue-gray" className="my-2">Your Name</Typography>
                     <Input
@@ -89,7 +106,7 @@ export default function EditProfile (){
     else if(editPassword){
         return(
             <div className="flex-grow box-border w-32 p-4 border-4 mr-4 rounded-lg flex flex-col items-center justify-center">
-                <Avatar className="my-2"src={user?.photoURL || noAvatar.src} alt="avatar" size="xxl"/>
+                <Avatar className="my-2"src={userObj?.profile_img || noAvatar.src} alt="avatar" size="xxl"/>
                 <form onSubmit={handleSubmit}>
                     <Typography variant="h6" color="blue-gray" className="my-2">Your Name</Typography>
                     <Input
@@ -143,12 +160,17 @@ export default function EditProfile (){
     }
     
     return (
-        <div className="flex-grow box-border w-32 p-4 border-4 mr-4 rounded-lg flex flex-col items-center justify-center">
-            <Avatar className="my-2"src={user?.photoURL || noAvatar.src} alt="avatar" size="xxl"/>
-            <Typography variant="h5" className="">{`Your Name: ${user?.displayName}`} </Typography>
-            <Typography variant="h5" className="">{`Your email: ${user?.email}`} </Typography>
-            <Button color="blue-gray" variant="gradient" className="my-2" onClick={() => setEditName(true)}>Edit Display Name</Button>
-            <Button color="blue-gray" variant="gradient" className="my-2" onClick={() => setEditPassword(true)}>Edit Password</Button>
-        </div>
+        <>
+            {ready ? (
+                <div className="flex-grow box-border w-32 p-4 border-4 mr-4 rounded-lg flex flex-col items-center justify-center">
+                <Avatar className="my-2"src={userObj?.profile_img || noAvatar.src} alt="avatar" size="xxl"/>
+                <Typography variant="h5" className="">{`Your Name: ${user?.displayName}`} </Typography>
+                <Typography variant="h5" className="">{`Your email: ${user?.email}`} </Typography>
+                <Button color="blue-gray" variant="gradient" className="my-2" onClick={() => setEditName(true)}>Edit Display Name</Button>
+                <Button color="blue-gray" variant="gradient" className="my-2" onClick={() => setEditPassword(true)}>Edit Password</Button>
+            </div>
+            ) : <div>Loading</div>}
+        </>
+       
     )
 }

@@ -62,7 +62,8 @@ async function signUpWithEmailAndPassword(
       followers: [],
       following: [],
       posts: [],
-      drafts: []
+      drafts: [],
+      profile_img: "empty-profile.png"
     });
   } catch (e) {
     console.error("Error adding document: ", e);
@@ -677,9 +678,17 @@ async function updatePostLikes(postId: string, userUid: string, likerUid: string
     }
     //if present, the reference is updates with a new like
     if (postRef){
-      const oldLikes = postRef.data()?.likes
-      const newLikes = [...oldLikes, likerUid];
-      await updateDoc(postRef.ref, {likes: newLikes})
+      //if the user has already liked the post, then we remove the like
+      if (postRef.data()?.likes.includes(likerUid)){
+        const oldLikes = postRef.data()?.likes
+        const newLikes = oldLikes.filter((myUid: string) => myUid !== likerUid);
+        await updateDoc(postRef.ref, {likes: newLikes})
+      }
+      else{
+        const oldLikes = postRef.data()?.likes
+        const newLikes = [...oldLikes, likerUid];
+        await updateDoc(postRef.ref, {likes: newLikes})
+      }
 
     }
     else{
@@ -692,39 +701,27 @@ async function updatePostLikes(postId: string, userUid: string, likerUid: string
   }
 }
 
-async function updatePostUnLikes(postId: string, userUid: string, likerUid: string){
+
+
+async function getUserbyUid(uid: string){
   try{
     // Get Firebase Firestore
     const db = getFirestore();
     if(!db) throw "Database is null";
 
-    //get the post id from the database and update it
-    const q = query(collection(db, "posts"), where ("userid", "==", userUid));
-    //this will be all the posts for this user id
+    // Find user in database
+    const q = query(collection(db, "users"), where("uid", "==", uid));
     const querySnapshot = await getDocs(q);
     if (querySnapshot.empty) throw "User does not exist in database";
+    const userRef = doc(db, "users", querySnapshot.docs[0].id);
 
-    //gets the particular doc that matches the post id
-    let postRef;
-    for (let doc of querySnapshot.docs){
-      if (doc.id === postId){
-        postRef = doc
-        break;
-      }
-    }
-    //if present, the reference is updates with a new like
-    if (postRef){
-      const oldLikes = postRef.data()?.likes
-      const newLikes = oldLikes.filter((myUid: string) => myUid !== likerUid);
-      await updateDoc(postRef.ref, {likes: newLikes})
+    // Get user's stat details
+    const docSnapshot = await getDoc(userRef);
 
-    }
-    else{
-      throw 'Post not found'
-    }
+    return docSnapshot.data();
   }
-  catch(e){
-    console.error("Error getting the post for the user: ", e);
+  catch(e) {
+    console.error("Error getting user drafts: ", e);
     throw e;
   }
 }
@@ -833,7 +830,7 @@ export {
   deleteDraft, 
   getUserStats,
   updatePostLikes, 
-  updatePostUnLikes,
   searchUsers,
-  updatePostComments
+  updatePostComments,
+  getUserbyUid
 };
