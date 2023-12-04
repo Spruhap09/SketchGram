@@ -1,23 +1,37 @@
 import Layout from "@/components/Layout";
+import { searchUsers } from "@/firebase/functions";
 import { Input, Typography } from "@material-tailwind/react";
-import { useState } from "react";
+import { User } from "firebase/auth";
+import { useEffect, useState } from "react";
 
 export default function Search() {
-    const [search, setSearch] = useState<string>("")
-
+    const [searchTerm, setSearchTerm] = useState<string>("")
+    const [searchResults, setSearchResults] = useState<User[]>([])
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        console.log(e.target.value);
-        setSearch(e.target.value);
+        setSearchTerm(e.target.value);
     }
 
-    // TODO
+    useEffect(() => {
+        const trimmedSearch = searchTerm.trim();
+        const fetchResults = async () => {
+            let results = [];
+            if(trimmedSearch.length > 0)
+                results = await searchUsers(trimmedSearch);
+            setSearchResults(results);
+        }
+
+        fetchResults();
+    }, [searchTerm])
+
     return (
         <Layout>
             <Typography variant="h1">Search Users</Typography>
             <Typography variant="h2">TODO Implement way to find and follow other users profiles</Typography>
             <Input label="Search" crossOrigin="anonymous" onChange={handleSearch}/>
             <div>
-                {search}
+                {searchResults.map((result, i) => {
+                    return <Typography key={i} variant="h2">{result?.displayName}</Typography>
+                })}
             </div>
         </Layout>
     )
