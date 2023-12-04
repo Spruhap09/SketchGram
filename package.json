@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "npm-run-all --parallel start-next-dev start-emulator cleanup",
+    "start": "npm-run-all --parallel start-next-dev start-emulator",
     "start-next-dev": "next dev",
     "start-emulator": "firebase emulators:start",
     "cleanup": "npm run stop-emulator",

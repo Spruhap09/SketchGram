@@ -6,8 +6,13 @@ const nextConfig = {
       protocol: 'https',
       hostname: 'firebasestorage.googleapis.com',
       pathname: '**'
-    }]
+    }, {
+      protocol: 'http',
+      hostname: '127.0.0.1',
+      pathname: '**'
+    }
+    ]
   }
 }
 
-module.exports = nextConfig
+module.exports = nextConfig;
