@@ -3,7 +3,8 @@ import Feed from "@/components/Feed";
 import { AuthContext } from "@/context/AuthContext";
 import { Typography } from "@material-tailwind/react";
 import { useRouter } from "next/router";
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
+import { getUserbyUid } from "@/firebase/functions";
 
 
 export default function FeedBody() {
@@ -11,10 +12,13 @@ export default function FeedBody() {
     const router = useRouter();
     if(!user) router.push('/login');
 
+
+
     return (
-        <Layout>
-            <Feed/>
-        </Layout>
+            <Layout>
+                <Feed/>
+            </Layout>
+      
     )
 
 }

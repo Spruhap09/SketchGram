@@ -252,6 +252,7 @@ async function postCanvasToProfile(
             comments: [],
             imageURL: path,
             likes: [],
+            timestamp: new Date().toISOString()
           });
   
           // Find user in database
@@ -770,44 +771,64 @@ async function searchUsers(searchTerm: string) {
   }
 }
 
-async function updatePostComments(postId: string, comment: string, userUid: string){
-  //TODO: Do we need to store the post comments as post id, and the comment?
-  try{
+async function updatePostComments(postId: string, comment: string, userUid: string) {
+  try {
     // Get Firebase Firestore
     const db = getFirestore();
-    if(!db) throw "Database is null";
+    if (!db) throw "Database is null";
 
-    //get the post id from the database and update it
-    const q = query(collection(db, "posts"), where ("userid", "==", userUid));
-    //this will be all the posts for this user id
+    const postRef = doc(collection(db, "posts"), postId);
+    const q = query(collection(db, "users"), where("uid", "==", userUid));
     const querySnapshot = await getDocs(q);
     if (querySnapshot.empty) throw "User does not exist in database";
 
-    //gets the particular doc that matches the post id
-    let postRef;
-    for (let doc of querySnapshot.docs){
-      if (doc.id === postId){
-        postRef = doc
-        break;
-      }
-    }
+      // // Get post from database
+      // const postRef = doc(db, "posts", postId);
+      // const post = await getDoc(postRef);
+      // if (!post || !post.data()) throw "Post does not exist in database";
+      // const ret = post.data();
 
-    //if present, the reference is updates with a new like
-    if (postRef){
-      const oldComments = postRef.data()?.comments
+    console.log(postRef);
+    const postDoc = await getDoc(postRef);
+    console.log("from updatepost " + postDoc.data())
+
+    if (postDoc.exists()) {
+      const oldComments = postDoc.data()?.comments || [];
       const newComments = [...oldComments, comment];
-      await updateDoc(postRef.ref, {comments: newComments})
-
+      await updateDoc(postDoc.ref, { comments: newComments });
+    } else {
+      throw 'Post not found';
     }
-    else{
-      throw 'Post not found'
-    }
-  }
-  catch(e){
-    console.error("Error getting the post for the user: ", e);
+  } catch (e) {
+    console.error("Error updating post comments: ", e);
     throw e;
   }
 }
+
+async function getAllPosts(){
+  try {
+    // Get Firebase Firestore
+    const db = getFirestore();
+    if (!db) throw "Database is null";
+
+    // Find posts in database
+    const q = query(collection(db, "posts"));
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty) throw "No posts exist in database";
+    const posts = querySnapshot.docs.map((doc) => {
+      let ret = doc.data();
+      ret.post_id = doc.id
+      return ret
+    });
+    if (!posts) throw "User has no posts";
+    return posts;
+  } catch (error) {
+    console.log("Error getting user posts:", error);
+    return []
+    //throw error;
+  }
+}
+
 
 export {
   signUpWithEmailAndPassword,
@@ -832,5 +853,6 @@ export {
   updatePostLikes, 
   searchUsers,
   updatePostComments,
-  getUserbyUid
+  getUserbyUid,
+  getAllPosts
 };

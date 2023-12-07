@@ -18,11 +18,9 @@ import Moment from "react-moment"
 
 export default function Post({
   id,
-  setPosts,
   posts,
 }: {
   id: string;
-  setPosts: any;
   posts: any;
 }) {
 
@@ -162,7 +160,7 @@ export default function Post({
 
       <div className="bg-blue-gray-800 my-7 border rounded-sm text-white !important max-w-500 overflow-x-hidden">
         <div className="flex items-center p-5">
-          <img src={userObj?.profile_img} width={500} height={500} className="rounded-full h-12 w-12 object-contain border p-1 mr-3" alt={"prfoile picture for " + userObj?.displayName} />
+          <img src={userObj?.profile_img} width={500} height={500} className="rounded-full h-12 w-12 object-contain border-2 p-1 mr-3" alt={"prfoile picture for " + userObj?.displayName} />
           <p className="flex-1 font-bold text-white">{userObj?.displayName}</p>
         </div>
         {src.length ? 
