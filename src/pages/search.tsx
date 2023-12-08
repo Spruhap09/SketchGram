@@ -30,7 +30,7 @@ export default function Search() {
             <Input label="Search" crossOrigin="anonymous" onChange={handleSearch}/>
             <div>
                 {searchResults.map((result, i) => {
-                    return <Typography key={i} variant="h2">{result?.displayName}</Typography>
+                    return <Typography key={i} variant="h2">{result?.displayName} {result?.email}</Typography>
                 })}
             </div>
         </Layout>

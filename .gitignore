@@ -37,4 +37,7 @@ firestore-debug.log
 *.tsbuildinfo
 next-env.d.ts
 
+# firebase
 /src/firebase/config.ts
+firebase-debug.log
+firestore-debug.log
