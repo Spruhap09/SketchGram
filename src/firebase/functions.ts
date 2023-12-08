@@ -31,6 +31,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 import { ref, getStorage, uploadBytes, getDownloadURL, deleteObject, getBytes, getBlob } from "firebase/storage";
+import initFirebaseConfig from "./firebase";
 
 // Create user with email and password
 // Called from signup page
@@ -41,10 +42,7 @@ async function signUpWithEmailAndPassword(
 ) {
   try {
     // Get Firebase Auth
-    const auth = getAuth();
-    if (!auth) {
-      throw "Auth is not initialized";
-    }
+    const {db, auth} = initFirebaseConfig();
 
     // Create user
     await createUserWithEmailAndPassword(auth, email, password);
@@ -54,7 +52,6 @@ async function signUpWithEmailAndPassword(
     await updateProfile(auth.currentUser, { displayName: displayName });
 
     // Add user to databse
-    const db = getFirestore();
     const docRef = await addDoc(collection(db, "users"), {
       uid: auth.currentUser.uid,
       displayName,
@@ -74,16 +71,11 @@ async function signUpWithEmailAndPassword(
 async function updateDisplayName(newDisplayName: string){
   
   try{
-    const auth = getAuth();
-    if (!auth){
-      throw "Auth is not initialized";
-    }
+    const {db, auth} = initFirebaseConfig();
     if (!auth.currentUser) {
       throw "No user is logged in";
     }
 
-    // Get Firebase Firestore
-    const db = getFirestore();
 
     //get the user collection reference
     const usersCollectionRef = collection(db, "users"); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference
@@ -123,8 +115,7 @@ async function changePassword(
 ) {
   try{
     // Get Firebase Auth
-    const auth = getAuth();
-    if (!auth) throw "Auth is not initialized";
+    const {auth} = initFirebaseConfig();
     if (!auth.currentUser) throw "No user is logged in";
 
     // Reauthenticate user
@@ -146,8 +137,7 @@ async function changePassword(
 async function logInWithEmailAndPassword(email: string, password: string) {
   try {
     // Get Firebase Auth
-    const auth = getAuth();
-    if (!auth) throw "Auth is not initialized";
+    const {auth} = initFirebaseConfig();
 
     // Log in
     const credential = await signInWithEmailAndPassword(auth, email, password);
@@ -164,16 +154,14 @@ async function logInWithEmailAndPassword(email: string, password: string) {
 async function doGoogleSignIn() {
   try {
     // Get Firebase Auth
-    let auth = getAuth();
-    if (!auth) throw "Auth is not initialized";
-    
+    const {db, auth} = initFirebaseConfig();
+
     // Sign in with Google
     let googleProvider = new GoogleAuthProvider();
     await signInWithPopup(auth, googleProvider);
     if (!auth.currentUser) throw new Error("User unable to be created");
 
-    // Get Firebase Firestore
-    const db = getFirestore();
+
     const usersCollectionRef = collection(db, "users"); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference
 
     // Check if user already exists in database 
@@ -210,17 +198,9 @@ async function postCanvasToProfile(
 ) {
   try {
     // Get Firebase Authentication
-    const auth = getAuth();
+    const {db, auth, storage} = initFirebaseConfig();
     if (!auth.currentUser || !auth.currentUser.uid)
       throw new Error("User not logged in");
-  
-    // Get Firebase Firestore
-    const db = getFirestore();
-    if (!db) throw "Database is null";
-  
-    // Get Firebase Cloud Storage
-    const storage = getStorage();
-    if (!storage) throw "Storage is null";
 
     // TODO: Maybe add check to see if canvas is blank and prevent user from posting
   
@@ -290,8 +270,7 @@ async function postCanvasToProfile(
 async function resetPassword(email: string) {
   try {
     // Get Firebase Auth
-    const auth: Auth = getAuth();
-    if (!auth) throw "Auth is not initialized";
+    const {auth} = initFirebaseConfig();
 
     // Send password reset email
     await sendPasswordResetEmail(auth, email);
@@ -324,8 +303,7 @@ async function logOutUser() {
 async function getUserPosts(uid: string) {
   try {
     // Get Firebase Firestore
-    const db = getFirestore();
-    if (!db) throw "Database is null";
+    const {db} = initFirebaseConfig();
 
     // Find user in database
     const q = query(collection(db, "users"), where("uid", "==", uid));
@@ -337,11 +315,10 @@ async function getUserPosts(uid: string) {
     const docSnapshot = await getDoc(userRef);
     const posts = querySnapshot.docs.map((doc) => {
       let ret = doc.data();
-      console.log(ret)
       ret.post_id = doc.id
       return ret
     });
-    console.log(posts)
+
     if (!posts) throw "User has no posts";
     return posts;
 
@@ -354,8 +331,7 @@ async function getUserPosts(uid: string) {
 //getUserPosts iwth limit option
 async function getUserPostsLimit(uid: string, limitValue: number | null = null) {
   try {
-    const db = getFirestore();
-    if (!db) throw "Database is null";
+    const {db} = initFirebaseConfig();
 
     let q;
     // Find posts in database
@@ -385,8 +361,7 @@ async function getUserPostsLimit(uid: string, limitValue: number | null = null) 
 async function getPost(postId: string) {
   try {
     // Get Firebase Firestore
-    const db = getFirestore();
-    if (!db) throw "Database is null";
+    const {db} = initFirebaseConfig();
 
     // Get post from database
     const postRef = doc(db, "posts", postId);
@@ -406,12 +381,7 @@ async function getPost(postId: string) {
 async function deletePost(postId: string) {
   try {
     // Get Firebase Cloud Storage
-    const storage = getStorage();
-    if(!storage) throw "Storage is null";
-
-    // Get Firebase Firestore
-    const db = getFirestore();
-    if (!db) throw "Database is null";
+    const {db, storage} = initFirebaseConfig();
 
     // Delete photo from storage
     const postData = await getPost(postId);
@@ -431,8 +401,7 @@ async function deletePost(postId: string) {
     const postRef = doc(db, "posts", postId);
     await deleteDoc(postRef);
 
-    return newPosts
-
+    return newPosts;
   }
   catch(e) {
     console.log("Error deleting post: ", e);
@@ -443,12 +412,7 @@ async function deletePost(postId: string) {
 async function deleteDraft(draftUrl: string, userid: string) {
   try {
     // Get Firebase Cloud Storage
-    const storage = getStorage();
-    if(!storage) throw "Storage is null";
-
-    // Get Firebase Firestore
-    const db = getFirestore();
-    if (!db) throw "Database is null";
+    const {db, storage} = initFirebaseConfig();
 
     // Delete photo from storage
     const draftRef = ref(storage, draftUrl);
@@ -477,8 +441,7 @@ async function deleteDraft(draftUrl: string, userid: string) {
 async function getImageFromUrl(imageUrl: string) {
   try{
     // Get Firebase Cloud Storage
-    const storage = getStorage();
-    if (!storage) throw "Storage is null";
+    const {storage} = initFirebaseConfig();
 
     // Get image from storage
     const storageRef = ref(storage, imageUrl);
@@ -495,8 +458,7 @@ async function getImageFromUrl(imageUrl: string) {
 async function getDraftUrl(draftId: string) {
   try{
     // Get Firebase Cloud Storage
-    const storage = getStorage();
-    if (!storage) throw "Storage is null";
+    const {storage} = initFirebaseConfig();
 
     // Get image from storage
     const storageRef = ref(storage, `drafts/${draftId}`);
@@ -513,27 +475,16 @@ async function getDraftUrl(draftId: string) {
 async function saveDraft(canvas: HTMLCanvasElement) {
   try {
     // Get Firebase Auth
-    const auth = getAuth();
+    const {db, auth, storage} = initFirebaseConfig();
     if (!auth.currentUser || !auth.currentUser.uid)
       throw new Error("User not logged in");
   
-    // Get Firebase Firestore
-    const db = getFirestore();
-    if (!db) throw "Database is null";
-  
-    // Get Firebase Cloud Storage
-    const storage = getStorage();
-    if (!storage) throw "Storage is null";
-
-    console.log('a');
     let path;
     //Wrap in new Promise to synchronize operation
     await new Promise<void>((resolve, reject) => {
-      console.log('b');
       // Convert canvas to blob
       canvas.toBlob(async (blob) => { // https://developer.mozilla.org/en-US/docs/Web/API/HTMLCanvasElement/toBlob
         try {
-          console.log('c');
           // Ensure blob was created
           if (!blob) throw new Error("Blob is null");
           
@@ -545,7 +496,6 @@ async function saveDraft(canvas: HTMLCanvasElement) {
             const snapshot = await uploadBytes(storageRef, blob);
             if (!snapshot) throw new Error("Snapshot is null");
             
-            console.log('d');
             // Get path to image in storage bucket
             path = snapshot.ref.fullPath;
             
@@ -563,7 +513,6 @@ async function saveDraft(canvas: HTMLCanvasElement) {
             await updateDoc(userRef, {
               drafts: arrayUnion(path),
             });
-            console.log('e');
             
             // Resolve the promise to indicate completion
           resolve();
@@ -584,8 +533,7 @@ async function saveDraft(canvas: HTMLCanvasElement) {
 async function getUserDrafts(uid: string) {
   try {
     // Get Firebase Firestore
-    const db = getFirestore();
-    if(!db) throw "Database is null";
+    const {db} = initFirebaseConfig();
 
     // Find user in database
     const q = query(collection(db, "users"), where("uid", "==", uid));
@@ -609,8 +557,7 @@ async function getUserDrafts(uid: string) {
 async function getBytesFromUrl(url: string) {
   try {
     // Get Firebase Cloud Storage
-    const storage = getStorage();
-    if (!storage) throw "Storage is null";
+    const {storage} = initFirebaseConfig();
 
     // Get image from storage
     const storageRef = ref(storage, url);
@@ -627,8 +574,7 @@ async function getBytesFromUrl(url: string) {
 async function getUserStats(uid: string){
   try{
     // Get Firebase Firestore
-    const db = getFirestore();
-    if(!db) throw "Database is null";
+    const {db} = initFirebaseConfig();
 
     // Find user in database
     const q = query(collection(db, "users"), where("uid", "==", uid));
@@ -660,8 +606,7 @@ async function getUserStats(uid: string){
 async function updatePostLikes(postId: string, userUid: string, likerUid: string){
   try{
     // Get Firebase Firestore
-    const db = getFirestore();
-    if(!db) throw "Database is null";
+    const {db} = initFirebaseConfig();
 
     //get the post id from the database and update it
     const q = query(collection(db, "posts"), where ("userid", "==", userUid));
@@ -707,8 +652,7 @@ async function updatePostLikes(postId: string, userUid: string, likerUid: string
 async function getUserbyUid(uid: string){
   try{
     // Get Firebase Firestore
-    const db = getFirestore();
-    if(!db) throw "Database is null";
+    const {db} = initFirebaseConfig();
 
     // Find user in database
     const q = query(collection(db, "users"), where("uid", "==", uid));
@@ -731,8 +675,7 @@ async function searchUsers(searchTerm: string) {
   try {
 
     // Get Firebase Firestore
-    const db = getFirestore();
-    if (!db) throw "Database is null";
+    const {db} = initFirebaseConfig();
 
     const searchArray = searchTerm.split("");
 
@@ -774,8 +717,7 @@ async function searchUsers(searchTerm: string) {
 async function updatePostComments(postId: string, comment: string, userUid: string) {
   try {
     // Get Firebase Firestore
-    const db = getFirestore();
-    if (!db) throw "Database is null";
+    const {db} = initFirebaseConfig();
 
     const postRef = doc(collection(db, "posts"), postId);
     const q = query(collection(db, "users"), where("uid", "==", userUid));
@@ -808,8 +750,7 @@ async function updatePostComments(postId: string, comment: string, userUid: stri
 async function getAllPosts(){
   try {
     // Get Firebase Firestore
-    const db = getFirestore();
-    if (!db) throw "Database is null";
+    const {db} = initFirebaseConfig();
 
     // Find posts in database
     const q = query(collection(db, "posts"));
