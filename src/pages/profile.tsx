@@ -7,8 +7,18 @@ import { useContext, useEffect, useState } from "react";
 import EditProfile from "../components/EditProfile";
 import ProfileStats from "../components/ProfileStats";
 import { getUserPostsLimit } from "@/firebase/functions";
-
+import ProfileHeader from "./profile/ProfileHeader"
+import noAvatar from 'public/noAvatar.jpeg'
 export default function Profile() {
+
+    const exampleProfile = {
+        name: 'Andy Horwitz',
+        location: "Hoboken, NJ", 
+        photos: 253,
+        followers: 1026,
+        following: 478
+      };
+      
 
     const user = useContext(AuthContext);
     const [posts, setPosts] = useState<any[] | null>(null);
@@ -31,10 +41,8 @@ export default function Profile() {
 
     
     return (
-        
-        
         <Layout>
-            {ready ? (
+            {/* {ready ? (
                 <>
                     <div className="sticky flex flex-col justify-center items-center">
                         <Typography variant="h2" className="">{'Welcome to your profile page!'} </Typography>
@@ -47,7 +55,15 @@ export default function Profile() {
                         <UserPosts setPosts={setPosts} posts={posts} />
                     </div><Button color="blue-gray" variant="gradient" onClick={() => router.push('/canvas')}>Back to Canvas</Button>
                 </>
-                ) : <div>Loading</div>}
+                ) : <div>Loading</div>} */}
+            {ready? (
+                <>
+                 <div>
+                    <ProfileHeader profile={exampleProfile}/>
+
+                 </div>
+                </>
+            ) : <div>Loading</div>}
         </Layout>
         
     )
