@@ -10,7 +10,9 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context/AuthContext";
 import { getUserbyUid, logOutUser } from "@/firebase/functions";
+import Head from "next/head";
 
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export default function Navigation() {
     const router = useRouter();
@@ -39,6 +41,7 @@ export default function Navigation() {
       color="blue-gray"
       className="mx-auto max-w-screen-xl from-blue-gray-900 to-blue-gray-800 px-4 py-3"
     >
+      <Head><title>{capitalize(pageName)}</title></Head>
       <div className="flex flex-wrap items-center justify-between gap-y-4 text-white">
         <Typography
           as="a"
