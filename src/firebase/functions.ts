@@ -770,6 +770,123 @@ async function getAllPosts(){
   }
 }
 
+async function followUser(otherUid: string, userUid: string){
+  try{
+    const {db, auth} = initFirebaseConfig();
+    if (!auth.currentUser) {
+      throw "No user is logged in";
+    }
+
+    //get the user collection reference
+    const usersCollectionRef = collection(db, "users"); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference
+
+    // Check if user already exists in database 
+    const q = query(usersCollectionRef, where("uid", "==", userUid));
+    const querySnapshot = await getDocs(q); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.QuerySnapshot
+    
+    // If user exists then update the details
+    if (!querySnapshot.empty) {
+
+      const userDocRef = querySnapshot.docs[0].ref;
+      const userDoc = await getDoc(userDocRef);
+
+      //update the db for the collection
+      const oldFollowing = userDoc.data()?.following
+      const newFollowing = [...oldFollowing, otherUid];
+      await updateDoc (userDocRef, {following: newFollowing});
+
+    }
+    else {
+      throw "This user does not exist";
+    }
+
+
+    //doing the same thing, but adding for following
+
+    // Check if user already exists in database 
+    const q1 = query(usersCollectionRef, where("uid", "==", otherUid));
+    const querySnapshot1 = await getDocs(q1); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.QuerySnapshot
+    
+    // If user exists then update the details
+    if (!querySnapshot1.empty) {
+
+      const userDocRef = querySnapshot1.docs[0].ref;
+      const userDoc = await getDoc(userDocRef);
+
+      //update the db for the collection
+      const oldFollowers = userDoc.data()?.followers
+      const newFollowers = [...oldFollowers, userUid];
+      await updateDoc (userDocRef, {followers: newFollowers});
+      
+    }
+
+    else {
+      throw "This user does not exist";
+    }
+    
+  }
+  catch(e){
+    console.error("Error updating the follower count: ", e);
+    throw e;
+  }
+}
+
+async function unfollowUser(otherUid: string, userUid: string){
+  try{
+
+    const {db, auth} = initFirebaseConfig();
+    if (!auth.currentUser) {
+      throw "No user is logged in";
+    }
+
+    //get the user collection reference
+    const usersCollectionRef = collection(db, "users"); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference
+
+    // Check if user already exists in database 
+    const q = query(usersCollectionRef, where("uid", "==", userUid));
+    const querySnapshot = await getDocs(q); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.QuerySnapshot
+    
+    // If user exists then update the details
+    if (!querySnapshot.empty) {
+
+      const userDocRef = querySnapshot.docs[0].ref;
+      const userDoc = await getDoc(userDocRef);
+
+      //update the db for the collection
+      const oldFollowing = userDoc.data()?.following
+      const newFollowing = oldFollowing.filter((myUid: string) => myUid !== otherUid);
+      await updateDoc (userDocRef, {following: newFollowing});
+      
+    }
+    else {
+      throw "This user does not exist";
+    }
+
+    //doing the same thing, but adding for following
+
+    // Check if user already exists in database 
+    const q1 = query(usersCollectionRef, where("uid", "==", otherUid));
+    const querySnapshot1 = await getDocs(q1); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.QuerySnapshot
+    
+    // If user exists then update the details
+    if (!querySnapshot1.empty) {
+
+      const userDocRef = querySnapshot1.docs[0].ref;
+      const userDoc = await getDoc(userDocRef);
+     
+      //update the db for the collection
+      const oldFollowers = userDoc.data()?.followers
+      const newFollowers = oldFollowers.filter((myUid: string) => myUid !== userUid);
+      await updateDoc (userDocRef, {followers: newFollowers});
+    }
+
+  }
+  catch(e){
+    console.error("Error updating the follower count: ", e);
+    throw e;
+  }
+}
+
 
 export {
   signUpWithEmailAndPassword,
@@ -795,5 +912,7 @@ export {
   searchUsers,
   updatePostComments,
   getUserbyUid,
-  getAllPosts
+  getAllPosts, 
+  followUser,
+  unfollowUser
 };

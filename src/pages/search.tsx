@@ -3,6 +3,7 @@ import { searchUsers } from "@/firebase/functions";
 import { Input, Typography } from "@material-tailwind/react";
 import { User } from "firebase/auth";
 import { useEffect, useState } from "react";
+import UserProfile from "@/components/UserProfile";
 
 export default function Search() {
     const [searchTerm, setSearchTerm] = useState<string>("")
@@ -23,6 +24,11 @@ export default function Search() {
         fetchResults();
     }, [searchTerm])
 
+    console.log('the search term is')
+    console.log(searchTerm)
+    console.log('these are the search results')
+    console.log(searchResults)
+
     return (
         <Layout>
             <Typography variant="h1">Search Users</Typography>
@@ -30,7 +36,8 @@ export default function Search() {
             <Input label="Search" crossOrigin="anonymous" onChange={handleSearch}/>
             <div>
                 {searchResults.map((result, i) => {
-                    return <Typography key={i} variant="h2">{result?.displayName} {result?.email}</Typography>
+                    return <UserProfile userDetails={result}/>
+                    //return <Typography key={i} variant="h2">{result?.displayName} {result?.email}</Typography>
                 })}
             </div>
         </Layout>

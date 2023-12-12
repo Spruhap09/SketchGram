@@ -71,6 +71,8 @@ export default function Post({
         const user = await getUserbyUid(post.userid);
         if (user){
         console.log(user);
+        console.log('hihihi')
+        console.log(user.profile_img)
         setUserObj(user);
         setReady(true);
         }
@@ -160,7 +162,8 @@ export default function Post({
 
       <div className="bg-blue-gray-800 my-7 border rounded-xl text-white !important max-w-500 overflow-x-hidden">
         <div className="flex items-center p-5">
-          <img src={userObj?.profile_img} width={500} height={500} className="rounded-full h-12 w-12 object-contain border-2 p-1 mr-3" alt={"prfoile picture for " + userObj?.displayName} />
+          <img src={userObj?.profile_img === 'empty-profile.png' ? '../empty-profile.png' : userObj?.profile_img}
+          width={500} height={500} className="rounded-full h-12 w-12 object-contain border-2 p-1 mr-3" alt={"profile picture for " + userObj?.displayName} />
           <p className="flex-1 font-bold text-white">{userObj?.displayName}</p>
         </div>
         {src.length ? 
@@ -203,8 +206,8 @@ export default function Post({
             <div>
               {post.comments.map((postComment: any) => (
                 <div key={postComment.uid} className="flex items-center space-x-2 ab-3 p-2 block">
-                  <img src={postComment?.profile_img}
-                  alt={"comment pofile picture for user " + postComment?.username}
+                  <img src={postComment?.profile_img === 'empty-profile.png' ? '../empty-profile.png' : postComment?.profile_img}
+                  alt={"comment profile picture for user " + postComment?.username}
                   className="h-7 rounded-full" />
                   <p className="text-sm flex-1 truncate space-x-4 overflow-ellipsis block whitespace-no-wrap">
                     <span className="font-bold mr-2">{postComment?.username}</span>
