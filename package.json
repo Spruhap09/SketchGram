@@ -5,10 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "npm-run-all --parallel start-next-dev start-emulator seed",
-    "start-next-dev": "next dev",
-    "start-emulator": "firebase emulators:start",
-    "seed": "node ./src/firebase/seed.js",
+    "start": "npm-run-all --parallel dev start-emulator",
+    "start-no-save": "npm-run-all --parallel dev start-emulator-no-save",
+    "start-emulator": "firebase emulators:start --import ./emulator-data/ --export-on-exit ./emulator-data",
+    "start-emulator-no-save": "firebase emulators:start --import ./emulator-data/",
     "lint": "next lint"
   },
   "dependencies": {
