@@ -6,7 +6,7 @@ import { Button, IconButton, Input, Typography, input } from "@material-tailwind
 import { TrashIcon } from "@heroicons/react/20/solid";
 import { AuthContext } from "@/context/AuthContext";
 import { v4 as uuidv4 } from "uuid";
-import router from "next/router";
+import { useRouter } from "next/router";
 import {
   FaceSmileIcon,
   ChatBubbleBottomCenterIcon,
@@ -19,14 +19,16 @@ import Moment from "react-moment"
 export default function Post({
   id,
   posts,
+  setPosts = "default",
 }: {
   id: string;
   posts: any;
+  setPosts: any;
 }) {
 
   const [src, setSrc] = useState<string>("");
-  const [post, setPost] = useState<DocumentData | undefined>();
-  const user = useContext(AuthContext);
+  const [post, setPost] = useState<DocumentData | undefined | boolean | any>();
+  const user:any = useContext(AuthContext);
   const [comment, setComment] = useState('');
   const [ready, setReady] = useState(false);
   const [userObj, setUserObj] = useState<any | any >();
@@ -35,14 +37,14 @@ export default function Post({
   //this is used to set the cursor to comment box when clicking comment button
   const inputRef = useRef<HTMLInputElement>(null);
 
-  if(!user) router.push('/login');
+  const router = useRouter()
+  const currentUrl = router.asPath
+  console.log(currentUrl)
 
   useEffect(() => {
     setReady(false);
     const getSrc = async () => {
       console.log("from Post, id = " + id)
-
-     
       // Get firebase bucket url
       //get post from posts context
       const post = posts.find((post: { post_id: string; }) => post.post_id === id);
@@ -54,32 +56,36 @@ export default function Post({
         });
       }
 
-
-
-      const res = await fetch(`/api/image?url=${post?.imageURL}`)
-      const {imageUrl} = await res.json();
-
+    
+      try {
+        const res = await fetch(`/api/image?url=${post?.imageURL}`)
+        const {imageUrl} = await res.json();
+        // Set state
+        setPost(post);
+        setSrc(imageUrl);
+        setLikes(post?.likes)
+      } catch (error) {
+        console.log(error)
+      }
       
-
-      // Set state
-      setPost(post);
-      setSrc(imageUrl);
-      setLikes(post?.likes)
     };
     async function getUser() {
       if (post?.userid) {
         const user = await getUserbyUid(post.userid);
         if (user){
-        console.log(user);
-        console.log('hihihi')
-        console.log(user.profile_img)
+        
         setUserObj(user);
         setReady(true);
         }
       }
     }
-    getUser();
-    getSrc();
+
+    if (post != false){
+      getUser();
+      getSrc();
+    }
+   
+    
 
   }, [id, user, post]);
 
@@ -133,7 +139,7 @@ export default function Post({
     try {
       if (comment && user?.uid) {
         //create comment object
-        const comment_obj = {
+        const comment_obj:any = {
           uid: uuidv4(),
           comment: comment,
           userid: user?.uid,
@@ -158,7 +164,7 @@ export default function Post({
 
   return (
     <>
-    {ready ? (
+    {(ready && post != false)? (
 
       <div className="bg-blue-gray-800 my-7 border rounded-xl text-white !important max-w-500 overflow-x-hidden">
         <div className="flex items-center p-5">
@@ -238,6 +244,35 @@ export default function Post({
           <button disabled={!comment.trim()} type='submit' className="font-semibold btn">Post</button>
         </form>
 
+        <div className="flex justify-center">
+
+        {(post && currentUrl == '/profile' && post?.userid == user?.uid) && (
+            <IconButton
+              variant="outlined"
+              className="m-5"
+              onClick={async () => {
+                let old_id = post.post_id
+                try {
+                  await deletePost(id);
+                } catch (error) {
+                  console.log(error)
+                }
+                
+                //remove post from posts context
+                if (setPosts != "default"){
+                  //need to remore post from posts state so that it updates the profile stats
+                  posts = posts.filter((e:any) => e.post_id != old_id)
+                  setPosts(posts)
+                }
+                setPost(false);
+              }}
+            >
+              <TrashIcon title="Delete Post" className="w-full h-full p-0 m-0 text-white" />
+            </IconButton>
+          )}
+
+        </div>
+
           {/* <div className="w-fit h-fit m-5 p-5 flex flex-col justify-center items-center border-blue-gray-500 rounded-md border-2">
           {src.length ? (
             <Image
@@ -276,25 +311,11 @@ export default function Post({
             }}/>
             <Button className="mt-6" fullWidth type="submit">Submit</Button>
           </form>
-          {post && (
-            <IconButton
-              variant="outlined"
-              className="m-2"
-              onClick={async () => {
-                const posts = await deletePost(id);
-                console.log("from delete " + posts);
-                //remove post from posts context
-                const newPosts = posts.filter((post: { post_id: string; }) => post.post_id !== id);
-                setPosts(newPosts);
-              }}
-            >
-              <TrashIcon title="Delete Post" className="w-full h-full p-0 m-0" />
-            </IconButton>
-          )}
+          
         </div> */}
     </div>
 
-    ): (<div>loading</div>)}
+    ): (post != false && <div>loading</div>)}
     </>
     
 
