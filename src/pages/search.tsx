@@ -24,11 +24,6 @@ export default function Search() {
         fetchResults();
     }, [searchTerm])
 
-    console.log('the search term is')
-    console.log(searchTerm)
-    console.log('these are the search results')
-    console.log(searchResults)
-
     return (
         <Layout>
             <Typography variant="h1">Search Users</Typography>
@@ -36,8 +31,7 @@ export default function Search() {
             <Input label="Search" crossOrigin="anonymous" onChange={handleSearch}/>
             <div>
                 {searchResults.map((result, i) => {
-                    return <UserProfile userDetails={result}/>
-                    //return <Typography key={i} variant="h2">{result?.displayName} {result?.email}</Typography>
+                    return <UserProfile key={i} userDetails={result}/>
                 })}
             </div>
         </Layout>

@@ -700,11 +700,12 @@ async function searchUsers(searchTerm: string) {
       where("email", "<=", searchTerm + "\uf8ff"),
       orderBy("email")
     );
-    const emailSnapshot = await getDocs(emailQ);
-    emailSnapshot.forEach((doc) => {
-      if(!users.includes(doc.data()))
-        users.push(doc.data());
-    });
+    const emailSnapshot = (await getDocs(emailQ));
+
+    emailSnapshot.forEach((snapshot) => {
+      let data = snapshot.data();
+      if (!users.some((user: any) => user.uid === data.uid)) users.push(data);
+    })
     
     return users;
   }
