@@ -26,8 +26,7 @@ export default function Search() {
 
     return (
         <Layout>
-            <Typography variant="h1">Search Users</Typography>
-            <Typography variant="h2">TODO Implement way to find and follow other users profiles</Typography>
+            <Typography className='p-5'variant="h1">Search Users</Typography>
             <Input label="Search" crossOrigin="anonymous" onChange={handleSearch}/>
             <div>
                 {searchResults.map((result, i) => {
