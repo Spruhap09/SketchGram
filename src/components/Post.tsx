@@ -54,9 +54,17 @@ export default function Post({
         post.comments.sort((a: { timestamp: string; }, b: { timestamp: string; }) => {
           return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
         });
+
+        //update usernames on comments
+
+        for (let i=0; i<post.comments.length; i++){
+          let ret_user:any = await getUserbyUid(post.comments[i].userid)
+          post.comments[i].username = ret_user.displayName
+        }
       }
 
-    
+      
+
       try {
         const res = await fetch(`/api/image?url=${post?.imageURL}`)
         const {imageUrl} = await res.json();
