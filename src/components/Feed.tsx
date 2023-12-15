@@ -6,6 +6,7 @@ import { Typography } from "@material-tailwind/react";
 import { useRouter } from "next/router";
 import { useContext, useState, useEffect } from "react";
 import { getUserbyUid } from "@/firebase/functions";
+import TopFeed from "./TopFeed";
 
 
 
@@ -50,8 +51,15 @@ export default function Feed() {
                         {activeTab == 'home' && <Home userObj={userObj}/>}
                         {activeTab == 'expore' && <Explore userObj={userObj}/>}
                     </div>
-                    <div className="flex-1/3 p-4">
-                        <p className="text-center"> Top 3 Pictures</p>
+                    <div className="flex flex-col items-center justify-center h-screen">
+                        <div className="p-4">
+                            <p className="text-center bg-blue-gray-800 text-white font-bold py-1 px-4 rounded-full"> Top 10 Pictures</p>
+                        </div>
+                        
+                        
+                        <div className="flex-2/3 overflow-y-scroll scrollbar-thumb-blue-gray-800 scrollbar-thin shadow-md">
+                            {<TopFeed />}
+                        </div>
                     </div>
 
                 </div>
