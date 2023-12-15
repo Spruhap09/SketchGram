@@ -19,6 +19,7 @@ import {
   collection,
   getFirestore,
   doc,
+  setDoc,
   query,
   where,
   or,
@@ -808,6 +809,44 @@ async function updatePostComments(postId: string, comment: string, userUid: stri
     throw e;
   }
 }
+
+const uploadProfilePic = async (file: any) => {
+  if (!file) throw "Error: No file to upload"
+
+   // Get Firebase Auth
+   const auth = getAuth();
+   if (!auth.currentUser || !auth.currentUser.uid)
+     throw new Error("User not logged in");
+ 
+   // Get Firebase Firestore
+   const db = getFirestore();
+   if (!db) throw "Database is null";
+ 
+   // Get Firebase Cloud Storage
+   const storage = getStorage();
+   if (!storage) throw "Storage is null";
+
+   const fileRef = ref(storage, `profile_pictures/${file.name}`);
+
+  try {
+    // Upload the file to Cloud Storage
+    const snapshot = await uploadBytes(fileRef, file);
+
+    // Get the URL of the uploaded file
+    const url = await getDownloadURL(snapshot.ref);
+
+    // Create a reference to the user's profile in Firestore
+    const profileRef = doc(db, 'users', 'user-id'); // Replace 'user-id' with the actual user's ID
+
+    // Update the user's profile with the new picture URL
+    await setDoc(profileRef, { profilePicture: url }, { merge: true });
+
+    console.log('File uploaded and Firestore reference set:', url);
+  } catch (error) {
+    console.log('Error uploading file and setting Firestore document:', error);
+  }
+};
+
 
 export {
   signUpWithEmailAndPassword,
