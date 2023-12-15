@@ -33,21 +33,23 @@ export default function Profile() {
             getPosts();
     },[])
 
-    
     return (
         <Layout>
             {/* {ready ? (
                 <>
                     <div className="sticky flex flex-col justify-center items-center">
                         <Typography variant="h2" className="">{'Welcome to your profile page!'} </Typography>
-                    </div><div className="flex justify-between py-10 w-full">
+                    </div>
+                    <div className="flex justify-between py-10 w-full">
                         <EditProfile />
                         <ProfileStats posts={posts} />
 
-                    </div><div>
+                    </div>
+                    <div>
                         <Typography variant="h4" className="text-center">Your Posts</Typography>
                         <UserPosts setPosts={setPosts} posts={posts} />
-                    </div><Button color="blue-gray" variant="gradient" onClick={() => router.push('/canvas')}>Back to Canvas</Button>
+                    </div>
+                    <Button color="blue-gray" variant="gradient" onClick={() => router.push('/canvas')}>Back to Canvas</Button>
                 </>
                 ) : <div>Loading</div>} */}
             {ready? (

@@ -7,20 +7,41 @@ import {
   Button,
   Input,
 } from "@material-tailwind/react";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context/AuthContext";
-import { logOutUser } from "@/firebase/functions";
+import { getUserbyUid, logOutUser } from "@/firebase/functions";
+import Head from "next/head";
+
+const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export default function Navigation() {
     const router = useRouter();
     const user = useContext(AuthContext);
-    const pageName = router.asPath.slice(1, router.asPath.length)
+    const [pageName, setPageName] = useState("");
+    
+
+    useEffect(() => {
+      async function getPageName(){
+        if (router.asPath.startsWith('/user/')){
+          const id = router.asPath.split('/')[2]
+          const viewUser = await getUserbyUid(id);
+          setPageName(`${viewUser?.displayName}'s Profile`)
+        }
+        else{
+          setPageName(router.asPath.slice(1, router.asPath.length));
+        }
+        
+      }
+      getPageName()
+    }, [router.asPath])
+    
   return (
     <Navbar
       variant="gradient"
       color="blue-gray"
       className="mx-auto max-w-screen-xl from-blue-gray-900 to-blue-gray-800 px-4 py-3"
     >
+      <Head><title>{capitalize(pageName)}</title></Head>
       <div className="flex flex-wrap items-center justify-between gap-y-4 text-white">
         <Typography
           as="a"
@@ -44,12 +65,13 @@ export default function Navigation() {
           <IconButton title="Canvas" variant="text" color="white" onClick={() => router.push('/canvas')}>
             <PencilSquareIcon className="h-4 w-4" />
           </IconButton>
+          {/* <IconButton title="User" variant="text" color="white" onClick={() => router.push(`/user/:id`)}>
+            <PencilSquareIcon className="h-4 w-4" />
+          </IconButton> */}
 
             {user ? <Button onClick={() => logOutUser()}>Sign Out</Button> : <Button onClick={() => router.push('/login')}>Log In</Button>}
         </div>
 
-
-        
       </div>
     </Navbar>
   );

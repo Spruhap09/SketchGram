@@ -1,7 +1,7 @@
 import Navigation from "@/components/Navigation"
 
 interface LayoutProps {
-    children: React.ReactNode
+    children: React.ReactNode,
 }
 
 export default function Layout({children}: LayoutProps) {

@@ -19,7 +19,7 @@ export default function UserPosts({ setPosts, posts }: { setPosts:any, posts: an
                     console.log(posts),
                 posts.map((post: any) => { // Add type annotation for 'post'
                     console.log(post);
-                    return <Post key={post.post_id} id={post.post_id} setPosts={setPosts} posts={posts} />;
+                    return <Post key={post.post_id} id={post.post_id} posts={posts} setPosts={setPosts} />;
                 })
             ) : (
               <div>No current posts</div>

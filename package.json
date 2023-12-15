@@ -5,11 +5,10 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "npm-run-all --parallel start-next-dev start-emulator",
-    "start-next-dev": "next dev",
-    "start-emulator": "firebase emulators:start",
-    "cleanup": "npm run stop-emulator",
-    "stop-emulator": "firebase emulators:stop",
+    "start": "npm-run-all --parallel dev start-emulator",
+    "start-no-save": "npm-run-all --parallel dev start-emulator-no-save",
+    "start-emulator": "firebase emulators:start --import ./emulator-data/ --export-on-exit ./emulator-data",
+    "start-emulator-no-save": "firebase emulators:start --import ./emulator-data/",
     "lint": "next lint"
   },
   "dependencies": {
@@ -30,6 +29,7 @@
     "@types/react": "^18.2.39",
     "@types/react-color": "^3.0.10",
     "@types/react-dom": "^18",
+    "@types/uuid": "^9.0.7",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.0.3",
