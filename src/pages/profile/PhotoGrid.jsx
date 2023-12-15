@@ -1,22 +1,37 @@
-import PhotoSquare from './PhotoSquare'
+import React, { useState } from 'react';
+import PhotoSquare from './PhotoSquare';
+import Post from "../../components/Post"
+import Modal from "../../components/Modal"
+
 const PhotoGrid = ({ posts }) => {
-  // const res = await fetch(`/api/image?url=${post?.imageURL}`);
-  // const data = await res.json();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activePost, setActivePost] = useState(null);
+
+  const handlePhotoClick = (post) => {
+    setActivePost(post);
+    setIsModalOpen(true);
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-4">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {posts.map((p, index) => (
-          // <div key={index} className={`overflow-hidden shadow-lg`}>
-          //   <img src={post.imageURL} alt={post.description} className="w-full object-cover" />
-          // </div>
-          
-          <PhotoSquare post={p}/>
+        {posts.map((post) => (
+          <div onClick={() => handlePhotoClick(post)} key={post.post_id}>
+            <PhotoSquare post={post} />
+          </div>
         ))}
       </div>
+
+      {isModalOpen && (
+        <Modal onClose={() => setIsModalOpen(false)}>
+           {console.log("active post", activePost.post_id)}
+          
+          <Post key={activePost.post_id} id={activePost.post_id} posts={posts}/>
+         
+        </Modal>
+      )}
     </div>
   );
 };
 
-
-
-export default PhotoGrid
+export default PhotoGrid;
