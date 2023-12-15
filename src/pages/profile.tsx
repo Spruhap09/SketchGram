@@ -9,6 +9,8 @@ import ProfileStats from "../components/ProfileStats";
 import { getUserPostsLimit } from "@/firebase/functions";
 import ProfileHeader from "./profile/ProfileHeader"
 import noAvatar from 'public/noAvatar.jpeg'
+import AboutSection from './profile/AboutSection'
+import PhotoGrid from "./profile/PhotoGrid"
 export default function Profile() {
 
     const exampleProfile = {
@@ -16,7 +18,8 @@ export default function Profile() {
         location: "Hoboken, NJ", 
         photos: 253,
         followers: 1026,
-        following: 478
+        following: 478,
+        bio: "I like art and im dominican"
       };
       
 
@@ -60,9 +63,9 @@ export default function Profile() {
                 ) : <div>Loading</div>} */}
             {ready? (
                 <>
-                 <div>
-                    <ProfileHeader profile={exampleProfile}/>
-
+                 <div className="w-full">
+                    <ProfileHeader profile={user} posts={posts}/>
+                    <PhotoGrid posts={posts}/> 
                  </div>
                 </>
             ) : <div>Loading</div>}
