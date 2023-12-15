@@ -19,6 +19,7 @@ import {
   collection,
   getFirestore,
   doc,
+  setDoc,
   query,
   where,
   or,
@@ -478,7 +479,7 @@ async function saveDraft(canvas: HTMLCanvasElement) {
     const {db, auth, storage} = initFirebaseConfig();
     if (!auth.currentUser || !auth.currentUser.uid)
       throw new Error("User not logged in");
-  
+
     let path;
     //Wrap in new Promise to synchronize operation
     await new Promise<void>((resolve, reject) => {
@@ -495,7 +496,7 @@ async function saveDraft(canvas: HTMLCanvasElement) {
             );
             const snapshot = await uploadBytes(storageRef, blob);
             if (!snapshot) throw new Error("Snapshot is null");
-            
+
             // Get path to image in storage bucket
             path = snapshot.ref.fullPath;
             
@@ -781,10 +782,10 @@ async function followUser(otherUid: string, userUid: string){
     //get the user collection reference
     const usersCollectionRef = collection(db, "users"); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference
 
-    // Check if user already exists in database 
+    // Check if user already exists in database
     const q = query(usersCollectionRef, where("uid", "==", userUid));
     const querySnapshot = await getDocs(q); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.QuerySnapshot
-    
+
     // If user exists then update the details
     if (!querySnapshot.empty) {
 
@@ -804,10 +805,10 @@ async function followUser(otherUid: string, userUid: string){
 
     //doing the same thing, but adding for following
 
-    // Check if user already exists in database 
+    // Check if user already exists in database
     const q1 = query(usersCollectionRef, where("uid", "==", otherUid));
     const querySnapshot1 = await getDocs(q1); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.QuerySnapshot
-    
+
     // If user exists then update the details
     if (!querySnapshot1.empty) {
 
@@ -818,13 +819,13 @@ async function followUser(otherUid: string, userUid: string){
       const oldFollowers = userDoc.data()?.followers
       const newFollowers = [...oldFollowers, userUid];
       await updateDoc (userDocRef, {followers: newFollowers});
-      
+
     }
 
     else {
       throw "This user does not exist";
     }
-    
+
   }
   catch(e){
     console.error("Error updating the follower count: ", e);
@@ -843,10 +844,10 @@ async function unfollowUser(otherUid: string, userUid: string){
     //get the user collection reference
     const usersCollectionRef = collection(db, "users"); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference
 
-    // Check if user already exists in database 
+    // Check if user already exists in database
     const q = query(usersCollectionRef, where("uid", "==", userUid));
     const querySnapshot = await getDocs(q); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.QuerySnapshot
-    
+
     // If user exists then update the details
     if (!querySnapshot.empty) {
 
@@ -857,7 +858,7 @@ async function unfollowUser(otherUid: string, userUid: string){
       const oldFollowing = userDoc.data()?.following
       const newFollowing = oldFollowing.filter((myUid: string) => myUid !== otherUid);
       await updateDoc (userDocRef, {following: newFollowing});
-      
+
     }
     else {
       throw "This user does not exist";
@@ -865,16 +866,16 @@ async function unfollowUser(otherUid: string, userUid: string){
 
     //doing the same thing, but adding for following
 
-    // Check if user already exists in database 
+    // Check if user already exists in database
     const q1 = query(usersCollectionRef, where("uid", "==", otherUid));
     const querySnapshot1 = await getDocs(q1); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.QuerySnapshot
-    
+
     // If user exists then update the details
     if (!querySnapshot1.empty) {
 
       const userDocRef = querySnapshot1.docs[0].ref;
       const userDoc = await getDoc(userDocRef);
-     
+
       //update the db for the collection
       const oldFollowers = userDoc.data()?.followers
       const newFollowers = oldFollowers.filter((myUid: string) => myUid !== userUid);
@@ -887,6 +888,44 @@ async function unfollowUser(otherUid: string, userUid: string){
     throw e;
   }
 }
+
+const uploadProfilePic = async (file: any) => {
+  if (!file) throw "Error: No file to upload"
+
+   // Get Firebase Auth
+   const auth = getAuth();
+   if (!auth.currentUser || !auth.currentUser.uid)
+     throw new Error("User not logged in");
+
+   // Get Firebase Firestore
+   const db = getFirestore();
+   if (!db) throw "Database is null";
+
+   // Get Firebase Cloud Storage
+   const storage = getStorage();
+   if (!storage) throw "Storage is null";
+
+   const fileRef = ref(storage, `profile_pictures/${file.name}`);
+
+  try {
+    // Upload the file to Cloud Storage
+    const snapshot = await uploadBytes(fileRef, file);
+
+    // Get the URL of the uploaded file
+    const url = await getDownloadURL(snapshot.ref);
+
+    // Create a reference to the user's profile in Firestore
+    const profileRef = doc(db, 'users', 'user-id'); // Replace 'user-id' with the actual user's ID
+
+    // Update the user's profile with the new picture URL
+    await setDoc(profileRef, { profilePicture: url }, { merge: true });
+
+    console.log('File uploaded and Firestore reference set:', url);
+  } catch (error) {
+    console.log('Error uploading file and setting Firestore document:', error);
+  }
+};
+
 
 
 export {
@@ -913,7 +952,7 @@ export {
   searchUsers,
   updatePostComments,
   getUserbyUid,
-  getAllPosts, 
+  getAllPosts,
   followUser,
   unfollowUser
 };
