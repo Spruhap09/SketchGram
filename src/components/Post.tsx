@@ -1,4 +1,5 @@
 import Image from "next/image";
+import noAvatar from 'public/noAvatar.jpeg'
 import { useContext, useEffect, useRef, useState } from "react";
 import { getUserbyUid, deletePost, updatePostLikes, updatePostComments } from "@/firebase/functions";
 import { DocumentData } from "firebase/firestore";
@@ -170,7 +171,7 @@ export default function Post({
           comment: comment,
           userid: user?.uid,
           username: user?.displayName,
-          profile_img: userObj?.profile_img,
+          profilePicture: userObj?.profilePicture,
           timestamp: new Date().toISOString(),
         };
         await updatePostComments(post?.post_id, comment_obj, user?.uid);
@@ -194,8 +195,8 @@ export default function Post({
 
       <div className="bg-blue-gray-800 my-7 border rounded-xl text-white !important max-w-500 overflow-x-hidden">
         <div className="flex items-center p-5">
-          <img src={userObj?.profile_img === 'empty-profile.png' ? '../empty-profile.png' : userObj?.profile_img}
-          width={500} height={500} className="rounded-full h-12 w-12 object-contain border-2 p-1 mr-3" alt={"profile picture for " + userObj?.displayName} />
+          <img src={userObj?.profilePicture || noAvatar.src}
+          width={500} height={500} className="rounded-full h-12 w-12 border-2 border-gray-300 mr-4" alt={"profile picture for " + userObj?.displayName} />
           <p className="flex-1 font-bold text-white">{userObj?.displayName}</p>
         </div>
         {src.length ? 
@@ -207,7 +208,7 @@ export default function Post({
         {(!sample ? (
                   <div className="flex space-x-4 p-4">
          
-                  {(!likes.includes(user?.uid) 
+                  {(!likes.includes(user?.uid)
                   ?  <HeartIcon onClick={handleLike} className='btn text-white'/> :
                   <HeartIconFilled onClick={handleUnLike} className='btn text-red-500'/>
                   )}
@@ -215,10 +216,11 @@ export default function Post({
                   <PaperAirplaneIcon onClick={() => (handleDownload(src))} className='btn text-white'/>
                 </div>
         ) : (<div></div>))}
-       
+
           
         {/* Caption */}
 
+        
         <div className="px-5 py-3 truncate">
         {likes.length > 0 && (
             <>
@@ -233,20 +235,18 @@ export default function Post({
         </div>
 
         {/* Comments */}
-
-        {(!sample ? (
-          <div className="ml-10 h-20 overflow-y-scroll scrollbar-thumb-white scrollbar-thin">
-            {(post && post?.comments) && (
-                <div>
-                  {post.comments.map((postComment: any) => (
-                    <div key={postComment.uid} className="flex items-center space-x-2 ab-3 p-2 block">
-                      <img src={postComment?.profile_img === 'empty-profile.png' ? '../empty-profile.png' : postComment?.profile_img}
-                      alt={"comment profile picture for user " + postComment?.username}
-                      className="h-7 rounded-full" />
-                      <p className="text-sm flex-1 truncate space-x-4 overflow-ellipsis block whitespace-no-wrap">
-                        <span className="font-bold mr-2">{postComment?.username}</span>
-                        {postComment?.comment}
-                      </p>
+        <div className="ml-10 h-20 overflow-y-scroll scrollbar-thumb-white scrollbar-thin">
+        {(post && post?.comments) && (
+            <div>
+              {post.comments.map((postComment: any) => (
+                <div key={postComment.uid} className="flex items-center space-x-2 ab-3 p-2 block">
+                  <img src={postComment?.profilePicture || noAvatar.src }
+                  alt={"comment profile picture for user " + postComment?.username}
+                  className="rounded-full h-7 w-7 border-2 border-gray-300 mr-4" />
+                  <p className="text-sm flex-1 truncate space-x-4 overflow-ellipsis block whitespace-no-wrap">
+                    <span className="font-bold mr-2">{postComment?.username}</span>
+                    {postComment?.comment}
+                  </p>
 
                       <Moment fromNow className="pr-5 text-xs">
                         {postComment?.timestamp}
@@ -255,10 +255,10 @@ export default function Post({
                     </div>
                   ))}
                 </div>)
-            } 
+            }
          </div>
         ) : (<div></div>))}
-        
+
 
 
 
@@ -267,9 +267,9 @@ export default function Post({
         {(!sample ? (
           <form onSubmit={handleSubmit} className="flex items-center space-x-3 p-4">
             <FaceSmileIcon className='h-7'/>
-            <input 
+            <input
               ref={inputRef}
-              type="text" 
+              type="text"
               value={comment}
               onChange={handleCommentChange}
               placeholder="Add a comment..."
@@ -308,7 +308,7 @@ export default function Post({
 
         </div>
 
-          
+
     </div>
 
     ): (post != false && <div>loading</div>)}

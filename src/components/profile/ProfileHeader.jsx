@@ -1,11 +1,12 @@
 import noAvatar from 'public/noAvatar.jpeg'
 import { AuthContext } from "@/context/AuthContext";
-import { getUserStats } from "@/firebase/functions";
+import { getUserbyUid, getUserStats } from "@/firebase/functions";
 import { useContext , useState, useEffect} from 'react';
 import { useRouter } from "next/router";
 
 const ProfileHeader = ({profile, posts}) => {
   const user = useContext(AuthContext);
+  const [userInformation, setUserInformation] = useState(undefined)
   const [following, setFollowing] = useState([]);
   const [followers, setFollowers] = useState([]);
   const [drafts, setDrafts] = useState([]);
@@ -18,6 +19,9 @@ const ProfileHeader = ({profile, posts}) => {
       const getStats = async () => {
           if(user){
               const stats = await getUserStats(user.uid);
+              const fetchUserInfo = await getUserbyUid(user.uid)
+              console.log("inside fet stats", fetchUserInfo)
+              setUserInformation(fetchUserInfo)
               setFollowers(stats.followers);
               setFollowing(stats.following);
               setDrafts(stats.drafts);
@@ -29,7 +33,9 @@ const ProfileHeader = ({profile, posts}) => {
     <div className="">
       <div className="flex flex-col items-center md:items-start md:flex-row w-full justify-center">
         <div className="mb-4 md:mb-0 md:mr-4">
-          <img src={noAvatar.src} className="w-40 h-30 rounded-lg mb-4" /> 
+          {console.log("user information", userInformation?.profilePicture)}
+          <img src={userInformation?.profilePicture || noAvatar.src} alt="Profile"
+          className="rounded-full w-20 h-20 border-2 border-gray-300 mr-4" /> 
         </div>
         <div>
         <div className="flex flex-col md:flex-row w-full justify-left items-center"> 
