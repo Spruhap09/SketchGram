@@ -889,42 +889,58 @@ async function unfollowUser(otherUid: string, userUid: string){
   }
 }
 
-const uploadProfilePic = async (file: any) => {
-  if (!file) throw "Error: No file to upload"
+const uploadProfilePic = async (file: File) => {
+  if (!file) throw new Error("No file to upload");
 
-   // Get Firebase Auth
-   const auth = getAuth();
-   if (!auth.currentUser || !auth.currentUser.uid)
-     throw new Error("User not logged in");
- 
-   // Get Firebase Firestore
-   const db = getFirestore();
-   if (!db) throw "Database is null";
- 
-   // Get Firebase Cloud Storage
-   const storage = getStorage();
-   if (!storage) throw "Storage is null";
+  const validFileTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+  const maxSize = 5 * 1024 * 1024; 
 
-   const fileRef = ref(storage, `profile_pictures/${file.name}`);
+  if (!validFileTypes.includes(file.type)) {
+    throw new Error("Invalid file type. Please upload a JPEG or PNG image.");
+  }
+
+  if (file.size > maxSize) {
+    throw new Error("File size exceeds the limit of 5MB.");
+  }
+
+  const {db, auth} = initFirebaseConfig();
+  if (!auth.currentUser || !auth.currentUser.uid)
+    throw new Error("User not logged in");
+
+  const userId = auth.currentUser.uid;
+  const storage = getStorage();
+
+  // Define a unique path for each user's profile picture
+  const fileRef = ref(storage, `profile_pictures/${userId}/profile_pic`);
+
+  //get the user collection reference
+  const usersCollectionRef = collection(db, "users"); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference
+
+  // Check if user already exists in database 
+  const q = query(usersCollectionRef, where("uid", "==", auth.currentUser.uid));
+  const querySnapshot = await getDocs(q); 
 
   try {
-    // Upload the file to Cloud Storage
+    // Upload the new file to the unique path (overwrites if exists)
     const snapshot = await uploadBytes(fileRef, file);
 
     // Get the URL of the uploaded file
     const url = await getDownloadURL(snapshot.ref);
 
-    // Create a reference to the user's profile in Firestore
-    const profileRef = doc(db, 'users', 'user-id'); // Replace 'user-id' with the actual user's ID
-
-    // Update the user's profile with the new picture URL
-    await setDoc(profileRef, { profilePicture: url }, { merge: true });
+    // Update the user's profile in Firestore with the new picture URL
+    const userDocRef = querySnapshot.docs[0].ref;
+    //update the profile for auth
+    //update the db for the collection
+    await updateDoc (userDocRef, {profilePicture: url});
 
     console.log('File uploaded and Firestore reference set:', url);
+    return url
   } catch (error) {
-    console.log('Error uploading file and setting Firestore document:', error);
+    console.error('Error uploading file and setting Firestore document:', error);
+    throw error;
   }
 };
+
 
 
 export {
@@ -953,5 +969,6 @@ export {
   getUserbyUid,
   getAllPosts, 
   followUser,
-  unfollowUser
+  unfollowUser,
+  uploadProfilePic
 };
