@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState, useEffect } from 'react';
-import { useRouter } from 'next/router'; // Assuming you are using Next.js
+import { useRouter } from 'next/router'; 
 import { AuthContext } from "@/context/AuthContext";
 import { uploadProfilePic, getUserbyUid } from "../firebase/functions.ts";
 
@@ -9,7 +9,7 @@ const ProfileCard = () => {
     const [error, setError] = useState(null); 
     const fileInputRef = useRef(null);
     const [userInformation, setUserInformation] = useState(null);
-    const [isLoading, setIsLoading] = useState(true); // Loading state
+    const [isLoading, setIsLoading] = useState(true); 
 
     useEffect(() => {
       if (!user) {
@@ -24,7 +24,7 @@ const ProfileCard = () => {
         } catch (error) {
           console.error("Error fetching user info:", error);
         } finally {
-          setIsLoading(false); // Update loading state when data is fetched
+          setIsLoading(false); 
         }
       };
     
@@ -41,17 +41,17 @@ const ProfileCard = () => {
 
       try {
         await uploadProfilePic(file);
-        // Reset error state if upload is successful
+      
         setError(null);
       } catch (error) {
-        // Set error state to display the error message
+
         setError(error.message);
       }
     };
 
-    // Render loading indicator or return null while loading
+
     if (isLoading) {
-      return <div>Loading...</div>; // or return null;
+      return <div>Loading...</div>; 
     }
 
     return (
