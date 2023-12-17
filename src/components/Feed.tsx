@@ -42,19 +42,20 @@ export default function Feed() {
                     <div className="flex items-center justyify-center space-x-4 py-5">
                         <button className="btn bg-blue-gray-800 text-white font-bold py-6 px-6 rounded-full flex items-center justify-center" onClick={() => setTab('home')}>Home</button>
                         <button className="btn bg-blue-gray-800 text-white font-bold py-6 px-6 rounded-full flex items-center justify-center" onClick={() => setTab('expore')}>Explore</button>
+                        <button className="btn bg-blue-gray-800 text-white font-bold py-6 px-6 rounded-full flex items-center justify-center" onClick={() => setTab('topFeed')}>Top 10 Posts</button>
                     </div>
                     <div className="flex items-center justyify-center text-4xl space-x-4 py-5 font-bold">
-                        {activeTab == 'expore' ? (<p>Explore</p>) : (<p>Home</p>)}
+                        {activeTab == 'expore' ? (<p>Explore</p>) : activeTab == 'home' ? (
+                            <p>Home</p>) : (<p>Top 10 Feed</p>)}
                     </div>
                     <div className="flex-2/3 h-200 overflow-y-scroll scrollbar-thumb-blue-gray-800 scrollbar-thin shadow-md">
                         {activeTab == 'home' && <Home userObj={userObj}/>} 
                         {activeTab == 'expore' && <Explore userObj={userObj}/>}
-
+                        {activeTab == 'topFeed' && <TopFeed />}
                     </div>
                 </div>
-
-
-                <div className="flex flex-col items-center justify-center">
+                
+                {/* <div className="flex flex-col items-center justify-center">
                     <div className="flex items-center justyify-center text-4xl space-x-4 py-10 lg:font-bold">
                         <p>Top 10 Posts</p>
                     </div>
@@ -63,8 +64,7 @@ export default function Feed() {
                             {<TopFeed />}
                         </div>
                     </div>
-
-                </div>
+                </div> */}
             </>
             ) : <div>Loading</div>}
 

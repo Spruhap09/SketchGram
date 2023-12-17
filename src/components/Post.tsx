@@ -106,9 +106,16 @@ export default function Post({
         //update post context
         const newLikes = [...post?.likes, user?.uid];
         post.likes = newLikes;
-        console.log(post.likes)
         setPost(post);
         setLikes(newLikes);
+        if (setPosts !== "default"){
+          const postIndex = posts.findIndex((postToFind: { post_id: any; }) => postToFind.post_id === post?.post_id);
+          if (postIndex !== -1){
+            const newPosts = [...posts];
+            newPosts[postIndex] = post;
+            setPosts(newPosts)
+          }
+        }
       }
       
     } catch (error) {
@@ -130,9 +137,16 @@ export default function Post({
         //update post context
         const newLikes = post?.likes.filter((like: string) => like !== user?.uid);
         post.likes = newLikes;
-        console.log(post.likes)
         setPost(post);
         setLikes(newLikes);
+        if (setPosts !== "default"){
+          const postIndex = posts.findIndex((postToFind: { post_id: any; }) => postToFind.post_id === post?.post_id);
+          if (postIndex !== -1){
+            const newPosts = [...posts];
+            newPosts[postIndex] = post;
+            setPosts(newPosts)
+          }
+        }
       }
       
     } catch (error) {
@@ -166,6 +180,14 @@ export default function Post({
         });
         setPost(post);
         setComment('');
+        if (setPosts !== "default"){
+          const postIndex = posts.findIndex((postToFind: { post_id: any; }) => postToFind.post_id === post?.post_id);
+          if (postIndex !== -1){
+            const newPosts = [...posts];
+            newPosts[postIndex] = post;
+            setPosts(newPosts)
+          }
+        }
       }
     } catch (e) {
       alert(e);
