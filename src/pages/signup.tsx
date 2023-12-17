@@ -15,12 +15,26 @@ import {
 } from "@material-tailwind/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useContext, useState } from "react";
+import { useContext, useState, useRef, useEffect } from "react";
 
 export default function SignUp() {
   const user = useContext(AuthContext);
   const [pwMatch, setPwMatch] = useState("");
   const router = useRouter();
+
+  const displayNameRef:any = useRef(null)
+  const passwordRef:any = useRef(null)
+  const emailRef:any = useRef(null)
+
+
+  useEffect(() => {
+    const inputElement = emailRef.current;
+  
+    if (inputElement) {
+      console.log(inputElement)
+      inputElement.focus();
+    }
+  }, []);
 
   // Redirect to canvas if user is logged in
   if (user) router.push("/canvas");
@@ -38,6 +52,27 @@ export default function SignUp() {
     const passwordConfirmation = form.elements.namedItem(
       "passwordConfirmation"
     ) as HTMLInputElement;
+
+    try {
+      if (displayName.value.length > 50){
+        displayNameRef.current.focus()
+        throw "Display Name too long!"
+      }
+  
+      if (email.value.length > 50){
+        emailRef.current.focus()
+        throw "Email too long!"
+      }
+  
+      if (password.value.length > 60 || passwordConfirmation.value.length > 60){
+        passwordRef.current.focus()
+        throw "Password too long!"
+      }
+    } catch (error) {
+      alert(error)
+      return 
+    }
+    
 
     // Check if passwords match
     if (password.value !== passwordConfirmation.value) {
@@ -81,6 +116,7 @@ export default function SignUp() {
                 Display Name
               </Typography>
               <Input
+                ref={displayNameRef}
                 name="displayName"
                 size="lg"
                 placeholder="Your Name"
@@ -94,6 +130,7 @@ export default function SignUp() {
                 Your Email
               </Typography>
               <Input
+                ref={emailRef}
                 name="email"
                 size="lg"
                 placeholder="name@mail.com"
@@ -108,6 +145,7 @@ export default function SignUp() {
               </Typography>
               {pwMatch.length > 0 && <Typography color="red">{pwMatch}</Typography>}
               <Input
+                ref={passwordRef}
                 name="password"
                 type="password"
                 size="lg"
