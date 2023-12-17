@@ -88,11 +88,12 @@ async function updateDisplayName(newDisplayName: string){
     if (!querySnapshot.empty) {
 
       const userDocRef = querySnapshot.docs[0].ref;
+
       //update the profile for auth
       await updateProfile(auth.currentUser, { displayName: newDisplayName });
       //update the db for the collection
       await updateDoc (userDocRef, {displayName: newDisplayName});
-
+      
     }
     else {
       throw "This user does not exist";

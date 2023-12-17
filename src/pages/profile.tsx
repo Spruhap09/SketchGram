@@ -14,6 +14,7 @@ export default function Profile() {
     const [posts, setPosts] = useState<any[] | null>(null);
     const [ready, setReady] = useState(false);
     const router = useRouter();
+    const [changeValue, setChangedValue] = useState(false);
     if(!user) router.push('/login');
 
     useEffect(() => {
@@ -27,7 +28,7 @@ export default function Profile() {
                 }
             }
             getPosts();
-    },[])
+    },[changeValue])
 
     return (
         
@@ -39,7 +40,7 @@ export default function Profile() {
                         <Typography variant="h2" className="">{'Welcome to your profile page!'} </Typography>
                     </div>
                     <div className="flex justify-between py-10 w-full">
-                        <EditProfile />
+                        <EditProfile setChangedValue={setChangedValue} changedValue={changeValue}/>
                         <ProfileStats posts={posts} />
 
                     </div>
