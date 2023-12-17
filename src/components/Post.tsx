@@ -140,6 +140,22 @@ export default function Post({
     }
   }
 
+  const handleDownload = async (e:any) => {
+    try {
+      const response = await fetch(e);
+      const blob = await response.blob();
+
+      const link = document.createElement('a');
+      link.href = window.URL.createObjectURL(blob);
+      link.download = post?.description;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      console.error('Error downloading image:', error);
+    }
+  };
+
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
   };
@@ -196,19 +212,10 @@ export default function Post({
                   <HeartIconFilled onClick={handleUnLike} className='btn text-red-500'/>
                   )}
                   <ChatBubbleBottomCenterIcon onClick={focusInput} className='btn text-white'/>
-                  <PaperAirplaneIcon className='btn text-white'/>
+                  <PaperAirplaneIcon onClick={() => (handleDownload(src))} className='btn text-white'/>
                 </div>
         ) : (<div></div>))}
-        {/* <div className="flex space-x-4 p-4">
-         
-          {(!likes.includes(user?.uid) 
-          ?  <HeartIcon onClick={handleLike} className='btn text-white'/> :
-          <HeartIconFilled onClick={handleUnLike} className='btn text-red-500'/>
-          )}
-          <ChatBubbleBottomCenterIcon onClick={focusInput} className='btn text-white'/>
-          <PaperAirplaneIcon className='btn text-white'/>
-        </div> */}
-
+       
           
         {/* Caption */}
 
@@ -301,46 +308,7 @@ export default function Post({
 
         </div>
 
-          {/* <div className="w-fit h-fit m-5 p-5 flex flex-col justify-center items-center border-blue-gray-500 rounded-md border-2">
-          {src.length ? (
-            <Image
-              src={src}
-              alt="alt"
-              width={500}
-              height={500}
-              className="w-auto h-auto border-2 rounded-md border-blue-gray-800"
-            />
-          ) : (
-            <div>loading</div>
-          )}
-          {post?.description && <div>{post.description}</div>}
-          {(post?.likes ? 
-            <div>{`Total Number of Likes: ${post?.likes.length}`}</div> 
-            : <div>{`Total Number of Likes: 0`}</div>)}
-          {(!post?.likes.includes(user?.uid) 
-          ? <Button className="m-6" type="submit" onClick={handleLike}>Like Me!</Button> :
-          <Button className="m-6" type="submit" onClick={handleUnLike}>Unlike Me</Button>)}
-          {(post && post?.comments) && (
-            <div>
-              {post.comments.map((postComment: string) => (
-                <Typography>{postComment}</Typography>
-              ))}
-            </div>)}
-          <form onSubmit={handleSubmit}>
-              <Input
-                name="comment" 
-                size="lg"
-                placeholder="Your comment..."
-                onChange={handleCommentChange}
-                crossOrigin="anonymous"
-                className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
-                labelProps={{
-                className: "before:content-none after:content-none",
-            }}/>
-            <Button className="mt-6" fullWidth type="submit">Submit</Button>
-          </form>
           
-        </div> */}
     </div>
 
     ): (post != false && <div>loading</div>)}

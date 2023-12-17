@@ -4,11 +4,23 @@ import ClearScreen from "@/components/tools/ClearScreen";
 import PaintBucket from "@/components/tools/PaintBucket";
 import PaintBrush from "@/components/tools/PaintBrush";
 import DownloadImage from "@/components/tools/DownloadImage";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect} from "react";
 
 export default function Canvas() {
   const [color, setColor] = useState<string>("#000");
   const [lineWidth, setLineWidth] = useState<number>(5);
+
+
+  //colors the canvas background white as default
+  useEffect(() => {
+    const canvas:any = canvasRef.current;
+    const context = canvas.getContext('2d');
+
+    // Set white background
+    context.fillStyle = '#fff'; // White color
+    context.fillRect(0, 0, canvas.width, canvas.height);
+  }, [])
+
 
   // drawLine function, gets passed in as callback to useCanvas hook
   const drawLine = useCallback(
