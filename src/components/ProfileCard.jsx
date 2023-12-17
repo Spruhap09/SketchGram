@@ -2,6 +2,7 @@ import React, { useContext, useRef, useState, useEffect } from 'react';
 import { useRouter } from 'next/router'; 
 import { AuthContext } from "@/context/AuthContext";
 import { uploadProfilePic, getUserbyUid } from "../firebase/functions.ts";
+import noAvatar from 'public/noAvatar.jpeg'
 
 const ProfileCard = () => {
     const user = useContext(AuthContext);
@@ -59,7 +60,7 @@ const ProfileCard = () => {
         {console.log("pfp", userInformation)}
         {error && <div className="error-message text-red-500">{error}</div>}
         <img
-          src={userInformation.profilePicture}
+          src={userInformation?.profilePicture || noAvatar.src}
           alt="Profile"
           className="rounded-full w-16 h-16 border-2 border-gray-300 mr-4"
         />

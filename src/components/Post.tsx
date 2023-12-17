@@ -21,12 +21,12 @@ export default function Post({
   id,
   posts,
   setPosts = "default",
-  sample,
+  sample
 }: {
   id: string;
   posts: any;
   setPosts: any;
-  sample:any
+  sample: any;
 }) {
 
   const [src, setSrc] = useState<string>("");
@@ -220,7 +220,6 @@ export default function Post({
           
         {/* Caption */}
 
-        
         <div className="px-5 py-3 truncate">
         {likes.length > 0 && (
             <>
