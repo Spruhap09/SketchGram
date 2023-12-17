@@ -169,6 +169,7 @@ export default function Post({
   };
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.target.value = e.target.value.substring(0, 59)
     setComment(e.target.value);
   };
 
@@ -176,6 +177,14 @@ export default function Post({
     e.preventDefault();
     try {
       if (comment && user?.uid) {
+
+        if (comment.length >59){
+          comment.substring(0, 59)
+        }
+
+        if (/^\s*$/.test(comment)){
+          throw "comment can't be just spaces"
+        }
         //create comment object
         const comment_obj:any = {
           uid: uuidv4(),
