@@ -13,6 +13,11 @@ import { useRouter } from "next/router";
 export default function PostButton() {
   const router = useRouter();
 
+
+  const handleChange = (e:any) => {
+    e.target.value = e.target.value.substring(0, 59)
+  }
+
   // Called when user posts a canvas image to their profile
   const handlePost = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -22,9 +27,13 @@ export default function PostButton() {
     const description = form.elements.namedItem(
       "description"
     ) as HTMLInputElement;
+    if (description.value.length > 59){
+      description.value = description.value.substring(0, 30)
+    }
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
     if (!canvas) throw "Canvas is null";
-    if (!description || !description.value) throw "Description is null";
+    //last test is if its only spaces
+    if (!description || !description.value || /^\s*$/.test(description.value)) throw "Description is null";
 
     // Store canvas in firestore/cloud storage
     await postCanvasToProfile(canvas, description.value);
@@ -42,7 +51,7 @@ export default function PostButton() {
           </IconButton>
         </SpeedDialHandler>
         <SpeedDialContent className="bg-white rounded-full">
-          <form onSubmit={handlePost} className="flex flex-col justify-center">
+          <form onChange={handleChange} onSubmit={handlePost} className="flex flex-col justify-center">
             <Input
               name="description"
               label="Title"
