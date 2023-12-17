@@ -66,20 +66,7 @@ export default function ProfileStats ({posts}: { posts: any }) {
                     following_info.push(ret_user)
                 }
                 
-                // if(posts){
-                //     let maxLike = -1;
-                //     let maxComment = -1;
-                    
-                //     for (let post of posts){
-                //         if (post.likes.length > maxLike){
-                //             currentMostLikedPost = post;
-                            
-                //         }
-                //         if (post.comments.length > maxComment){
-                //             setMostCommentedPost(post)
-                //         }
-                //     }
-                // }
+                
                 console.log(JSON.stringify(followers_info))
                 setFollowers(followers_info);
                 setFollowing(following_info);
@@ -119,6 +106,7 @@ export default function ProfileStats ({posts}: { posts: any }) {
 
     //TODO: ADD STUFF ABOUT YOUR MOST LIKED POST SO FAR...
     return (
+        <>
         <div className="flex-grow box-border w-32 p-4 border-4 mr-4 rounded-lg flex flex-col items-center justify-center">
             <Typography variant="h5" color="blue-gray" className="my-2">Here are your profile stats!</Typography>
             <Typography onClick={togglePop} className="h6 hover:cursor-pointer">{`You have `} <span className="font-bold text-xl">{followers.length}</span> {`${followers.length === 1 ? 'follower' : 'followers'}`}</Typography>
@@ -139,8 +127,13 @@ export default function ProfileStats ({posts}: { posts: any }) {
                     <span className="font-bold text-xl">{mostCommentedPost.comments.length}</span> {`${mostCommentedPost.comments.length === 1 ? ' comment' : ' comments'}`}
                 </Typography>
             )}
+            
+        </div>  
+
+        <div>
             {followers.length > 0 && <Popout content={followers} isOpen={isOpen} popRef={popRef}/>}
             {following.length > 0 && <Popout content={following} isOpen={followingOpen} popRef={pop2Ref}/>}
-        </div>  
+        </div>
+        </>
     )
 }
