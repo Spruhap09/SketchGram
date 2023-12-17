@@ -92,7 +92,7 @@ export default function EditProfile (){
                         name="email" 
                         size="lg"
                         readOnly
-                        value={user?.email || ''}
+                        defaultValue={user?.email || ''}
                         crossOrigin="anonymous"
                         className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
                         labelProps={{
@@ -123,7 +123,8 @@ export default function EditProfile (){
                     <Input
                         name="email" 
                         size="lg"
-                        value={user?.email || ''}
+                        readOnly
+                        defaultValue={user?.email || ''}
                         crossOrigin="anonymous"
                         className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
                         labelProps={{

@@ -106,6 +106,14 @@ export default function Post({
         post.likes = newLikes;
         setPost(post);
         setLikes(newLikes);
+        if (setPosts !== "default"){
+          const postIndex = posts.findIndex((postToFind: { post_id: any; }) => postToFind.post_id === post?.post_id);
+          if (postIndex !== -1){
+            const newPosts = [...posts];
+            newPosts[postIndex] = post;
+            setPosts(newPosts)
+          }
+        }
       }
       
     } catch (error) {
@@ -129,6 +137,14 @@ export default function Post({
         post.likes = newLikes;
         setPost(post);
         setLikes(newLikes);
+        if (setPosts !== "default"){
+          const postIndex = posts.findIndex((postToFind: { post_id: any; }) => postToFind.post_id === post?.post_id);
+          if (postIndex !== -1){
+            const newPosts = [...posts];
+            newPosts[postIndex] = post;
+            setPosts(newPosts)
+          }
+        }
       }
       
     } catch (error) {
@@ -178,6 +194,14 @@ export default function Post({
         });
         setPost(post);
         setComment('');
+        if (setPosts !== "default"){
+          const postIndex = posts.findIndex((postToFind: { post_id: any; }) => postToFind.post_id === post?.post_id);
+          if (postIndex !== -1){
+            const newPosts = [...posts];
+            newPosts[postIndex] = post;
+            setPosts(newPosts)
+          }
+        }
       }
     } catch (e) {
       alert(e);
