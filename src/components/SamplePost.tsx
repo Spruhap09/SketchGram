@@ -3,8 +3,7 @@ import { getPost, getImageFromUrl, getUserPostsLimit, getAllPosts } from "@/fire
 import { AuthContext } from "@/context/AuthContext";
 import { Key, SetStateAction, useContext, useEffect, useRef, useState } from "react";
 
-
-export default function TopFeed() {
+export default function SamplePost(){
     const user = useContext(AuthContext);
     const [posts, setPosts] = useState<any[] | null>(null);
 
@@ -12,14 +11,10 @@ export default function TopFeed() {
     useEffect(() => {
         const getPosts = async () => {
             //gets all the posts from the database
-            const data: DocumentData[] = await getAllPosts();
-
-            const newest = data.sort((a: { timestamp: string; }, b: { timestamp: string; }) => {
-                return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
-            });
+            const data = await getAllPosts();
 
             // sorts the posts from most to least likes
-            const sortedPosts = newest.sort((a, b) => b.likes.length - a.likes.length);
+            const sortedPosts = data.sort((a, b) => b.likes.length - a.likes.length);
             
             //sets the current list of top posts
             setPosts(sortedPosts.slice(0,10));
@@ -28,15 +23,14 @@ export default function TopFeed() {
         }
 
     , []);
-
-    return(
+    return (
         <div>
-            {posts && posts.map((post: { post_id: Key | null | undefined; }) =>
-            <div key={post.post_id} className="px-3">
-            
-            <Post id={post.post_id} posts={posts}/>
-            </div> 
-            )}
-        </div>
+        {posts && posts.map((post: { post_id: Key | null | undefined; }) =>
+        <div key={post.post_id} className="px-3">
+        
+            <Post id={post.post_id} posts={posts} sample={true}/>
+        </div> 
+        )}
+    </div>
     )
 }

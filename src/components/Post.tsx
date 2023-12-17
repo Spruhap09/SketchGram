@@ -20,10 +20,12 @@ export default function Post({
   id,
   posts,
   setPosts = "default",
+  sample,
 }: {
   id: string;
   posts: any;
   setPosts: any;
+  sample:any
 }) {
 
   const [src, setSrc] = useState<string>("");
@@ -39,12 +41,12 @@ export default function Post({
 
   const router = useRouter()
   const currentUrl = router.asPath
-  console.log(currentUrl)
+  // console.log(currentUrl)
 
   useEffect(() => {
     setReady(false);
     const getSrc = async () => {
-      console.log("from Post, id = " + id)
+      // console.log("from Post, id = " + id)
       // Get firebase bucket url
       //get post from posts context
       const post = posts.find((post: { post_id: string; }) => post.post_id === id);
@@ -186,8 +188,18 @@ export default function Post({
         ) : (<div>loading</div>)}
 
 
-        
-        <div className="flex space-x-4 p-4">
+        {(!sample ? (
+                  <div className="flex space-x-4 p-4">
+         
+                  {(!likes.includes(user?.uid) 
+                  ?  <HeartIcon onClick={handleLike} className='btn text-white'/> :
+                  <HeartIconFilled onClick={handleUnLike} className='btn text-red-500'/>
+                  )}
+                  <ChatBubbleBottomCenterIcon onClick={focusInput} className='btn text-white'/>
+                  <PaperAirplaneIcon className='btn text-white'/>
+                </div>
+        ) : (<div></div>))}
+        {/* <div className="flex space-x-4 p-4">
          
           {(!likes.includes(user?.uid) 
           ?  <HeartIcon onClick={handleLike} className='btn text-white'/> :
@@ -195,12 +207,11 @@ export default function Post({
           )}
           <ChatBubbleBottomCenterIcon onClick={focusInput} className='btn text-white'/>
           <PaperAirplaneIcon className='btn text-white'/>
-        </div>
+        </div> */}
 
           
         {/* Caption */}
 
-        
         <div className="px-5 py-3 truncate">
         {likes.length > 0 && (
             <>
@@ -215,42 +226,51 @@ export default function Post({
         </div>
 
         {/* Comments */}
-        <div className="ml-10 h-20 overflow-y-scroll scrollbar-thumb-white scrollbar-thin">
-        {(post && post?.comments) && (
-            <div>
-              {post.comments.map((postComment: any) => (
-                <div key={postComment.uid} className="flex items-center space-x-2 ab-3 p-2 block">
-                  <img src={postComment?.profile_img === 'empty-profile.png' ? '../empty-profile.png' : postComment?.profile_img}
-                  alt={"comment profile picture for user " + postComment?.username}
-                  className="h-7 rounded-full" />
-                  <p className="text-sm flex-1 truncate space-x-4 overflow-ellipsis block whitespace-no-wrap">
-                    <span className="font-bold mr-2">{postComment?.username}</span>
-                    {postComment?.comment}
-                  </p>
 
-                  <Moment fromNow className="pr-5 text-xs">
-                    {postComment?.timestamp}
-                  </Moment>
+        {(!sample ? (
+          <div className="ml-10 h-20 overflow-y-scroll scrollbar-thumb-white scrollbar-thin">
+            {(post && post?.comments) && (
+                <div>
+                  {post.comments.map((postComment: any) => (
+                    <div key={postComment.uid} className="flex items-center space-x-2 ab-3 p-2 block">
+                      <img src={postComment?.profile_img === 'empty-profile.png' ? '../empty-profile.png' : postComment?.profile_img}
+                      alt={"comment profile picture for user " + postComment?.username}
+                      className="h-7 rounded-full" />
+                      <p className="text-sm flex-1 truncate space-x-4 overflow-ellipsis block whitespace-no-wrap">
+                        <span className="font-bold mr-2">{postComment?.username}</span>
+                        {postComment?.comment}
+                      </p>
 
-                </div>
-              ))}
-            </div>)
-         }
+                      <Moment fromNow className="pr-5 text-xs">
+                        {postComment?.timestamp}
+                      </Moment>
 
-        </div>
+                    </div>
+                  ))}
+                </div>)
+            } 
+         </div>
+        ) : (<div></div>))}
+        
+
+
 
         {/* Input Box */}
-        <form onSubmit={handleSubmit} className="flex items-center space-x-3 p-4">
-          <FaceSmileIcon className='h-7'/>
-          <input 
-            ref={inputRef}
-            type="text" 
-            value={comment}
-            onChange={handleCommentChange}
-            placeholder="Add a comment..."
-            className="bg-blue-gray-400 p-1 border-none flex-1 focus:ring-0 outline=none text-sm" />
-          <button disabled={!comment.trim()} type='submit' className="font-semibold btn">Post</button>
-        </form>
+
+        {(!sample ? (
+          <form onSubmit={handleSubmit} className="flex items-center space-x-3 p-4">
+            <FaceSmileIcon className='h-7'/>
+            <input 
+              ref={inputRef}
+              type="text" 
+              value={comment}
+              onChange={handleCommentChange}
+              placeholder="Add a comment..."
+              className="bg-blue-gray-400 p-1 border-none flex-1 focus:ring-0 outline=none text-sm" />
+            <button disabled={!comment.trim()} type='submit' className="font-semibold btn">Post</button>
+          </form>
+        ) : (<div></div>))}
+
 
         <div className="flex justify-center">
 

@@ -5,7 +5,7 @@ import { AuthContext } from "@/context/AuthContext";
 import { logOutUser } from "@/firebase/functions";
 import { Button } from "@material-tailwind/react";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import router, { useRouter } from "next/router";
 import { useContext } from "react";
 import UserDrafts from "@/components/UserDrafts";
 import PostButton from "@/components/PostButton";
@@ -15,6 +15,16 @@ export default function CanvasPage() {
 
   return (
     <Layout>
+      {!user && (
+        <div className="flex flex-row">
+        <Button className="m-5" onClick={() => router.push("/login")}>
+          Log In
+        </Button>
+        <Button className="m-5" onClick={() => router.push("/signup")}>
+          Sign Up
+        </Button>
+        </div>
+      )}
       <Canvas />
       {user && (
         <>

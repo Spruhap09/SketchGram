@@ -35,29 +35,31 @@ export default function Feed() {
     },[user])
 
     return(
-        <div>
+        <div className="flex flex-row">
             {ready ? (
             <>
-                <div>
+                <div className="flex flex-col items-center h-screen p-4">
                     <div className="flex items-center justyify-center space-x-4 py-5">
-                        <button className="btn bg-blue-gray-800 text-white font-bold py-1 px-4 rounded-full" onClick={() => setTab('home')}>Home</button>
-                        <button className="btn bg-blue-gray-800 text-white font-bold py-1 px-4 rounded-full" onClick={() => setTab('expore')}>Explore</button>
+                        <button className="btn bg-blue-gray-800 text-white font-bold py-6 px-6 rounded-full flex items-center justify-center" onClick={() => setTab('home')}>Home</button>
+                        <button className="btn bg-blue-gray-800 text-white font-bold py-6 px-6 rounded-full flex items-center justify-center" onClick={() => setTab('expore')}>Explore</button>
+                    </div>
+                    <div className="flex items-center justyify-center text-4xl space-x-4 py-5 font-bold">
+                        {activeTab == 'expore' ? (<p>Explore</p>) : (<p>Home</p>)}
+                    </div>
+                    <div className="flex-2/3 h-200 overflow-y-scroll scrollbar-thumb-blue-gray-800 scrollbar-thin shadow-md">
+                        {activeTab == 'home' && <Home userObj={userObj}/>} 
+                        {activeTab == 'expore' && <Explore userObj={userObj}/>}
+
                     </div>
                 </div>
 
 
-                <div className="flex items-cetner justify-center h-screen">
-                    <div className="flex-2/3 overflow-y-scroll scrollbar-thumb-blue-gray-800 scrollbar-thin shadow-md">
-                        {activeTab == 'home' && <Home userObj={userObj}/>}
-                        {activeTab == 'expore' && <Explore userObj={userObj}/>}
+                <div className="flex flex-col items-center justify-center">
+                    <div className="flex items-center justyify-center text-4xl space-x-4 py-10 lg:font-bold">
+                        <p>Top 10 Posts</p>
                     </div>
                     <div className="flex flex-col items-center justify-center h-screen">
-                        <div className="p-4">
-                            <p className="text-center bg-blue-gray-800 text-white font-bold py-1 px-4 rounded-full"> Top 10 Pictures</p>
-                        </div>
-                        
-                        
-                        <div className="flex-2/3 overflow-y-scroll scrollbar-thumb-blue-gray-800 scrollbar-thin shadow-md">
+                        <div className="flex-1/3 h-200 overflow-y-scroll scrollbar-thumb-blue-gray-800 scrollbar-thin shadow-md">
                             {<TopFeed />}
                         </div>
                     </div>
