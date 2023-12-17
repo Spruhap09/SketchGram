@@ -41,13 +41,11 @@ export default function Post({
 
   const router = useRouter()
   const currentUrl = router.asPath
-  // console.log(currentUrl)
 
   useEffect(() => {
     setReady(false);
     const getSrc = async () => {
-      // console.log("from Post, id = " + id)
-      // Get firebase bucket url
+     
       //get post from posts context
       const post = posts.find((post: { post_id: string; }) => post.post_id === id);
 
@@ -106,7 +104,6 @@ export default function Post({
         //update post context
         const newLikes = [...post?.likes, user?.uid];
         post.likes = newLikes;
-        console.log(post.likes)
         setPost(post);
         setLikes(newLikes);
       }
@@ -130,7 +127,6 @@ export default function Post({
         //update post context
         const newLikes = post?.likes.filter((like: string) => like !== user?.uid);
         post.likes = newLikes;
-        console.log(post.likes)
         setPost(post);
         setLikes(newLikes);
       }
@@ -194,13 +190,25 @@ export default function Post({
 
       <div className="bg-blue-gray-800 my-7 border rounded-xl text-white !important max-w-500 overflow-x-hidden">
         <div className="flex items-center p-5">
-          <img src={userObj?.profile_img === 'empty-profile.png' ? '../empty-profile.png' : userObj?.profile_img}
-          width={500} height={500} className="rounded-full h-12 w-12 object-contain border-2 p-1 mr-3" alt={"profile picture for " + userObj?.displayName} />
+          <Image 
+            src={userObj?.profile_img === 'empty-profile.png' ? '/../empty-profile.png' : `/${userObj?.profile_img}`}
+            width={500} 
+            height={500} 
+            className="rounded-full h-12 w-12 object-contain border-2 p-1 mr-3" 
+            alt={"profile picture for " + userObj?.displayName}
+          />
           <p className="flex-1 font-bold text-white">{userObj?.displayName}</p>
         </div>
         {src.length ? 
         (
-          <img src={src} alt="user post" className="object-cover w-full bg-white" />
+        
+          <Image 
+          src={src} 
+          alt="user post" 
+          className="object-cover w-full bg-white"
+          height={750}
+          width={750}
+          />
         ) : (<div>loading</div>)}
 
 
@@ -240,9 +248,13 @@ export default function Post({
                 <div>
                   {post.comments.map((postComment: any) => (
                     <div key={postComment.uid} className="flex items-center space-x-2 ab-3 p-2 block">
-                      <img src={postComment?.profile_img === 'empty-profile.png' ? '../empty-profile.png' : postComment?.profile_img}
-                      alt={"comment profile picture for user " + postComment?.username}
-                      className="h-7 rounded-full" />
+                      <Image 
+                        src={postComment?.profile_img === 'empty-profile.png' ? '/../empty-profile.png' : '/' + postComment?.profile_img}
+                        alt={"comment profile picture for user " + postComment?.username}
+                        className="rounded-full h-8 w-8 object-contain"
+                        width={500} 
+                        height={500} 
+                      />
                       <p className="text-sm flex-1 truncate space-x-4 overflow-ellipsis block whitespace-no-wrap">
                         <span className="font-bold mr-2">{postComment?.username}</span>
                         {postComment?.comment}
