@@ -20,7 +20,7 @@ export default function Home({userObj}: {userObj: any}){
                     const following = userObj.following;
 
                     //get all posts from today from the people the user is following
-                    let userPosts = [];
+                    let userPosts: any[] = [];
                     for(let i = 0; i < following.length; i++){
                         const temp = await getUserPostsLimit(following[i], 10);
                         userPosts = userPosts.concat(temp);
