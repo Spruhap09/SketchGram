@@ -9,7 +9,7 @@ import ColorBoardProps from "./tools/ColorBoard";
 export default function Canvas() {
   const [color, setColor] = useState<string>("#000");
   const [lineWidth, setLineWidth] = useState<number>(5);
-
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
 
   //colors the canvas background white as default
   useEffect(() => {
@@ -61,7 +61,26 @@ export default function Canvas() {
         <ClearScreen onClick={clear} />
         <PaintBrush value={lineWidth} setValue={setLineWidth} />
         <PaintBucket onClick={fill} />
-        <DownloadImage onClick={download}/>
+        <DownloadImage onClick={() => setShowDownloadModal(true)} />
+        {showDownloadModal && (
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center">
+            <div className="bg-white p-6 rounded-lg shadow-lg">
+              <p className="text-lg font-semibold mb-4 text-center">Select a format</p>
+              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-2"
+                      onClick={() => { download('jpeg'); setShowDownloadModal(false); }}>
+                JPEG
+              </button>
+              <button className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded mr-2"
+                      onClick={() => { download('png'); setShowDownloadModal(false); }}>
+                PNG
+              </button>
+              <button className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                      onClick={() => setShowDownloadModal(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

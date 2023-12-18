@@ -41,7 +41,7 @@ export default function useCanvas(
     ctx.fillRect(0, 0, canvas.width, canvas.height);
   };
 
-  const download = () => {
+  const download = (format = 'png') => {
     // Get the canvas context
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -49,10 +49,20 @@ export default function useCanvas(
     if (!ctx) return;
     ctx.save()
 
+    
     // Fill all contents with selected color
     const link = document.createElement("a");
-    link.download = "canvas.png";
-    link.href = canvas.toDataURL();
+
+    if (format.toLowerCase() === 'jpeg') {
+      link.download = "canvas.jpeg";
+      link.href = canvas.toDataURL("image/jpeg");
+    } else {
+      link.download = "canvas.png";
+      link.href = canvas.toDataURL("image/png");
+    }
+
+    // link.download = "canvas.png";
+    // link.href = canvas.toDataURL();
     link.click();
   }
 
