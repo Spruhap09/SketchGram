@@ -56,6 +56,7 @@ export default function useCanvas(
     link.click();
   }
 
+
   useEffect(() => {
     // Mouse move event listeners
     const handler = (e: MouseEvent) => {

@@ -1,10 +1,10 @@
 import useCanvas from "@/hooks/useCanvas";
-import ColorPicker from "@/components/tools/ColorPicker";
 import ClearScreen from "@/components/tools/ClearScreen";
 import PaintBucket from "@/components/tools/PaintBucket";
 import PaintBrush from "@/components/tools/PaintBrush";
 import DownloadImage from "@/components/tools/DownloadImage";
 import { useCallback, useState, useEffect} from "react";
+import ColorBoardProps from "./tools/ColorBoard";
 
 export default function Canvas() {
   const [color, setColor] = useState<string>("#000");
@@ -56,7 +56,8 @@ export default function Canvas() {
         className="border-4 border-blue-gray-800 rounded-3xl"
       ></canvas>
       <div className="w-15 h-1/2 m-2 flex flex-col justify-center items-center rounded-full border-4 border-blue-gray-800 ">
-        <ColorPicker color={color} setColor={setColor} />
+
+        <ColorBoardProps color={color} setColor={setColor}/>
         <ClearScreen onClick={clear} />
         <PaintBrush value={lineWidth} setValue={setLineWidth} />
         <PaintBucket onClick={fill} />
