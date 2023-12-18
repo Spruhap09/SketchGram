@@ -48,7 +48,7 @@ export default function UserProfile(){
 
     return (
         <Layout>
-            ({ready ? (
+            {ready ? (
         <div>
             <div>
                 <div className="flex items-center p-5">

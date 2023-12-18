@@ -12,7 +12,7 @@ import { AuthContext } from "@/context/AuthContext";
 import { getPost, getUserbyUid, logOutUser } from "@/firebase/functions";
 import Head from "next/head";
 import Home from "./Home";
-
+import ToggleButton from './ToggleButton';
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export default function Navigation() {
@@ -22,13 +22,14 @@ export default function Navigation() {
     
 
     useEffect(() => {
+      console.log('useEffect')
       async function getPageName(){
+
         if (router.asPath.startsWith('/user/')){
           const id = router.asPath.split('/')[2]
           const viewUser = await getUserbyUid(id);
           setPageName(`${viewUser?.displayName}'s Profile`)
-        }
-        if (router.asPath.startsWith('/post/')){
+        } else if (router.asPath.startsWith('/post/')){
           const id = router.asPath.split('/')[2]
           const viewPost = await getPost(id);
           setPageName(`Post titled ${viewPost.description}`)
@@ -40,7 +41,8 @@ export default function Navigation() {
       }
       getPageName()
     }, [router.asPath])
-    
+
+
   return (
     <Navbar
       variant="gradient"
@@ -59,6 +61,7 @@ export default function Navigation() {
         </Typography>
 
         <div className="ml-auto flex gap-1 md:mr-4">
+          <ToggleButton />
           {!user && (          
             <IconButton title='Home' variant="text" color="white" onClick={() => router.push('/')}>
               <HomeIcon className="h-4 w-4" />
