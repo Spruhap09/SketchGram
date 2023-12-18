@@ -9,7 +9,7 @@ import {
 } from "@material-tailwind/react";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context/AuthContext";
-import { getUserbyUid, logOutUser } from "@/firebase/functions";
+import { getPost, getUserbyUid, logOutUser } from "@/firebase/functions";
 import Head from "next/head";
 import Home from "./Home";
 
@@ -27,6 +27,11 @@ export default function Navigation() {
           const id = router.asPath.split('/')[2]
           const viewUser = await getUserbyUid(id);
           setPageName(`${viewUser?.displayName}'s Profile`)
+        }
+        if (router.asPath.startsWith('/post/')){
+          const id = router.asPath.split('/')[2]
+          const viewPost = await getPost(id);
+          setPageName(`Post titled ${viewPost.description}`)
         }
         else{
           setPageName(router.asPath.slice(1, router.asPath.length));
@@ -58,9 +63,8 @@ export default function Navigation() {
             <IconButton title='Home' variant="text" color="white" onClick={() => router.push('/')}>
               <HomeIcon className="h-4 w-4" />
             </IconButton>)}
-          {/* <IconButton title='Home' variant="text" color="white" onClick={() => router.push('/')}>
-            <HomeIcon className="h-4 w-4" />
-          </IconButton> */}
+
+
           {user && (
             <>
             <IconButton title="Feed" variant="text" color="white" onClick={() => router.push('/feed')}>
@@ -73,14 +77,9 @@ export default function Navigation() {
               <UserCircleIcon className="h-4 w-4" />
             </IconButton></>
           )}
-
           <IconButton title="Canvas" variant="text" color="white" onClick={() => router.push('/canvas')}>
             <PencilSquareIcon className="h-4 w-4" />
           </IconButton>
-          {/* <IconButton title="User" variant="text" color="white" onClick={() => router.push(`/user/:id`)}>
-            <PencilSquareIcon className="h-4 w-4" />
-          </IconButton> */}
-
             {user ? <Button onClick={() => logOutUser()}>Sign Out</Button> : <Button onClick={() => router.push('/login')}>Log In</Button>}
         </div>
 

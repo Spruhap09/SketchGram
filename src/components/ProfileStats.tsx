@@ -46,16 +46,14 @@ export default function ProfileStats ({posts}: { posts: any }) {
     
 
     useEffect(() => {
-        console.log('here')
+        
         const getStats = async () => {
             if(user){
                 const stats = await getUserStats(user.uid);
-                console.log(posts)
                 //get user object for each follower and following
                 if (stats){
                 let followers_info:any = []
                 let following_info:any = []
-                let currentMostLikedPost: any = null;
                 for (let i=0; i < stats.followers.length; i++){
                     const ret_user:any = await getUserbyUid(stats.followers[i]);
                     followers_info.push(ret_user)
@@ -65,21 +63,7 @@ export default function ProfileStats ({posts}: { posts: any }) {
                     const ret_user:any = await getUserbyUid(stats.following[i]);
                     following_info.push(ret_user)
                 }
-                
-                // if(posts){
-                //     let maxLike = -1;
-                //     let maxComment = -1;
-                    
-                //     for (let post of posts){
-                //         if (post.likes.length > maxLike){
-                //             currentMostLikedPost = post;
-                            
-                //         }
-                //         if (post.comments.length > maxComment){
-                //             setMostCommentedPost(post)
-                //         }
-                //     }
-                // }
+
                 console.log(JSON.stringify(followers_info))
                 setFollowers(followers_info);
                 setFollowing(following_info);
@@ -128,13 +112,13 @@ export default function ProfileStats ({posts}: { posts: any }) {
             <Typography className="h6">{`You have  `} <span className="font-bold text-xl">{posts.length}</span> {`${posts.length === 1 ? 'post' : 'posts'}`}</Typography>
             <Typography className="h6">{`You have `} <span className="font-bold text-xl">{drafts.length}</span> {`${drafts.length === 1 ? 'draft' : 'drafts'}`}</Typography>
             {posts && posts.length > 0 && mostLikedPost && mostLikedPost.likes && (
-                <Typography onClick={() => router.push(`/post`)} className="h6">
+                <Typography onClick={() => router.push(`/post/${mostLikedPost.post_id}`)} className="h6">
                     <span className="font-bold text-xl">{mostLikedPost.description}</span> {` is your most liked post with `} 
                     <span className="font-bold text-xl">{mostLikedPost.likes.length}</span> {`${mostLikedPost.likes.length === 1 ? ' like' : ' likes'}`}
                 </Typography>
             )}
             {posts && posts.length > 0 && mostCommentedPost && mostCommentedPost.comments && (
-                <Typography onClick={() => router.push(`/post`)} className="h6">
+                <Typography onClick={() => router.push(`/post/${mostCommentedPost.post_id}`)} className="h6">
                     <span className="font-bold text-xl">{mostCommentedPost.description}</span> {` is your most commented post with `} 
                     <span className="font-bold text-xl">{mostCommentedPost.comments.length}</span> {`${mostCommentedPost.comments.length === 1 ? ' comment' : ' comments'}`}
                 </Typography>

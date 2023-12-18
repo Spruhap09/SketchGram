@@ -678,8 +678,6 @@ async function searchUsers(searchTerm: string) {
     // Get Firebase Firestore
     const {db} = initFirebaseConfig();
 
-    const searchArray = searchTerm.split("");
-
     let users: any = [] // todo figure out proper typescript
 
     // Find users by display name
@@ -689,9 +687,11 @@ async function searchUsers(searchTerm: string) {
       where("displayName", "<=", searchTerm + "\uf8ff"),
       orderBy("displayName")
     );    
+    
     const nameSnapshot = await getDocs(nameQ);
     nameSnapshot.forEach((doc) => {
-      users.push(doc.data());
+      let data = doc.data();
+      if (!users.some((user: any) => user.uid === data.uid)) users.push(data);
     });
 
     // Find users by email

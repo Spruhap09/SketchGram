@@ -13,8 +13,6 @@ export default function UserProfile(){
     const user = useContext(AuthContext);
     const [posts, setPosts] = useState<any[] | null>(null);
     const [ready, setReady] = useState(false);
-    const [following, setFollowing] = useState<string[]>([]);
-    const [followers, setFollowers] = useState<string[]>([]);
     const [userObj, setUserObj] = useState<any | any >();
     if(!user) router.push('/login');
 
@@ -23,7 +21,6 @@ export default function UserProfile(){
         const getPosts = async () => {
                 if(user){
                     const userPosts = await getUserPostsLimit(id);
-                    console.log(userPosts)
                     if (userPosts) {
                         setReady(true)
                     };
@@ -31,10 +28,6 @@ export default function UserProfile(){
                     if (ret_user){
                         setUserObj(ret_user);
                     }
-                    console.log('the user')
-                    console.log(userObj)
-                    setFollowers(userObj?.followers || null);
-                    setFollowing(userObj?.following || null);
                     setPosts(userPosts || null);
                 }
             }
@@ -43,27 +36,19 @@ export default function UserProfile(){
 
     const handleFollow = async () => {
         await followUser(id, user?.uid);
-        console.log('the user')
-        console.log(userObj)
         const accountUser = await getUserbyUid(id);
         setUserObj(accountUser);
-        setFollowers(userObj?.followers || null);
-        setFollowing(userObj?.following || null);
     };
 
     const handleUnfollow = async () => {
         await unfollowUser(id, user?.uid);
-        console.log('the user')
-        console.log(userObj)
         const accountUser = await getUserbyUid(id);
         setUserObj(accountUser);
-        setFollowers(userObj?.followers || null);
-        setFollowing(userObj?.following || null);
-        
     };
 
     return (
         <Layout>
+            ({ready ? (
         <div>
             <div>
                 <div className="flex items-center p-5">
@@ -84,7 +69,7 @@ export default function UserProfile(){
                 <Typography variant="h4" className="text-center">User Posts</Typography>
                 <UserPosts setPosts={setPosts} posts={posts} />
              </div>
-        </div> 
+        </div> ) : <div>Loading</div>}
         </Layout>
     )
 }
