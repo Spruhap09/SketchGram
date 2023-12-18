@@ -40,6 +40,15 @@ async function signUpWithEmailAndPassword(
   password: string,
   displayName: string
 ) {
+  if (email.length > 50){
+    throw "Email is too long!"
+  }
+  if (password.length > 60){
+    throw "Password is too long!"
+  }
+  if (displayName.length > 50){
+    throw "Display Name is too long"
+  }
   try {
     // Get Firebase Auth
     const {db, auth} = initFirebaseConfig();
