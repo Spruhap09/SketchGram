@@ -1,15 +1,17 @@
 import Layout from "@/components/Layout";
-import { searchUsers } from "@/firebase/functions";
+import { searchPosts, searchUsers } from "@/firebase/functions";
 import { Input, Typography } from "@material-tailwind/react";
 import { User } from "firebase/auth";
 import { useEffect, useState } from "react";
 import UserProfile from "@/components/UserProfile";
+import Post from "@/components/Post";
 
 export default function Search() {
     const [searchTerm, setSearchTerm] = useState<string>("")
     const [searchResults, setSearchResults] = useState<User[]>([])
     const [activeTab, setTab] = useState('none');
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchResults([])
         setSearchTerm(e.target.value);
     }
 
@@ -17,9 +19,18 @@ export default function Search() {
         const trimmedSearch = searchTerm.trim();
         const fetchResults = async () => {
             let results = [];
-            if(trimmedSearch.length > 0)
+            if(trimmedSearch.length > 0 && activeTab === 'user')
                 results = await searchUsers(trimmedSearch);
+
+            if(trimmedSearch.length > 0 && activeTab === 'post')
+                results = await searchPosts(trimmedSearch)
+                results = results.filter(
+                    (post: { post_id: any; }, index: any, self: any[]) =>
+                      index === self.findIndex((p) => p.post_id === post.post_id)
+                  );
+                  
             setSearchResults(results);
+            
         }
 
         fetchResults();
@@ -46,8 +57,8 @@ export default function Search() {
                 <Typography className='p-5'variant="h1">Search Posts</Typography>
                 <Input label="Search" crossOrigin="anonymous" onChange={handleSearch}/>
                 <div>
-                    {searchResults.map((result, i) => {
-                        return <UserProfile key={i} userDetails={result}/>
+                    {searchResults.map((result:any, i) => {
+                        return <Post key={i} id={result.post_id} posts={[result]} setPosts={undefined}/>
                     })}
                 </div>
             </div> : <div><p>Pick a search option! </p></div>}       

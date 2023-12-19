@@ -949,6 +949,56 @@ async function unfollowUser(otherUid: string, userUid: string){
   }
 }
 
+async function searchPosts(searchTerm: string) {
+  try {
+
+    // Get Firebase Firestore
+    const {db} = initFirebaseConfig();
+
+    let posts: any = [] // todo figure out proper typescript
+    let uniquePostIds = new Set();
+
+    //Find posts by description
+    const postQ = query(
+      collection(db, "posts"),
+      where("description", ">=", searchTerm ),
+      where("description", "<=", searchTerm + "\uf8ff"),
+      orderBy("description")
+    );    
+    
+    const nameSnapshot = await getDocs(postQ);
+    nameSnapshot.forEach((doc) => {
+      let data = doc.data();
+      data.post_id = doc.id
+      posts.push(data);
+      
+    });
+
+    //find the post by tags
+    const postQuery = collection(db, "posts");
+    const snapshot = await getDocs(postQuery);
+    console.log('this is post before')
+    console.log(posts)
+
+    snapshot.forEach((doc) => {
+      console.log(doc.data())
+      const data = doc.data();
+      const tags = data.tags || [];
+      for (let tag of tags) {
+        if (tag === searchTerm || tag.includes(searchTerm)){
+          data.post_id = doc.id
+          posts.push(data);
+        }
+      }
+    })
+    return posts;
+  }
+  catch (e) {
+    console.error("Error searching for posts: ", e);
+    throw e;
+  }
+}
+
 
 export {
   signUpWithEmailAndPassword,
@@ -977,5 +1027,6 @@ export {
   getAllPosts, 
   followUser,
   unfollowUser,
-  deleteComment
+  deleteComment,
+  searchPosts
 };
