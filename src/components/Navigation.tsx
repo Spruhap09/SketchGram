@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { MagnifyingGlassIcon, PencilSquareIcon, RectangleStackIcon, UserCircleIcon, HashtagIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, PencilSquareIcon, RectangleStackIcon, UserCircleIcon, HomeIcon } from "@heroicons/react/24/outline";
 import {
   Navbar,
   Typography,
