@@ -57,7 +57,7 @@ export default function Home({userObj, posts, setPosts}: {userObj: any, posts:an
             {homePosts && homePosts.map((post:any) =>
             <div key={post.post_id} className="px-3">
             
-             <Post id={post.post_id} posts={homePosts} setPosts={setPosts}/>
+             <Post id={post.post_id} posts={homePosts} setPosts={setPosts} sample={false}/>
             </div> 
             )}
         </div>
