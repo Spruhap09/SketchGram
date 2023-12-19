@@ -6,7 +6,8 @@ import { useContext, useState, useEffect } from "react";
 import noAvatar from 'public/noAvatar.jpeg'
 
 
-export default function EditProfile (){
+
+export default function EditProfile ({setChangedValue, changedValue} : {setChangedValue: any, changedValue: any}){
     const user = useContext(AuthContext);
     const [editName, setEditName] = useState(false);
     const [editPassword, setEditPassword] = useState(false);
@@ -40,7 +41,13 @@ export default function EditProfile (){
         if(editName){ 
             try{
                 await updateDisplayName(displayName)
-                setEditName(false)          
+                
+                // if (user?.uid) {
+                //     const ret_user = await getUserbyUid(user.uid);
+                //     setUserObj(ret_user);
+                // }
+                setEditName(false) 
+                setChangedValue(!changedValue)         
             }
             catch(error){
                 alert(error)
@@ -50,9 +57,15 @@ export default function EditProfile (){
         
             const email = form.elements.namedItem("email") as HTMLInputElement;
             try{
+
                 await updateDisplayName(displayName)
                 await changePassword(email.value, oldPassword, newPassword)
+                // if (user?.uid) {
+                //     const ret_user = await getUserbyUid(user.uid);
+                //     setUserObj(ret_user);
+                // }
                 setEditPassword(false)
+                setChangedValue(!changedValue)
             }
             catch(error){
                 alert(error)
@@ -92,13 +105,14 @@ export default function EditProfile (){
                         name="email" 
                         size="lg"
                         readOnly
-                        value={user?.email || ''}
+                        defaultValue={user?.email || ''}
                         crossOrigin="anonymous"
                         className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
                         labelProps={{
                             className: "before:content-none after:content-none",
                     }}/>
                     <Button className="mt-6" fullWidth type="submit">Submit</Button>
+                    <Button className="mt-6" fullWidth type="button"  onClick={() => setEditName(!editName)}>Cancel</Button>
                 </form>
             </div>
         )
@@ -123,7 +137,8 @@ export default function EditProfile (){
                     <Input
                         name="email" 
                         size="lg"
-                        value={user?.email || ''}
+                        readOnly
+                        defaultValue={user?.email || ''}
                         crossOrigin="anonymous"
                         className=" !border-t-blue-gray-200 focus:!border-t-gray-900"
                         labelProps={{
@@ -154,6 +169,7 @@ export default function EditProfile (){
                             className: "before:content-none after:content-none",
                     }}/>
                     <Button className="mt-6" fullWidth type="submit">Submit</Button>
+                    <Button className="mt-6" fullWidth type="button"  onClick={() => setEditPassword(!editPassword)}>Cancel</Button>
                 </form>
             </div>
         )

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import noAvatar from 'public/noAvatar.jpeg'
 import { useContext, useEffect, useRef, useState } from "react";
-import { getUserbyUid, deletePost, updatePostLikes, updatePostComments } from "@/firebase/functions";
+import { getUserbyUid, deletePost, updatePostLikes, updatePostComments, deleteComment } from "@/firebase/functions";
 import { DocumentData } from "firebase/firestore";
 import { Button, IconButton, Input, Typography, input } from "@material-tailwind/react";
 import { TrashIcon } from "@heroicons/react/20/solid";
@@ -12,7 +12,7 @@ import {
   FaceSmileIcon,
   ChatBubbleBottomCenterIcon,
   HeartIcon,
-  PaperAirplaneIcon,
+  ArrowDownCircleIcon,
 } from "@heroicons/react/24/outline";
 import {HeartIcon as HeartIconFilled} from "@heroicons/react/20/solid"
 import Moment from "react-moment"
@@ -21,12 +21,12 @@ export default function Post({
   id,
   posts,
   setPosts = "default",
-  sample
+  sample = false,
 }: {
   id: string;
   posts: any;
   setPosts: any;
-  sample: any;
+  sample: boolean;
 }) {
 
   const [src, setSrc] = useState<string>("");
@@ -42,13 +42,23 @@ export default function Post({
 
   const router = useRouter()
   const currentUrl = router.asPath
-  // console.log(currentUrl)
 
+  const commentCount = (user:any, comments:any) => {
+    let count = 0;
+    for (let i=0; i<comments.length; i++){
+      if (comments[i].userid === user){
+        count++;
+      }
+    }
+    if (count >= 3){
+      return true
+    }
+    return false
+  }
   useEffect(() => {
     setReady(false);
     const getSrc = async () => {
-      // console.log("from Post, id = " + id)
-      // Get firebase bucket url
+
       //get post from posts context
       const post = posts.find((post: { post_id: string; }) => post.post_id === id);
 
@@ -69,7 +79,7 @@ export default function Post({
       
 
       try {
-        const res = await fetch(`/api/image?url=${post?.imageURL}`)
+        const res = await fetch(`/api/image?url=${post.imageURL}`)
         const {imageUrl} = await res.json();
         // Set state
         setPost(post);
@@ -107,9 +117,16 @@ export default function Post({
         //update post context
         const newLikes = [...post?.likes, user?.uid];
         post.likes = newLikes;
-        console.log(post.likes)
         setPost(post);
         setLikes(newLikes);
+        if (setPosts !== "default"){
+          const postIndex = posts.findIndex((postToFind: { post_id: any; }) => postToFind.post_id === post?.post_id);
+          if (postIndex !== -1){
+            const newPosts = [...posts];
+            newPosts[postIndex] = post;
+            setPosts(newPosts)
+          }
+        }
       }
       
     } catch (error) {
@@ -131,9 +148,16 @@ export default function Post({
         //update post context
         const newLikes = post?.likes.filter((like: string) => like !== user?.uid);
         post.likes = newLikes;
-        console.log(post.likes)
         setPost(post);
         setLikes(newLikes);
+        if (setPosts !== "default"){
+          const postIndex = posts.findIndex((postToFind: { post_id: any; }) => postToFind.post_id === post?.post_id);
+          if (postIndex !== -1){
+            const newPosts = [...posts];
+            newPosts[postIndex] = post;
+            setPosts(newPosts)
+          }
+        }
       }
       
     } catch (error) {
@@ -158,13 +182,64 @@ export default function Post({
   };
 
   const handleCommentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.target.value = e.target.value.substring(0, 59)
     setComment(e.target.value);
   };
+
+  const delComment = async (comment: any) => {
+    try {
+      if (comment.userid === user?.uid){
+
+
+          await deleteComment(post?.post_id, comment, user?.uid, comment.uid)
+          let temp:any = []
+          for (let i=0; i<post?.comments.length; i++){
+            if (post?.comments[i].uid === comment.uid){
+
+              continue
+            }
+            temp.push(post?.comments[i])
+          }
+          post.comments = temp
+
+            //resort comments by timestamp
+          post?.comments.sort((a: { timestamp: string; }, b: { timestamp: string; }) => {
+            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+         });
+
+         setPost(post)
+         setComment('');
+        if (setPosts !== "default"){
+          const postIndex = posts.findIndex((postToFind: { post_id: any; }) => postToFind.post_id === post?.post_id);
+
+          if (postIndex !== -1){
+            const newPosts = [...posts];
+            newPosts[postIndex] = post;
+            setPosts(newPosts)
+          }
+        }
+
+        }
+
+
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       if (comment && user?.uid) {
+
+        if (comment.length >59){
+          comment.substring(0, 59)
+        }
+
+        if (/^\s*$/.test(comment)){
+          throw "comment can't be just spaces"
+        }
         //create comment object
         const comment_obj:any = {
           uid: uuidv4(),
@@ -183,6 +258,14 @@ export default function Post({
         });
         setPost(post);
         setComment('');
+        if (setPosts !== "default"){
+          const postIndex = posts.findIndex((postToFind: { post_id: any; }) => postToFind.post_id === post?.post_id);
+          if (postIndex !== -1){
+            const newPosts = [...posts];
+            newPosts[postIndex] = post;
+            setPosts(newPosts)
+          }
+        }
       }
     } catch (e) {
       alert(e);
@@ -201,22 +284,29 @@ export default function Post({
         </div>
         {src.length ? 
         (
-          <img src={src} alt="user post" className="object-cover w-full bg-white" />
+
+          <Image
+          src={src}
+          alt="user post"
+          className="object-cover w-full bg-white"
+          height={750}
+          width={750}
+          />
         ) : (<div>loading</div>)}
 
 
-        {(!sample ? (
+        {!sample &&
                   <div className="flex space-x-4 p-4">
          
-                  {(!likes.includes(user?.uid)
+                  {(!likes.includes(user?.uid) 
                   ?  <HeartIcon onClick={handleLike} className='btn text-white'/> :
                   <HeartIconFilled onClick={handleUnLike} className='btn text-red-500'/>
                   )}
                   <ChatBubbleBottomCenterIcon onClick={focusInput} className='btn text-white'/>
-                  <PaperAirplaneIcon onClick={() => (handleDownload(src))} className='btn text-white'/>
+                  <ArrowDownCircleIcon onClick={() => (handleDownload(src))} className='btn text-white'/>
                 </div>
-        ) : (<div></div>))}
-
+        }
+       
           
         {/* Caption */}
 
@@ -234,18 +324,28 @@ export default function Post({
         </div>
 
         {/* Comments */}
-        <div className="ml-10 h-20 overflow-y-scroll scrollbar-thumb-white scrollbar-thin">
-        {(post && post?.comments) && (
-            <div>
-              {post.comments.map((postComment: any) => (
-                <div key={postComment.uid} className="flex items-center space-x-2 ab-3 p-2 block">
-                  <img src={postComment?.profilePicture || noAvatar.src }
-                  alt={"comment profile picture for user " + postComment?.username}
-                  className="rounded-full h-7 w-7 border-2 border-gray-300 mr-4" />
-                  <p className="text-sm flex-1 truncate space-x-4 overflow-ellipsis block whitespace-no-wrap">
-                    <span className="font-bold mr-2">{postComment?.username}</span>
-                    {postComment?.comment}
-                  </p>
+
+        {
+          <div className="ml-10 h-20 overflow-y-scroll scrollbar-thumb-white scrollbar-thin">
+            {(post && post?.comments) && (
+                <div>
+                  {post.comments.map((postComment: any) => (
+                    <div key={postComment.uid} className="flex items-center space-x-2 ab-3 p-2 block">
+                      <Image
+                        src={postComment?.profile_img === 'empty-profile.png' ? '/../empty-profile.png' : '/' + postComment?.profile_img}
+                        alt={"comment profile picture for user " + postComment?.username}
+                        className="rounded-full h-8 w-8 object-contain"
+                        width={500}
+                        height={500}
+                      />
+                      <p className="text-sm flex-1 truncate space-x-4 overflow-ellipsis block whitespace-no-wrap">
+                        <span className="font-bold mr-2">{postComment?.username}</span>
+                        {postComment?.comment}
+                      </p>
+
+                      {user?.uid === postComment.userid && (
+                        <TrashIcon onClick={() => delComment(postComment)} title="Delete Post" className="btn w-4 h-5 p-0 m-0 text-white" />
+                      )}
 
                       <Moment fromNow className="pr-5 text-xs">
                         {postComment?.timestamp}
@@ -256,26 +356,27 @@ export default function Post({
                 </div>)
             }
          </div>
- 
+        }
+        
 
 
 
 
         {/* Input Box */}
 
-        {(!sample ? (
+        {!sample && (post?.comments && (!commentCount(user?.uid, post.comments)) ? (
           <form onSubmit={handleSubmit} className="flex items-center space-x-3 p-4">
             <FaceSmileIcon className='h-7'/>
-            <input
+            <input 
               ref={inputRef}
-              type="text"
+              type="text" 
               value={comment}
               onChange={handleCommentChange}
               placeholder="Add a comment..."
               className="bg-blue-gray-400 p-1 border-none flex-1 focus:ring-0 outline=none text-sm" />
             <button disabled={!comment.trim()} type='submit' className="font-semibold btn">Post</button>
           </form>
-        ) : (<div></div>))}
+        ) : (<div className="pb-10"></div>))}
 
 
         <div className="flex justify-center">

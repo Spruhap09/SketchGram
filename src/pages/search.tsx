@@ -29,9 +29,9 @@ export default function Search() {
                     (post: { post_id: any; }, index: any, self: any[]) =>
                       index === self.findIndex((p) => p.post_id === post.post_id)
                   );
-                  
+
             setSearchResults(results);
-            
+
         }
 
         fetchResults();
@@ -50,8 +50,8 @@ export default function Search() {
                 <button className="btn bg-blue-gray-800 text-white font-bold py-6 px-6 rounded-full flex items-center justify-center" onClick={() => handleSwitch('user')}>Search Users</button>
                 <button className="btn bg-blue-gray-800 text-white font-bold py-6 px-6 rounded-full flex items-center justify-center" onClick={() => handleSwitch('post')}>Search Posts</button>
             </div>
-            
-            {activeTab === 'user' ? 
+
+            {activeTab === 'user' ?
             <div>
                 <Typography className='p-5'variant="h1">Search Users</Typography>
                 <Input label="Search" crossOrigin="anonymous" onChange={handleSearch}/>
@@ -67,7 +67,7 @@ export default function Search() {
                 <div>
                     <PhotoGrid posts={searchResults} />
                 </div>
-            </div> : <div><p>Pick a search option! </p></div>}       
+            </div> : <div><p>Pick a search option! </p></div>}
         </Layout>
     )
 }

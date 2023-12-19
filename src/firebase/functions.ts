@@ -41,6 +41,15 @@ async function signUpWithEmailAndPassword(
   password: string,
   displayName: string
 ) {
+  if (email.length > 50){
+    throw "Email is too long!"
+  }
+  if (password.length > 60){
+    throw "Password is too long!"
+  }
+  if (displayName.length > 50){
+    throw "Display Name is too long"
+  }
   try {
     // Get Firebase Auth
     const {db, auth} = initFirebaseConfig();
@@ -89,6 +98,7 @@ async function updateDisplayName(newDisplayName: string){
     if (!querySnapshot.empty) {
 
       const userDocRef = querySnapshot.docs[0].ref;
+
       //update the profile for auth
       await updateProfile(auth.currentUser, { displayName: newDisplayName });
       //update the db for the collection
@@ -145,7 +155,7 @@ async function updateEmail(newEmail: string){
 
   }
   catch(e){
-    console.error("Error updating the display name: ", e);
+    console.error("Error updating the email: ", e);
     throw e;
   }
 
@@ -725,8 +735,6 @@ async function searchUsers(searchTerm: string) {
     // Get Firebase Firestore
     const {db} = initFirebaseConfig();
 
-    const searchArray = searchTerm.split("");
-
     let users: any = [] // todo figure out proper typescript
 
     // Find users by display name
@@ -736,9 +744,11 @@ async function searchUsers(searchTerm: string) {
       where("displayName", "<=", searchTerm + "\uf8ff"),
       orderBy("displayName")
     );    
+
     const nameSnapshot = await getDocs(nameQ);
     nameSnapshot.forEach((doc) => {
-      users.push(doc.data());
+      let data = doc.data();
+      if (!users.some((user: any) => user.uid === data.uid)) users.push(data);
     });
 
     // Find users by email
@@ -763,6 +773,44 @@ async function searchUsers(searchTerm: string) {
   }
 }
 
+async function deleteComment(postId: string, comment: string, userUid: string, commentId:string){
+  try {
+     // Get Firebase Firestore
+     const {db} = initFirebaseConfig();
+
+     const postRef = doc(collection(db, "posts"), postId);
+     const q = query(collection(db, "users"), where("uid", "==", userUid));
+     const querySnapshot = await getDocs(q);
+     if (querySnapshot.empty) throw "User does not exist in database";
+
+
+     const postDoc = await getDoc(postRef);
+     console.log("from updatepost " + postDoc.data())
+
+     if (postDoc.exists()) {
+       const oldComments = postDoc.data()?.comments || [];
+
+       //check if user has commented more than 3 times
+       let temp:any = []
+       for (let i=0; i<oldComments.length; i++){
+         if (oldComments[i].uid === commentId){
+          continue
+         }
+         temp.push(oldComments[i])
+       }
+       const newComments:any = temp
+
+
+       await updateDoc(postDoc.ref, { comments: newComments });
+     } else {
+       throw 'Post not found';
+     }
+  } catch (error) {
+    console.error("Error updating post comments: ", error);
+    throw error;
+  }
+}
+
 async function searchByTitleFn (searchTerm: string){
   try {
 
@@ -779,7 +827,7 @@ async function searchByTitleFn (searchTerm: string){
       where("description", ">=", searchTerm),
       where("description", "<=", searchTerm + "\uf8ff"),
       orderBy("description")
-    );  
+    );
     const nameSnapshot = await getDocs(nameQ);
     const posts = nameSnapshot.docs.map((doc) => {
       let ret = doc.data()
@@ -787,7 +835,7 @@ async function searchByTitleFn (searchTerm: string){
       return ret
     })
     console.log("name snapshot", nameSnapshot)
-    
+
     console.log("userrrrrrrrrrrsssdsfjdsifjasdofjdasoif", posts)
     return posts;
 
@@ -819,6 +867,19 @@ async function updatePostComments(postId: string, comment: string, userUid: stri
 
     if (postDoc.exists()) {
       const oldComments = postDoc.data()?.comments || [];
+
+      //check if user has commented more than 3 times
+      let count = 0;
+      for (let i=0; i<oldComments.length;i++){
+        if (userUid === oldComments[i].uid){
+          count++;
+        }
+      }
+
+      if (count >= 3){
+        throw "too many comments for user"
+      }
+
       const newComments = [...oldComments, comment];
       await updateDoc(postDoc.ref, { comments: newComments });
     } else {
@@ -868,14 +929,14 @@ async function searchPosts(searchTerm: string) {
       where("description", ">=", searchTerm ),
       where("description", "<=", searchTerm + "\uf8ff"),
       orderBy("description")
-    );    
-    
+    );
+
     const nameSnapshot = await getDocs(postQ);
     nameSnapshot.forEach((doc) => {
       let data = doc.data();
       data.post_id = doc.id
       posts.push(data);
-      
+
     });
 
     //find the post by tags
@@ -1025,7 +1086,7 @@ const uploadProfilePic = async (file: File) => {
   if (!file) throw new Error("No file to upload");
 
   const validFileTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-  const maxSize = 5 * 1024 * 1024; 
+  const maxSize = 5 * 1024 * 1024;
 
   if (!validFileTypes.includes(file.type)) {
     throw new Error("Invalid file type. Please upload a JPEG or PNG image.");
@@ -1073,6 +1134,56 @@ const uploadProfilePic = async (file: File) => {
   }
 };
 
+async function searchPosts(searchTerm: string) {
+  try {
+
+    // Get Firebase Firestore
+    const {db} = initFirebaseConfig();
+
+    let posts: any = [] // todo figure out proper typescript
+    let uniquePostIds = new Set();
+
+    //Find posts by description
+    const postQ = query(
+      collection(db, "posts"),
+      where("description", ">=", searchTerm ),
+      where("description", "<=", searchTerm + "\uf8ff"),
+      orderBy("description")
+    );
+
+    const nameSnapshot = await getDocs(postQ);
+    nameSnapshot.forEach((doc) => {
+      let data = doc.data();
+      data.post_id = doc.id
+      posts.push(data);
+
+    });
+
+    //find the post by tags
+    const postQuery = collection(db, "posts");
+    const snapshot = await getDocs(postQuery);
+    console.log('this is post before')
+    console.log(posts)
+
+    snapshot.forEach((doc) => {
+      console.log(doc.data())
+      const data = doc.data();
+      const tags = data.tags || [];
+      for (let tag of tags) {
+        if (tag === searchTerm || tag.includes(searchTerm)){
+          data.post_id = doc.id
+          posts.push(data);
+        }
+      }
+    })
+    return posts;
+  }
+  catch (e) {
+    console.error("Error searching for posts: ", e);
+    throw e;
+  }
+}
+
 
 export {
   signUpWithEmailAndPassword,
@@ -1104,5 +1215,8 @@ export {
   uploadProfilePic,
   updateEmail,
   searchByTitleFn,
+  searchPosts
+  unfollowUser,
+  deleteComment,
   searchPosts
 };

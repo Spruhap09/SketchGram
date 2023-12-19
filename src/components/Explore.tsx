@@ -4,18 +4,18 @@ import { AuthContext } from "@/context/AuthContext";
 import { useContext, useEffect, useState } from "react";
 
 
-export default function Explore({userObj}: {userObj: any}){
+export default function Explore({userObj, posts, setPosts}: {userObj: any, posts:any, setPosts:any}){
 
     const user = useContext(AuthContext);
-    const [posts, setPosts] = useState<any[] | null>(null);
+    const [explorePosts, setExplorePosts]:any = useState(null)
 
     useEffect(() => {
         const getPosts = async () => {
                 if(user){
-                    let userPosts = await getAllPosts();
+                    let userPosts = posts
 
                     //make sure there are no posts from the current user
-                    userPosts = userPosts.filter((post) => {
+                    userPosts = userPosts.filter((post:any) => {
                         return post.userid !== user.uid;
                     })
 
@@ -23,7 +23,7 @@ export default function Explore({userObj}: {userObj: any}){
                     let userPostsCopy = [...userPosts];
                     
                     //only take the posts that were made today
-                    userPosts = userPosts.filter((post) => {
+                    userPosts = userPosts.filter((post:any) => {
                         const today = new Date();
                         const postDate = new Date(post.timestamp);
                         return today.getDate() === postDate.getDate() && today.getMonth() === postDate.getMonth() && today.getFullYear() === postDate.getFullYear();
@@ -44,14 +44,14 @@ export default function Explore({userObj}: {userObj: any}){
 
                     //make sure there are no duplicate posts in userPosts
                     const seen = new Set();
-                    userPosts = userPosts.filter((post) => {
+                    userPosts = userPosts.filter((post:any) => {
                         const duplicate = seen.has(post.post_id);
                         seen.add(post.post_id);
                         return !duplicate;
                     })
 
                     //set the posts
-                    setPosts(userPosts || null);
+                    setExplorePosts(userPosts || null);
                 }
             }
             getPosts();
@@ -59,10 +59,10 @@ export default function Explore({userObj}: {userObj: any}){
 
     return(
         <div>
-            {posts && posts.map((post) =>
+            {explorePosts && explorePosts.map((post:any) =>
             <div key={post.post_id} className="px-3">
             
-                <Post id={post.post_id} posts={posts}/>
+                <Post id={post.post_id} posts={explorePosts} setPosts={setPosts} sample={false}/>
             </div> 
             )}
         </div>

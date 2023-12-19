@@ -24,4 +24,8 @@
     @apply h-7 hover:scale-125 cursor-pointer transition-all duration-150 ease-out;
   }
 
+  body.dark-mode {
+    @apply bg-gray-600 text-white;
+  }
+
 }

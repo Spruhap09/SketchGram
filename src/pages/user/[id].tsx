@@ -9,12 +9,10 @@ import { followUser, getUserPostsLimit, getUserStats, getUserbyUid, unfollowUser
 
 export default function UserProfile(){
     const router = useRouter();
-    const {id} = router.query;
-    const user = useContext(AuthContext);
+    const {id}:any = router.query;
+    const user:any = useContext(AuthContext);
     const [posts, setPosts] = useState<any[] | null>(null);
     const [ready, setReady] = useState(false);
-    const [following, setFollowing] = useState<string[]>([]);
-    const [followers, setFollowers] = useState<string[]>([]);
     const [userObj, setUserObj] = useState<any | any >();
     if(!user) router.push('/login');
 
@@ -23,7 +21,6 @@ export default function UserProfile(){
         const getPosts = async () => {
                 if(user){
                     const userPosts = await getUserPostsLimit(id);
-                    console.log(userPosts)
                     if (userPosts) {
                         setReady(true)
                     };
@@ -31,10 +28,6 @@ export default function UserProfile(){
                     if (ret_user){
                         setUserObj(ret_user);
                     }
-                    console.log('the user')
-                    console.log(userObj)
-                    setFollowers(userObj?.followers || null);
-                    setFollowing(userObj?.following || null);
                     setPosts(userPosts || null);
                 }
             }
@@ -43,35 +36,29 @@ export default function UserProfile(){
 
     const handleFollow = async () => {
         await followUser(id, user?.uid);
-        console.log('the user')
-        console.log(userObj)
         const accountUser = await getUserbyUid(id);
         setUserObj(accountUser);
-        setFollowers(userObj?.followers || null);
-        setFollowing(userObj?.following || null);
     };
 
     const handleUnfollow = async () => {
         await unfollowUser(id, user?.uid);
-        console.log('the user')
-        console.log(userObj)
         const accountUser = await getUserbyUid(id);
         setUserObj(accountUser);
-        setFollowers(userObj?.followers || null);
-        setFollowing(userObj?.following || null);
-        
     };
 
     return (
         <Layout>
+            {ready ? (
         <div>
             <div>
                 <div className="flex items-center p-5">
                     <img src={userObj?.profile_img === 'empty-profile.png' ? '../empty-profile.png' : userObj?.profile_img}
                     width={500} height={500} className="rounded-full h-12 w-12 object-contain border-2 p-1 mr-3" alt={"profile picture for " + userObj?.displayName} />
-                    <p className="flex-1 font-bold">{userObj?.displayName}</p>
-                    <p className="flex-1 font-bold">{`Following: ${userObj?.following.length}`}</p>
-                    <p className="flex-1 font-bold">{`Followers: ${userObj?.followers.length}`}</p>
+                    <div className="flex">
+                        <p className="flex-1 font-bold whitespace-nowrap p-2">{userObj?.displayName}</p>
+                        <p className="flex-1 font-bold whitespace-nowrap p-2">{`Following: ${userObj?.following.length}`}</p>
+                        <p className="flex-1 font-bold whitespace-nowrap p-2">{`Followers: ${userObj?.followers.length}`}</p>
+                    </div>    
                     {userObj?.uid !== user?.uid && ( 
                         userObj?.followers.includes(user?.uid) ? (
                             <Button onClick={handleUnfollow}>Unfollow</Button>
@@ -81,10 +68,11 @@ export default function UserProfile(){
                     )}
                 </div>
 
-                <Typography variant="h4" className="text-center">User Posts</Typography>
+                {posts && posts.length > 0 && <Typography variant="h4" className="text-center">User Posts</Typography>}
+                {posts && posts.length === 0 && <Typography variant="h4" className="text-center">No Posts yet</Typography>}
                 <UserPosts setPosts={setPosts} posts={posts} />
              </div>
-        </div> 
+        </div> ) : <div>Loading</div>}
         </Layout>
     )
 }

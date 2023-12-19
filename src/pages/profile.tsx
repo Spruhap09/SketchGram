@@ -11,12 +11,13 @@ import ProfileHeader from "../components/profile/ProfileHeader"
 import AboutSection from '../components/profile/AboutSection'
 import PhotoGrid from "../components/profile/PhotoGrid"
 export default function Profile() {
-      
+
 
     const user = useContext(AuthContext);
     const [posts, setPosts] = useState<any[] | null>(null);
     const [ready, setReady] = useState(false);
     const router = useRouter();
+    const [changeValue, setChangedValue] = useState(false);
     if(!user) router.push('/login');
 
     useEffect(() => {
@@ -30,7 +31,7 @@ export default function Profile() {
                 }
             }
             getPosts();
-    },[])
+    },[changeValue])
 
     return (
         <Layout>
@@ -38,7 +39,7 @@ export default function Profile() {
                 <>
                  <div className="w-full">
                     <ProfileHeader profile={user} posts={posts}/>
-                    <PhotoGrid posts={posts}/> 
+                    <PhotoGrid posts={posts}/>
                  </div>
                 </>
             ) : <div>Loading</div>}

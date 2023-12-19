@@ -25,10 +25,10 @@ export default function SamplePost(){
     , []);
     return (
         <div>
-        {posts && posts.map((post: { post_id: Key | null | undefined; }) =>
+        {posts && posts.map((post: { post_id: Key | null | undefined | any; }) =>
         <div key={post.post_id} className="px-3">
         
-            <Post id={post.post_id} posts={posts} sample={true}/>
+            <Post id={post.post_id} posts={posts} setPosts={"default"} sample={true}/>
         </div> 
         )}
     </div>
