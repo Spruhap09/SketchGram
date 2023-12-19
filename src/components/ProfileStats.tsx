@@ -107,20 +107,20 @@ export default function ProfileStats ({posts}: { posts: any }) {
         <>
         <div className="flex-grow box-border w-32 p-4 border-4 mr-4 rounded-lg flex flex-col items-center justify-center">
             <Typography variant="h5" color="blue-gray" className="my-2">Here are your profile stats!</Typography>
-            <Typography onClick={togglePop} className="h6 hover:cursor-pointer">{`You have `} <span className="font-bold text-xl">{followers.length}</span> {`${followers.length === 1 ? 'follower' : 'followers'}`}</Typography>
-            <Typography onClick={toggle2Pop} className="h6 hover:cursor-pointer">  {`You're ${following.length === 1 ? 'following' : 'following'} `}
+            <Typography onClick={togglePop} className="h6 hover:cursor-pointer hover:cursor-pointer hover:text-blue-400">{`You have `} <span className="font-bold text-xl">{followers.length}</span> {`${followers.length === 1 ? 'follower' : 'followers'}`}</Typography>
+            <Typography onClick={toggle2Pop} className="h6 hover:cursor-pointer hover:cursor-pointer hover:text-blue-400">  {`You're ${following.length === 1 ? 'following' : 'following'} `}
                                         <span className="font-bold text-xl">{following.length}</span>
                                         {` ${following.length === 1 ? 'person' : 'people'}`}</Typography>
             <Typography className="h6">{`You have  `} <span className="font-bold text-xl">{posts.length}</span> {`${posts.length === 1 ? 'post' : 'posts'}`}</Typography>
             <Typography className="h6">{`You have `} <span className="font-bold text-xl">{drafts.length}</span> {`${drafts.length === 1 ? 'draft' : 'drafts'}`}</Typography>
             {posts && posts.length > 0 && mostLikedPost && mostLikedPost.likes && (
-                <Typography onClick={() => router.push(`/post/${mostLikedPost.post_id}`)} className="h6">
+                <Typography onClick={() => router.push(`/post/${mostLikedPost.post_id}`)} className="h6 hover:cursor-pointer hover:text-blue-400">
                     <span className="font-bold text-xl">{mostLikedPost.description}</span> {` is your most liked post with `} 
                     <span className="font-bold text-xl">{mostLikedPost.likes.length}</span> {`${mostLikedPost.likes.length === 1 ? ' like' : ' likes'}`}
                 </Typography>
             )}
             {posts && posts.length > 0 && mostCommentedPost && mostCommentedPost.comments && (
-                <Typography onClick={() => router.push(`/post/${mostCommentedPost.post_id}`)} className="h6">
+                <Typography onClick={() => router.push(`/post/${mostCommentedPost.post_id}`)} className="h6 hover:cursor-pointer hover:text-blue-400">
                     <span className="font-bold text-xl">{mostCommentedPost.description}</span> {` is your most commented post with `} 
                     <span className="font-bold text-xl">{mostCommentedPost.comments.length}</span> {`${mostCommentedPost.comments.length === 1 ? ' comment' : ' comments'}`}
                 </Typography>
