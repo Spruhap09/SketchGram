@@ -28,10 +28,15 @@ export default function Search() {
         <Layout>
             <Typography className='p-5'variant="h1">Search Users</Typography>
             <Input label="Search" crossOrigin="anonymous" onChange={handleSearch}/>
+
+            <div className="flex flex-col items-center h-screen p-4">
+
+
             <div>
                 {searchResults.map((result, i) => {
                     return <UserProfile key={i} userDetails={result}/>
                 })}
+            </div>
             </div>
         </Layout>
     )
