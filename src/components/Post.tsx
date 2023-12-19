@@ -195,7 +195,7 @@ export default function Post({
 
       <div className="bg-blue-gray-800 my-7 border rounded-xl text-white !important max-w-500 overflow-x-hidden">
         <div className="flex items-center p-5">
-          <img src={userObj?.profilePicture || noAvatar.src}
+          <img src={userObj?.profilePicture || '../empty-profile.png'}
           width={500} height={500} className="rounded-full h-12 w-12 border-2 border-gray-300 mr-4" alt={"profile picture for " + userObj?.displayName} />
           <p className="flex-1 font-bold text-white">{userObj?.displayName}</p>
         </div>
@@ -256,7 +256,7 @@ export default function Post({
                 </div>)
             }
          </div>
-        ) : (<div></div>))}
+ 
 
 
 

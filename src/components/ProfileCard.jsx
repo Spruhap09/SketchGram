@@ -60,7 +60,7 @@ const ProfileCard = () => {
         {console.log("pfp", userInformation)}
         {error && <div className="error-message text-red-500">{error}</div>}
         <img
-          src={userInformation?.profilePicture || noAvatar.src}
+          src={userInformation?.profilePicture || '../empty-profile.png'}
           alt="Profile"
           className="rounded-full w-16 h-16 border-2 border-gray-300 mr-4"
         />

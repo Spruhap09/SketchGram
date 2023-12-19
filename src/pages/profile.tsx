@@ -8,7 +8,6 @@ import EditProfile from "../components/EditProfile";
 import ProfileStats from "../components/ProfileStats";
 import { getUserPostsLimit } from "@/firebase/functions";
 import ProfileHeader from "../components/profile/ProfileHeader"
-import noAvatar from 'public/noAvatar.jpeg'
 import AboutSection from '../components/profile/AboutSection'
 import PhotoGrid from "../components/profile/PhotoGrid"
 export default function Profile() {

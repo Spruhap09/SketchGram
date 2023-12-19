@@ -763,6 +763,40 @@ async function searchUsers(searchTerm: string) {
   }
 }
 
+async function searchByTitleFn (searchTerm: string){
+  try {
+
+    // Get Firebase Firestore
+    const {db} = initFirebaseConfig();
+
+    const searchArray = searchTerm.split("");
+
+    let users: any = [] // todo figure out proper typescript
+
+    // Find users by display name
+    const nameQ = query(
+      collection(db, "posts"),
+      where("description", ">=", searchTerm),
+      where("description", "<=", searchTerm + "\uf8ff"),
+      orderBy("description")
+    );  
+    const nameSnapshot = await getDocs(nameQ);
+    const posts = nameSnapshot.docs.map((doc) => {
+      let ret = doc.data()
+      ret.post_id = doc.id
+      return ret
+    })
+    console.log("name snapshot", nameSnapshot)
+    
+    console.log("userrrrrrrrrrrsssdsfjdsifjasdofjdasoif", posts)
+    return posts;
+
+  } catch (e){
+    console.log("Error searching for post by title", e)
+    throw e
+  }
+}
+
 async function updatePostComments(postId: string, comment: string, userUid: string) {
   try {
     // Get Firebase Firestore
@@ -818,6 +852,57 @@ async function getAllPosts(){
     //throw error;
   }
 }
+
+async function searchPosts(searchTerm: string) {
+  try {
+
+    // Get Firebase Firestore
+    const {db} = initFirebaseConfig();
+
+    let posts: any = [] // todo figure out proper typescript
+    let uniquePostIds = new Set();
+
+    //Find posts by description
+    const postQ = query(
+      collection(db, "posts"),
+      where("description", ">=", searchTerm ),
+      where("description", "<=", searchTerm + "\uf8ff"),
+      orderBy("description")
+    );    
+    
+    const nameSnapshot = await getDocs(postQ);
+    nameSnapshot.forEach((doc) => {
+      let data = doc.data();
+      data.post_id = doc.id
+      posts.push(data);
+      
+    });
+
+    //find the post by tags
+    const postQuery = collection(db, "posts");
+    const snapshot = await getDocs(postQuery);
+    console.log('this is post before')
+    console.log(posts)
+
+    snapshot.forEach((doc) => {
+      console.log(doc.data())
+      const data = doc.data();
+      const tags = data.tags || [];
+      for (let tag of tags) {
+        if (tag === searchTerm || tag.includes(searchTerm)){
+          data.post_id = doc.id
+          posts.push(data);
+        }
+      }
+    })
+    return posts;
+  }
+  catch (e) {
+    console.error("Error searching for posts: ", e);
+    throw e;
+  }
+}
+
 
 async function followUser(otherUid: string, userUid: string){
   try{
@@ -1017,5 +1102,7 @@ export {
   followUser,
   unfollowUser,
   uploadProfilePic,
-  updateEmail
+  updateEmail,
+  searchByTitleFn,
+  searchPosts
 };

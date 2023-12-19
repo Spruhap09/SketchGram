@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { MagnifyingGlassIcon, PencilSquareIcon, RectangleStackIcon, UserCircleIcon, HomeIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, PencilSquareIcon, RectangleStackIcon, UserCircleIcon, HashtagIcon } from "@heroicons/react/24/outline";
 import {
   Navbar,
   Typography,
@@ -54,7 +54,7 @@ export default function Navigation() {
         </Typography>
 
         <div className="ml-auto flex gap-1 md:mr-4">
-          {!user && (          
+          {!user && (
             <IconButton title='Home' variant="text" color="white" onClick={() => router.push('/')}>
               <HomeIcon className="h-4 w-4" />
             </IconButton>)}
@@ -77,9 +77,7 @@ export default function Navigation() {
           <IconButton title="Canvas" variant="text" color="white" onClick={() => router.push('/canvas')}>
             <PencilSquareIcon className="h-4 w-4" />
           </IconButton>
-          {/* <IconButton title="User" variant="text" color="white" onClick={() => router.push(`/user/:id`)}>
-            <PencilSquareIcon className="h-4 w-4" />
-          </IconButton> */}
+
 
             {user ? <Button onClick={() => logOutUser()}>Sign Out</Button> : <Button onClick={() => router.push('/login')}>Log In</Button>}
         </div>
