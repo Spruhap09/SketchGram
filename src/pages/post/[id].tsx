@@ -14,7 +14,7 @@ export default function IndividualPost(){
     const {id}:any = router.query;
     const user = useContext(AuthContext);
     const [ready, setReady] = useState(false);
-    const [post, setPost] = useState<DocumentData | null>(null);
+    const [post, setPost]:any = useState([])
     const posts: DocumentData[] = [];
     
 
@@ -23,22 +23,28 @@ export default function IndividualPost(){
         const getIndividualPost = async () => {
 
             if (user){
+              try {
                 const individualPost = await getPost(id)
-                setPost(individualPost)
+                setPost([individualPost])
+                
+                
+              } catch (error) {
+                console.log(error + " big error man")
                 setReady(true)
+              }
 
                 
             }   
         }
         getIndividualPost()
+        setReady(true)
     }, [user, id])
-
 
     return (
         <Layout>
           {ready ? (
             <div>
-              <Post id={post?.post_id} posts={[post]} setPosts="default" />
+              <Post id={post[0]?.post_id} posts={post} setPosts={setPost} />
             </div>
           ) : (
             <div>Loading</div>
