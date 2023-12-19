@@ -725,6 +725,44 @@ async function searchUsers(searchTerm: string) {
   }
 }
 
+async function deleteComment(postId: string, comment: string, userUid: string, commentId:string){
+  try {
+     // Get Firebase Firestore
+     const {db} = initFirebaseConfig();
+
+     const postRef = doc(collection(db, "posts"), postId);
+     const q = query(collection(db, "users"), where("uid", "==", userUid));
+     const querySnapshot = await getDocs(q);
+     if (querySnapshot.empty) throw "User does not exist in database";
+ 
+      
+     const postDoc = await getDoc(postRef);
+     console.log("from updatepost " + postDoc.data())
+ 
+     if (postDoc.exists()) {
+       const oldComments = postDoc.data()?.comments || [];
+ 
+       //check if user has commented more than 3 times
+       let temp:any = []
+       for (let i=0; i<oldComments.length; i++){
+         if (oldComments[i].uid === commentId){
+          continue
+         }
+         temp.push(oldComments[i])
+       }
+       const newComments:any = temp
+ 
+       
+       await updateDoc(postDoc.ref, { comments: newComments });
+     } else {
+       throw 'Post not found';
+     }
+  } catch (error) {
+    console.error("Error updating post comments: ", error);
+    throw error;
+  }
+}
+
 async function updatePostComments(postId: string, comment: string, userUid: string) {
   try {
     // Get Firebase Firestore
@@ -747,6 +785,19 @@ async function updatePostComments(postId: string, comment: string, userUid: stri
 
     if (postDoc.exists()) {
       const oldComments = postDoc.data()?.comments || [];
+
+      //check if user has commented more than 3 times
+      let count = 0;
+      for (let i=0; i<oldComments.length;i++){
+        if (userUid === oldComments[i].uid){
+          count++;
+        }
+      }
+
+      if (count >= 3){
+        throw "too many comments for user"
+      }
+
       const newComments = [...oldComments, comment];
       await updateDoc(postDoc.ref, { comments: newComments });
     } else {
@@ -925,5 +976,6 @@ export {
   getUserbyUid,
   getAllPosts, 
   followUser,
-  unfollowUser
+  unfollowUser,
+  deleteComment
 };

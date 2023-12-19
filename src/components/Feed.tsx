@@ -5,7 +5,7 @@ import { AuthContext } from "@/context/AuthContext";
 import { Typography } from "@material-tailwind/react";
 import { useRouter } from "next/router";
 import { useContext, useState, useEffect } from "react";
-import { getUserbyUid } from "@/firebase/functions";
+import { getUserbyUid, getAllPosts} from "@/firebase/functions";
 import TopFeed from "./TopFeed";
 
 
@@ -19,6 +19,7 @@ export default function Feed() {
     const [activeTab, setTab] = useState('home');
     const [userObj, setUserObj] = useState<any | any >();
     const [ready, setReady] = useState(false);
+    const [posts, setPosts] = useState(null)
 
     useEffect(()=> {
         const getUser = async () => {
@@ -26,13 +27,19 @@ export default function Feed() {
               const ret_user = await getUserbyUid(user.uid);
               if (ret_user){
               setUserObj(ret_user);
-              setReady(true);
+              try {
+                let userPosts:any = await getAllPosts()
+                setPosts(userPosts)
+                setReady(true);
+              } catch (error) {
+                console.log(error)
+              }
               }
             }
           }
           getUser();
 
-    },[user])
+    },[user, posts])
 
     return(
         <div className="flex flex-row">
@@ -49,8 +56,8 @@ export default function Feed() {
                             <p>Home</p>) : (<p>Top 10 Feed</p>)}
                     </div>
                     <div className="flex-2/3 h-200 overflow-y-scroll scrollbar-thumb-blue-gray-800 scrollbar-thin shadow-md">
-                        {activeTab == 'home' && <Home userObj={userObj}/>} 
-                        {activeTab == 'expore' && <Explore userObj={userObj}/>}
+                        {activeTab == 'home' && <Home posts={posts} setPosts={setPosts} userObj={userObj}/>} 
+                        {activeTab == 'expore' && <Explore posts={posts} setPosts={setPosts} userObj={userObj}/>}
                         {activeTab == 'topFeed' && <TopFeed />}
                     </div>
                 </div>

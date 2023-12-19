@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { useContext, useEffect, useRef, useState } from "react";
-import { getUserbyUid, deletePost, updatePostLikes, updatePostComments } from "@/firebase/functions";
+import { getUserbyUid, deletePost, updatePostLikes, updatePostComments, deleteComment } from "@/firebase/functions";
 import { DocumentData } from "firebase/firestore";
 import { Button, IconButton, Input, Typography, input } from "@material-tailwind/react";
 import { TrashIcon } from "@heroicons/react/20/solid";
@@ -11,7 +11,7 @@ import {
   FaceSmileIcon,
   ChatBubbleBottomCenterIcon,
   HeartIcon,
-  ArrowDownCircleIcon
+  PaperAirplaneIcon,
 } from "@heroicons/react/24/outline";
 import {HeartIcon as HeartIconFilled} from "@heroicons/react/20/solid"
 import Moment from "react-moment"
@@ -20,12 +20,10 @@ export default function Post({
   id,
   posts,
   setPosts = "default",
-  sample,
 }: {
   id: string;
   posts: any;
   setPosts: any;
-  sample:any
 }) {
 
   const [src, setSrc] = useState<string>("");
@@ -42,6 +40,18 @@ export default function Post({
   const router = useRouter()
   const currentUrl = router.asPath
 
+  const commentCount = (user:any, comments:any) => {
+    let count = 0;
+    for (let i=0; i<comments.length; i++){
+      if (comments[i].userid === user){
+        count++;
+      }
+    }
+    if (count >= 3){
+      return true
+    }
+    return false
+  }
   useEffect(() => {
     setReady(false);
     const getSrc = async () => {
@@ -173,6 +183,52 @@ export default function Post({
     setComment(e.target.value);
   };
 
+  const delComment = async (comment: any) => {
+    try {
+      if (comment.userid === user?.uid){
+       
+          console.log("target comment = " + JSON.stringify(comment))
+          console.log("comparison")
+          console.log(JSON.stringify(post.comments))
+          await deleteComment(post?.post_id, comment, user?.uid, comment.uid)
+          let temp:any = []
+          for (let i=0; i<post?.comments.length; i++){
+            if (post?.comments[i].uid === comment.uid){
+              console.log(JSON.stringify(post.comments[i]) + " stupid boy found")
+              continue
+            }
+            temp.push(post?.comments[i])
+          }
+          post.comments = temp
+          console.log(JSON.stringify(post.comments))
+
+            //resort comments by timestamp
+          post?.comments.sort((a: { timestamp: string; }, b: { timestamp: string; }) => {
+            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+         });
+         console.log("deleting post comment")
+         setPost(post)
+         setComment('');
+        if (setPosts !== "default"){
+          const postIndex = posts.findIndex((postToFind: { post_id: any; }) => postToFind.post_id === post?.post_id);
+          console.log('before')
+          if (postIndex !== -1){
+            console.log('reached inside')
+            const newPosts = [...posts];
+            newPosts[postIndex] = post;
+            setPosts(newPosts)
+          }
+        }
+
+        }
+      
+
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -245,7 +301,7 @@ export default function Post({
         ) : (<div>loading</div>)}
 
 
-        {(!sample ? (
+        {
                   <div className="flex space-x-4 p-4">
          
                   {(!likes.includes(user?.uid) 
@@ -253,9 +309,9 @@ export default function Post({
                   <HeartIconFilled onClick={handleUnLike} className='btn text-red-500'/>
                   )}
                   <ChatBubbleBottomCenterIcon onClick={focusInput} className='btn text-white'/>
-                  <ArrowDownCircleIcon onClick={() => (handleDownload(src))} className='btn text-white'/>
+                  <PaperAirplaneIcon onClick={() => (handleDownload(src))} className='btn text-white'/>
                 </div>
-        ) : (<div></div>))}
+        }
        
           
         {/* Caption */}
@@ -275,7 +331,7 @@ export default function Post({
 
         {/* Comments */}
 
-        {(!sample ? (
+        {
           <div className="ml-10 h-20 overflow-y-scroll scrollbar-thumb-white scrollbar-thin">
             {(post && post?.comments) && (
                 <div>
@@ -293,6 +349,10 @@ export default function Post({
                         {postComment?.comment}
                       </p>
 
+                      {user?.uid === postComment.userid && (
+                        <TrashIcon onClick={() => delComment(postComment)} title="Delete Post" className="btn w-4 h-5 p-0 m-0 text-white" />
+                      )}
+
                       <Moment fromNow className="pr-5 text-xs">
                         {postComment?.timestamp}
                       </Moment>
@@ -302,14 +362,14 @@ export default function Post({
                 </div>)
             } 
          </div>
-        ) : (<div></div>))}
+        }
         
 
 
 
         {/* Input Box */}
 
-        {(!sample ? (
+        {(post?.comments && (!commentCount(user?.uid, post.comments)) ? (
           <form onSubmit={handleSubmit} className="flex items-center space-x-3 p-4">
             <FaceSmileIcon className='h-7'/>
             <input 
@@ -321,7 +381,7 @@ export default function Post({
               className="bg-blue-gray-400 p-1 border-none flex-1 focus:ring-0 outline=none text-sm" />
             <button disabled={!comment.trim()} type='submit' className="font-semibold btn">Post</button>
           </form>
-        ) : (<div></div>))}
+        ) : (<div className="pb-10"></div>))}
 
 
         <div className="flex justify-center">
