@@ -58,9 +58,7 @@ export default function UserProfile(){
                         <p className="flex-1 font-bold whitespace-nowrap p-2">{userObj?.displayName}</p>
                         <p className="flex-1 font-bold whitespace-nowrap p-2">{`Following: ${userObj?.following.length}`}</p>
                         <p className="flex-1 font-bold whitespace-nowrap p-2">{`Followers: ${userObj?.followers.length}`}</p>
-                    </div>
-                    
-                    
+                    </div>    
                     {userObj?.uid !== user?.uid && ( 
                         userObj?.followers.includes(user?.uid) ? (
                             <Button onClick={handleUnfollow}>Unfollow</Button>
