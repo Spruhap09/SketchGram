@@ -36,11 +36,18 @@ export default function Search() {
         fetchResults();
     }, [searchTerm])
 
+
+    const handleSwitch = (name:string) => {
+        setTab(name)
+        setSearchResults([])
+        setSearchTerm("")
+    }
+
     return (
         <Layout>
             <div className="flex items-center justyify-center space-x-4 py-5">
-                <button className="btn bg-blue-gray-800 text-white font-bold py-6 px-6 rounded-full flex items-center justify-center" onClick={() => setTab('user')}>Search Users</button>
-                <button className="btn bg-blue-gray-800 text-white font-bold py-6 px-6 rounded-full flex items-center justify-center" onClick={() => setTab('post')}>Search Posts</button>
+                <button className="btn bg-blue-gray-800 text-white font-bold py-6 px-6 rounded-full flex items-center justify-center" onClick={() => handleSwitch('user')}>Search Users</button>
+                <button className="btn bg-blue-gray-800 text-white font-bold py-6 px-6 rounded-full flex items-center justify-center" onClick={() => handleSwitch('post')}>Search Posts</button>
             </div>
             
             {activeTab === 'user' ? 
