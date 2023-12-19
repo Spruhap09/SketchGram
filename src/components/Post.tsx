@@ -11,7 +11,7 @@ import {
   FaceSmileIcon,
   ChatBubbleBottomCenterIcon,
   HeartIcon,
-  PaperAirplaneIcon,
+  ArrowDownCircleIcon,
 } from "@heroicons/react/24/outline";
 import {HeartIcon as HeartIconFilled} from "@heroicons/react/20/solid"
 import Moment from "react-moment"
@@ -309,7 +309,7 @@ export default function Post({
                   <HeartIconFilled onClick={handleUnLike} className='btn text-red-500'/>
                   )}
                   <ChatBubbleBottomCenterIcon onClick={focusInput} className='btn text-white'/>
-                  <PaperAirplaneIcon onClick={() => (handleDownload(src))} className='btn text-white'/>
+                  <ArrowDownCircleIcon onClick={() => (handleDownload(src))} className='btn text-white'/>
                 </div>
         }
        
