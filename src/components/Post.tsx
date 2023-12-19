@@ -76,7 +76,7 @@ export default function Post({
       
 
       try {
-        const res = await fetch(`/api/image?url=${post?.imageURL}`)
+        const res = await fetch(`/api/image?url=${post.imageURL}`)
         const {imageUrl} = await res.json();
         // Set state
         setPost(post);
@@ -187,33 +187,29 @@ export default function Post({
     try {
       if (comment.userid === user?.uid){
        
-          console.log("target comment = " + JSON.stringify(comment))
-          console.log("comparison")
-          console.log(JSON.stringify(post.comments))
+      
           await deleteComment(post?.post_id, comment, user?.uid, comment.uid)
           let temp:any = []
           for (let i=0; i<post?.comments.length; i++){
             if (post?.comments[i].uid === comment.uid){
-              console.log(JSON.stringify(post.comments[i]) + " stupid boy found")
+            
               continue
             }
             temp.push(post?.comments[i])
           }
           post.comments = temp
-          console.log(JSON.stringify(post.comments))
 
             //resort comments by timestamp
           post?.comments.sort((a: { timestamp: string; }, b: { timestamp: string; }) => {
             return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
          });
-         console.log("deleting post comment")
+
          setPost(post)
          setComment('');
         if (setPosts !== "default"){
           const postIndex = posts.findIndex((postToFind: { post_id: any; }) => postToFind.post_id === post?.post_id);
-          console.log('before')
+
           if (postIndex !== -1){
-            console.log('reached inside')
             const newPosts = [...posts];
             newPosts[postIndex] = post;
             setPosts(newPosts)

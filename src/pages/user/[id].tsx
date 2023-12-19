@@ -14,7 +14,7 @@ export default function UserProfile(){
     const [posts, setPosts] = useState<any[] | null>(null);
     const [ready, setReady] = useState(false);
     const [userObj, setUserObj] = useState<any | any >();
-    if(!user) router.push('login');
+    if(!user) router.push('/login');
 
     useEffect(() => {
         setReady(false);
