@@ -9,12 +9,12 @@ import { followUser, getUserPostsLimit, getUserStats, getUserbyUid, unfollowUser
 
 export default function UserProfile(){
     const router = useRouter();
-    const {id} = router.query;
-    const user = useContext(AuthContext);
+    const {id}:any = router.query;
+    const user:any = useContext(AuthContext);
     const [posts, setPosts] = useState<any[] | null>(null);
     const [ready, setReady] = useState(false);
     const [userObj, setUserObj] = useState<any | any >();
-    if(!user) router.push('/login');
+    if(!user) router.push('login');
 
     useEffect(() => {
         setReady(false);

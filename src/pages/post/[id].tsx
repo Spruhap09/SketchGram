@@ -11,7 +11,7 @@ import { DocumentData } from "firebase/firestore";
 
 export default function IndividualPost(){
     const router = useRouter();
-    const {id} = router.query;
+    const {id}:any = router.query;
     const user = useContext(AuthContext);
     const [ready, setReady] = useState(false);
     const [post, setPost] = useState<DocumentData | null>(null);
@@ -38,7 +38,7 @@ export default function IndividualPost(){
         <Layout>
           {ready ? (
             <div>
-              <Post id={post?.post_id} posts={[post]} />
+              <Post id={post?.post_id} posts={[post]} setPosts="default" />
             </div>
           ) : (
             <div>Loading</div>
