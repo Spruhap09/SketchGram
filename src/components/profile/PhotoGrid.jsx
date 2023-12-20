@@ -3,7 +3,7 @@ import PhotoSquare from './PhotoSquare';
 import Post from "../Post"
 import Modal from "../Modal"
 
-const PhotoGrid = ({ posts }) => {
+const PhotoGrid = ({ posts , setPosts}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [activePost, setActivePost] = useState(null);
 
@@ -26,7 +26,7 @@ const PhotoGrid = ({ posts }) => {
         <Modal onClose={() => setIsModalOpen(false)}>
            {console.log("active post", activePost.post_id)}
           
-          <Post key={activePost.post_id} id={activePost.post_id} posts={posts}/>
+          <Post key={activePost.post_id} id={activePost.post_id} posts={posts} sample={false} setPosts={setPosts}/>
          
         </Modal>
       )}

@@ -14,7 +14,7 @@ export default function Profile() {
 
 
     const user = useContext(AuthContext);
-    const [posts, setPosts] = useState<any[] | null>(null);
+    const [posts, setPosts] = useState(null);
     const [ready, setReady] = useState(false);
     const router = useRouter();
     const [changeValue, setChangedValue] = useState(false);
@@ -27,7 +27,7 @@ export default function Profile() {
                     const userPosts = await getUserPostsLimit(user.uid);
                     console.log(userPosts)
                     if (userPosts) setReady(true);
-                    setPosts(userPosts || null);
+                    setPosts(userPosts);
                 }
             }
             getPosts();
@@ -39,7 +39,7 @@ export default function Profile() {
                 <>
                  <div className="w-full">
                     <ProfileHeader profile={user} posts={posts}/>
-                    <PhotoGrid posts={posts}/>
+                    <PhotoGrid posts={posts} setPosts={setPosts}/>
                  </div>
                 </>
             ) : <div>Loading</div>}
