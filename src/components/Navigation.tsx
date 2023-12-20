@@ -22,9 +22,7 @@ export default function Navigation() {
     
 
     useEffect(() => {
-      console.log('useEffect')
       async function getPageName(){
-
         if (router.asPath.startsWith('/user/')){
           const id = router.asPath.split('/')[2]
           const viewUser = await getUserbyUid(id);
@@ -41,8 +39,7 @@ export default function Navigation() {
       }
       getPageName()
     }, [router.asPath])
-
-
+    
   return (
     <Navbar
       variant="gradient"
@@ -62,7 +59,7 @@ export default function Navigation() {
 
         <div className="ml-auto flex gap-1 md:mr-4">
           <ToggleButton />
-          {!user && (          
+          {!user && (
             <IconButton title='Home' variant="text" color="white" onClick={() => router.push('/')}>
               <HomeIcon className="h-4 w-4" />
             </IconButton>)}

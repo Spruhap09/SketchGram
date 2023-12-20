@@ -1,4 +1,5 @@
 import Image from "next/image";
+import noAvatar from 'public/noAvatar.jpeg'
 import { useContext, useEffect, useRef, useState } from "react";
 import { getUserbyUid, deletePost, updatePostLikes, updatePostComments, deleteComment } from "@/firebase/functions";
 import { DocumentData } from "firebase/firestore";
@@ -57,7 +58,7 @@ export default function Post({
   useEffect(() => {
     setReady(false);
     const getSrc = async () => {
-     
+
       //get post from posts context
       const post = posts.find((post: { post_id: string; }) => post.post_id === id);
 
@@ -188,13 +189,13 @@ export default function Post({
   const delComment = async (comment: any) => {
     try {
       if (comment.userid === user?.uid){
-       
-      
+
+
           await deleteComment(post?.post_id, comment, user?.uid, comment.uid)
           let temp:any = []
           for (let i=0; i<post?.comments.length; i++){
             if (post?.comments[i].uid === comment.uid){
-            
+
               continue
             }
             temp.push(post?.comments[i])
@@ -219,7 +220,7 @@ export default function Post({
         }
 
         }
-      
+
 
 
     } catch (error) {
@@ -245,7 +246,7 @@ export default function Post({
           comment: comment,
           userid: user?.uid,
           username: user?.displayName,
-          profile_img: userObj?.profile_img,
+          profilePicture: userObj?.profilePicture,
           timestamp: new Date().toISOString(),
         };
         await updatePostComments(post?.post_id, comment_obj, user?.uid);
@@ -277,21 +278,16 @@ export default function Post({
 
       <div className="bg-blue-gray-800 my-7 border rounded-xl text-white !important max-w-500 overflow-x-hidden">
         <div className="flex items-center p-5">
-          <Image 
-            src={userObj?.profile_img === 'empty-profile.png' ? '/../empty-profile.png' : `/${userObj?.profile_img}`}
-            width={500} 
-            height={500} 
-            className="rounded-full h-12 w-12 object-contain border-2 p-1 mr-3" 
-            alt={"profile picture for " + userObj?.displayName}
-          />
+          <img src={userObj?.profilePicture || '../empty-profile.png'}
+          width={500} height={500} className="rounded-full h-12 w-12 border-2 border-gray-300 mr-4" alt={"profile picture for " + userObj?.displayName} />
           <p className="flex-1 font-bold text-white">{userObj?.displayName}</p>
         </div>
         {src.length ? 
         (
-        
-          <Image 
-          src={src} 
-          alt="user post" 
+
+          <Image
+          src={src}
+          alt="user post"
           className="object-cover w-full bg-white"
           height={750}
           width={750}
@@ -299,7 +295,7 @@ export default function Post({
         ) : (<div>loading</div>)}
 
 
-        {!sample && 
+        {!sample &&
                   <div className="flex space-x-4 p-4">
          
                   {(!likes.includes(user?.uid) 
@@ -335,12 +331,12 @@ export default function Post({
                 <div>
                   {post.comments.map((postComment: any) => (
                     <div key={postComment.uid} className="flex items-center space-x-2 ab-3 p-2 block">
-                      <Image 
+                      <Image
                         src={postComment?.profile_img === 'empty-profile.png' ? '/../empty-profile.png' : '/' + postComment?.profile_img}
                         alt={"comment profile picture for user " + postComment?.username}
                         className="rounded-full h-8 w-8 object-contain"
-                        width={500} 
-                        height={500} 
+                        width={500}
+                        height={500}
                       />
                       <p className="text-sm flex-1 truncate space-x-4 overflow-ellipsis block whitespace-no-wrap">
                         <span className="font-bold mr-2">{postComment?.username}</span>
@@ -358,10 +354,11 @@ export default function Post({
                     </div>
                   ))}
                 </div>)
-            } 
+            }
          </div>
         }
         
+
 
 
 
@@ -411,7 +408,7 @@ export default function Post({
 
         </div>
 
-          
+
     </div>
 
     ): (post != false && <div>loading</div>)}
