@@ -17,6 +17,7 @@ export default function IndividualPost(){
     const [post, setPost]:any = useState([])
     const posts: DocumentData[] = [];
     
+    if(!user) router.push('/login');
 
     useEffect(() => {
         setReady(false);

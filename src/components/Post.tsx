@@ -68,7 +68,7 @@ export default function Post({
      
       //get post from posts context
       const post = posts.find((post: { post_id: string; }) => post.post_id === id);
-
+      // console.log(post)
       //order comments by timestamp
       if (post?.comments){
         post.comments.sort((a: { timestamp: string; }, b: { timestamp: string; }) => {
@@ -81,11 +81,11 @@ export default function Post({
           try {
             let ret_user:any = await getUserbyUid(post.comments[i].userid)
             post.comments[i].username = ret_user.displayName
-            if(ret_user.profile_img){
-              post.comments[i].profile_img = ret_user.profile_img
-            } else {
-              post.comments[i].profile_img = 'empty-profile.png'
-            }
+            // if(ret_user.profile_img){
+            //   post.comments[i].profile_img = ret_user.profile_img
+            // } else {
+            //   post.comments[i].profile_img = 'empty-profile.png'
+            // }
           } catch (error) {
             console.log(error)
           }
@@ -96,13 +96,16 @@ export default function Post({
       
 
       try {
-        const res = await fetch(`/api/image?url=${post.imageURL}`)
-        const {imageUrl} = await res.json();
-        // Set state
+        if(post){
+          const res = await fetch(`/api/image?url=${post.imageURL}`)
+          // console.log(`/api/image?url=${post.imageURL}`)
+          const {imageUrl} = await res.json();
+          // Set state
+          setPost(post);
+          setSrc(imageUrl);
+          setLikes(post?.likes)
+        }
 
-        setPost(post);
-        setSrc(imageUrl);
-        setLikes(post?.likes)
       } catch (error) {
         console.log(error)
       }
