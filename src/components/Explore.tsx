@@ -62,7 +62,7 @@ export default function Explore({userObj, posts, setPosts}: {userObj: any, posts
             {explorePosts && explorePosts.map((post:any) =>
             <div key={post.post_id} className="px-3">
             
-                <Post id={post.post_id} posts={explorePosts} setPosts={setPosts}/>
+                <Post id={post.post_id} posts={explorePosts} setPosts={setPosts} sample={false}/>
             </div> 
             )}
         </div>
