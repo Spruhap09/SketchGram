@@ -496,7 +496,9 @@ async function getImageFromUrl(imageUrl: string) {
 
     // Get image from storage
     const storageRef = ref(storage, imageUrl);
+    // console.log("storageRef", storageRef)
     const url = await getDownloadURL(storageRef);
+    // console.log("url", url)
     if (!url) throw "Image does not exist in storage";
     return url;
   }

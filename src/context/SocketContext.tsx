@@ -23,7 +23,7 @@ export const SocketProvider = ({ children }: { children: ReactNode }) => {
     const user = useContext(AuthContext);
 
     useEffect(() => {
-        console.log(user);
+        // console.log(user);
         if(isConnected && socket && (user?.uid !== oldUser)){
             socket?.emit('disconnect');
             socket?.off();

@@ -30,7 +30,7 @@ export default function Chatrooms() {
 
     }, [socket, user]);
 
-    console.log(chatrooms);
+    // console.log(chatrooms);
 
     return (
         <div className='text-center'>

@@ -52,16 +52,17 @@ io.on('connection', (socket => {
     });
     
     socket.on('send_post_to_user', async (data) => {
+        console.log('send_post_to_user accessed');
         const { postId, recipientId, post } = data;
 
-        console.log(postId, recipientId, post);
+        // console.log(postId, recipientId, post);
 
         const senderId = token;
         const existingChat = query(collection(db, "chats"), where("participants", "array-contains", senderId));
 
 
 
-        const chatID = await getDocs(existingChat).then((querySnapshot) => {
+        let chatID = await getDocs(existingChat).then((querySnapshot) => {
             let chatID = null;
             querySnapshot.forEach((doc) => {
                 if(doc.data().participants.includes(recipientId)) {
@@ -90,7 +91,7 @@ io.on('connection', (socket => {
                 messages: []
             });
 
-            console.log(newChat.id);
+            // console.log(newChat.id);
 
             const messageRef = doc(db, "chats", newChat.id);
             await updateDoc(messageRef, {
@@ -101,9 +102,11 @@ io.on('connection', (socket => {
                     createdAt: new Date().toISOString(),
                 })
             });
+            chatID = newChat.id;
         }
 
-        socket.to(recipientId).emit('receive_post', post);
+        // socket.to(recipientId).emit('receive_post', post);
+        socket.to(recipientId).emit('messages', chatID);
     });
 
     socket.on('chatrooms', async (data) => {
@@ -169,7 +172,7 @@ io.on('connection', (socket => {
                     return user.displayName;
                 });
                 post.time = e.createdAt;
-                console.log(post);
+                // console.log(post);
                 return post;
             })}));
         

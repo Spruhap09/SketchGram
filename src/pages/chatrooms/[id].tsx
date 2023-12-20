@@ -64,7 +64,7 @@ export default function Chatroom() {
                         <div>
                             {posts.map((post, index) => (
                                 <div key={post.post_id + "_" + index} className="max-w-md mx-auto bg-white p-4 rounded shadow mb-4 border-b border-gray-300">
-                                    <Post id={post.post_id} posts={[post]} setPosts={undefined} sample={undefined} />
+                                    <Post id={post.post_id} posts={[post]} setPosts={undefined} sample={false} />
                                     <p>Sent by: {post.senderId}</p>
                                     <p>Time: {formatDate(post.time)}</p> 
                                 </div>

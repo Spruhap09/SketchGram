@@ -15,7 +15,7 @@ export default function UserPosts({ setPosts, posts }: { setPosts:any, posts: an
             posts ? (
                    
                 posts.map((post: any) => { // Add type annotation for 'post'
-                    console.log(post);
+                    // console.log(post);
                     return <Post key={post.post_id} id={post.post_id} posts={posts} setPosts={setPosts} sample={false} />;
                 })
             ) : (

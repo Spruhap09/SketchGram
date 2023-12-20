@@ -30,7 +30,7 @@ export default function Explore({userObj, posts, setPosts}: {userObj: any, posts
                     })
 
                     //sort by likes
-                    userPosts.sort((a, b) => {
+                    userPosts.sort((a: { likes: string | any[]; }, b: { likes: string | any[]; }) => {
                         return b.likes.length - a.likes.length;
                     });
 

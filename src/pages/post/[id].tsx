@@ -21,8 +21,6 @@ export default function IndividualPost(){
     useEffect(() => {
         setReady(false);
         const getIndividualPost = async () => {
-
-<<<<<<< Updated upstream
             if (user){
               try {
                 const individualPost = await getPost(id)
@@ -33,10 +31,6 @@ export default function IndividualPost(){
                 console.log(error + " big error man")
                 setReady(true)
               }
-
-                
-=======
->>>>>>> Stashed changes
             }   
         }
         getIndividualPost()

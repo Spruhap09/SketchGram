@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { getUserbyUid, deletePost, updatePostLikes, updatePostComments } from "@/firebase/functions";
 import noAvatar from 'public/noAvatar.jpeg'
 import { useContext, useEffect, useRef, useState } from "react";
 import { getUserbyUid, deletePost, updatePostLikes, updatePostComments, deleteComment } from "@/firebase/functions";
@@ -19,6 +18,7 @@ import {HeartIcon as HeartIconFilled} from "@heroicons/react/20/solid"
 import Moment from "react-moment"
 import { useSocket } from "@/context/SocketContext";
 import UserModal from "./UserModal";
+import { set } from "firebase/database";
 
 export default function Post({
   id,
@@ -81,7 +81,11 @@ export default function Post({
           try {
             let ret_user:any = await getUserbyUid(post.comments[i].userid)
             post.comments[i].username = ret_user.displayName
-            post.comments[i].profile_img = ret_user.profile_img
+            if(ret_user.profile_img){
+              post.comments[i].profile_img = ret_user.profile_img
+            } else {
+              post.comments[i].profile_img = 'empty-profile.png'
+            }
           } catch (error) {
             console.log(error)
           }
@@ -109,6 +113,9 @@ export default function Post({
         let user;
         try {
           user = await getUserbyUid(post.userid);
+          if (user && !user.profile_img) {
+            user.profile_img = 'empty-profile.png';
+          }
         } catch (error) {
           console.log(error)
         }
@@ -138,7 +145,7 @@ export default function Post({
     // Defining the data to send
     const dataToSend = {
       postId: id,
-      recipientId: recipientId, 
+      recipientId: recipientId,
       post: post
     };
 
@@ -154,8 +161,8 @@ export default function Post({
     // console.log("open modal");
   }
 
-  const handleSendToFollower = async (followerid: string) => {
-    handleSendToUser(followerid);
+  const handleSendToFollower = async (followerId: string) => {
+    handleSendToUser(followerId);
     closeModal();
   };
 
@@ -166,7 +173,8 @@ export default function Post({
       if (userObj){
         let followingNames = await Promise.all(userObj.following.map(async (following: any) =>{ 
           const person = await getUserbyUid(following);
-          return person?.displayName;
+          const personName = person?.displayName;
+          return {name: personName, id: following};
         }));
         setFollowering(followingNames)
       }
@@ -352,7 +360,7 @@ export default function Post({
       <div className="bg-blue-gray-800 my-7 border rounded-xl text-white !important max-w-500 overflow-x-hidden">
         <div className="flex items-center p-5">
           <Image 
-            src={userObj?.profile_img === 'empty-profile.png' ? '/empty-profile.png' : `${userObj?.profile_img}`}
+            src={userObj?.profile_img === 'empty-profile.png' ? '/../empty-profile.png' : userObj?.profile_img}
             width={500} 
             height={500} 
             className="rounded-full h-12 w-12 object-contain border-2 p-1 mr-3" 
@@ -385,9 +393,10 @@ export default function Post({
                   <UserModal isOpen={isModalOpen} onClose={closeModal}>
                     <div className="flex flex-col">
                       <div className="flex flex-col space-y-2">
-                        {followering?.map((follower: any) => (
-                          <Button key={follower} color="blue" onClick={() => handleSendToFollower(follower)}>
-                            {follower}
+                        {followering?.map((follower: any, findIndex: any) => (
+                          // console.log(follower),
+                          <Button key={follower.id} color="blue" onClick={() => handleSendToFollower(follower.id)}>
+                            {follower.name}
                           </Button>
                         ))}
                       </div>
