@@ -19,7 +19,6 @@ import {
   collection,
   getFirestore,
   doc,
-  setDoc,
   query,
   where,
   or,
@@ -79,7 +78,7 @@ async function signUpWithEmailAndPassword(
 }
 
 async function updateDisplayName(newDisplayName: string){
-  if (newDisplayName.trim() == "") throw "Error: Display name field must have a value"
+  
   try{
     const {db, auth} = initFirebaseConfig();
     if (!auth.currentUser) {
@@ -103,12 +102,12 @@ async function updateDisplayName(newDisplayName: string){
       await updateProfile(auth.currentUser, { displayName: newDisplayName });
       //update the db for the collection
       await updateDoc (userDocRef, {displayName: newDisplayName});
-
+      
     }
     else {
       throw "This user does not exist";
     }
-
+    
   }
   catch(e){
     console.error("Error updating the display name: ", e);
@@ -116,51 +115,6 @@ async function updateDisplayName(newDisplayName: string){
   }
 
 }
-function validateEmail(email: string) {
-  const regex = /^[^\s@]+@[^\s@]+\.(com|org|edu|net|gov|mil|biz|info)$/i;
-  return regex.test(email);
-}
-
-async function updateEmail(newEmail: string){
-
-  if (newEmail.trim() == "") throw "Error: email field must have a value"
-  if (!validateEmail(newEmail)) throw "Error: invalid email"
-  try{
-    const {db, auth} = initFirebaseConfig();
-    if (!auth.currentUser) {
-      throw "No user is logged in";
-    }
-
-
-    //get the user collection reference
-    const usersCollectionRef = collection(db, "users"); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference
-
-    // Check if user already exists in database
-    const q = query(usersCollectionRef, where("uid", "==", auth.currentUser.uid));
-    const querySnapshot = await getDocs(q); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.QuerySnapshot
-
-    // If user exists then update the details
-    if (!querySnapshot.empty) {
-
-      const userDocRef = querySnapshot.docs[0].ref;
-      //update the profile for auth
-      await updateProfile(auth.currentUser, { email: newEmail });
-      //update the db for the collection
-      await updateDoc (userDocRef, {displayName: newEmail});
-
-    }
-    else {
-      throw "This user does not exist";
-    }
-
-  }
-  catch(e){
-    console.error("Error updating the email: ", e);
-    throw e;
-  }
-
-}
-
 
 // Change user password
 // Not implemented anywhere yet
@@ -169,8 +123,6 @@ async function changePassword(
   oldPassword: string,
   newPassword: string
 ) {
-  if (oldPassword.trim() == "") throw "Error: old password field must have a value"
-  if (newPassword.trim() == "") throw "Error: new password field must have a value"
   try{
     // Get Firebase Auth
     const {auth} = initFirebaseConfig();
@@ -744,7 +696,7 @@ async function searchUsers(searchTerm: string) {
       where("displayName", "<=", searchTerm + "\uf8ff"),
       orderBy("displayName")
     );    
-
+    
     const nameSnapshot = await getDocs(nameQ);
     nameSnapshot.forEach((doc) => {
       let data = doc.data();
@@ -782,14 +734,14 @@ async function deleteComment(postId: string, comment: string, userUid: string, c
      const q = query(collection(db, "users"), where("uid", "==", userUid));
      const querySnapshot = await getDocs(q);
      if (querySnapshot.empty) throw "User does not exist in database";
-
-
+ 
+      
      const postDoc = await getDoc(postRef);
      console.log("from updatepost " + postDoc.data())
-
+ 
      if (postDoc.exists()) {
        const oldComments = postDoc.data()?.comments || [];
-
+ 
        //check if user has commented more than 3 times
        let temp:any = []
        for (let i=0; i<oldComments.length; i++){
@@ -799,8 +751,8 @@ async function deleteComment(postId: string, comment: string, userUid: string, c
          temp.push(oldComments[i])
        }
        const newComments:any = temp
-
-
+ 
+       
        await updateDoc(postDoc.ref, { comments: newComments });
      } else {
        throw 'Post not found';
@@ -808,40 +760,6 @@ async function deleteComment(postId: string, comment: string, userUid: string, c
   } catch (error) {
     console.error("Error updating post comments: ", error);
     throw error;
-  }
-}
-
-async function searchByTitleFn (searchTerm: string){
-  try {
-
-    // Get Firebase Firestore
-    const {db} = initFirebaseConfig();
-
-    const searchArray = searchTerm.split("");
-
-    let users: any = [] // todo figure out proper typescript
-
-    // Find users by display name
-    const nameQ = query(
-      collection(db, "posts"),
-      where("description", ">=", searchTerm),
-      where("description", "<=", searchTerm + "\uf8ff"),
-      orderBy("description")
-    );
-    const nameSnapshot = await getDocs(nameQ);
-    const posts = nameSnapshot.docs.map((doc) => {
-      let ret = doc.data()
-      ret.post_id = doc.id
-      return ret
-    })
-    console.log("name snapshot", nameSnapshot)
-
-    console.log("userrrrrrrrrrrsssdsfjdsifjasdofjdasoif", posts)
-    return posts;
-
-  } catch (e){
-    console.log("Error searching for post by title", e)
-    throw e
   }
 }
 
@@ -913,9 +831,6 @@ async function getAllPosts(){
     //throw error;
   }
 }
-
-
-
 
 async function followUser(otherUid: string, userUid: string){
   try{
@@ -1034,58 +949,6 @@ async function unfollowUser(otherUid: string, userUid: string){
   }
 }
 
-const uploadProfilePic = async (file: File) => {
-  if (!file) throw new Error("No file to upload");
-
-  const validFileTypes = ['image/jpeg', 'image/png', 'image/jpg'];
-  const maxSize = 5 * 1024 * 1024;
-
-  if (!validFileTypes.includes(file.type)) {
-    throw new Error("Invalid file type. Please upload a JPEG or PNG image.");
-  }
-
-  if (file.size > maxSize) {
-    throw new Error("File size exceeds the limit of 5MB.");
-  }
-
-  const {db, auth} = initFirebaseConfig();
-  if (!auth.currentUser || !auth.currentUser.uid)
-    throw new Error("User not logged in");
-
-  const userId = auth.currentUser.uid;
-  const storage = getStorage();
-
-  // Define a unique path for each user's profile picture
-  const fileRef = ref(storage, `profile_pictures/${userId}/profile_pic`);
-
-  //get the user collection reference
-  const usersCollectionRef = collection(db, "users"); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference
-
-  // Check if user already exists in database
-  const q = query(usersCollectionRef, where("uid", "==", auth.currentUser.uid));
-  const querySnapshot = await getDocs(q);
-
-  try {
-    // Upload the new file to the unique path (overwrites if exists)
-    const snapshot = await uploadBytes(fileRef, file);
-
-    // Get the URL of the uploaded file
-    const url = await getDownloadURL(snapshot.ref);
-
-    // Update the user's profile in Firestore with the new picture URL
-    const userDocRef = querySnapshot.docs[0].ref;
-    //update the profile for auth
-    //update the db for the collection
-    await updateDoc (userDocRef, {profilePicture: url});
-
-    console.log('File uploaded and Firestore reference set:', url);
-    return url
-  } catch (error) {
-    console.error('Error uploading file and setting Firestore document:', error);
-    throw error;
-  }
-};
-
 async function searchPosts(searchTerm: string) {
   try {
 
@@ -1101,14 +964,14 @@ async function searchPosts(searchTerm: string) {
       where("description", ">=", searchTerm ),
       where("description", "<=", searchTerm + "\uf8ff"),
       orderBy("description")
-    );
-
+    );    
+    
     const nameSnapshot = await getDocs(postQ);
     nameSnapshot.forEach((doc) => {
       let data = doc.data();
       data.post_id = doc.id
       posts.push(data);
-
+      
     });
 
     //find the post by tags
@@ -1161,12 +1024,9 @@ export {
   searchUsers,
   updatePostComments,
   getUserbyUid,
-  getAllPosts,
+  getAllPosts, 
   followUser,
   unfollowUser,
-  uploadProfilePic,
-  updateEmail,
-  searchByTitleFn,
   deleteComment,
   searchPosts
 };

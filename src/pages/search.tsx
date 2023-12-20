@@ -2,7 +2,6 @@ import Layout from "@/components/Layout";
 import { searchPosts, searchUsers } from "@/firebase/functions";
 import { Input, Typography } from "@material-tailwind/react";
 import { User } from "firebase/auth";
-import PhotoGrid from "@/components/profile/PhotoGrid";
 import { useEffect, useState } from "react";
 import UserProfile from "@/components/UserProfile";
 import Post from "@/components/Post";
@@ -29,9 +28,9 @@ export default function Search() {
                     (post: { post_id: any; }, index: any, self: any[]) =>
                       index === self.findIndex((p) => p.post_id === post.post_id)
                   );
-
+                  
             setSearchResults(results);
-
+            
         }
 
         fetchResults();
@@ -50,8 +49,8 @@ export default function Search() {
                 <button className="btn bg-blue-gray-800 text-white font-bold py-6 px-6 rounded-full flex items-center justify-center" onClick={() => handleSwitch('user')}>Search Users</button>
                 <button className="btn bg-blue-gray-800 text-white font-bold py-6 px-6 rounded-full flex items-center justify-center" onClick={() => handleSwitch('post')}>Search Posts</button>
             </div>
-
-            {activeTab === 'user' ?
+            
+            {activeTab === 'user' ? 
             <div>
                 <Typography className='p-5'variant="h1">Search Users</Typography>
                 <Input label="Search" crossOrigin="anonymous" onChange={handleSearch}/>
@@ -65,9 +64,11 @@ export default function Search() {
                 <Typography className='p-5'variant="h1">Search Posts</Typography>
                 <Input label="Search" crossOrigin="anonymous" onChange={handleSearch}/>
                 <div>
-                    <PhotoGrid posts={searchResults} />
+                    {searchResults.map((result:any, i) => {
+                        return <Post key={i} id={result.post_id} posts={searchResults} setPosts={setSearchResults} sample={false}/>
+                    })}
                 </div>
-            </div> : <div><p>Pick a search option! </p></div>}
+            </div> : <div><p>Pick a search option! </p></div>}       
         </Layout>
     )
 }
