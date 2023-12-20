@@ -65,7 +65,7 @@ export default function Search() {
                 <Input label="Search" crossOrigin="anonymous" onChange={handleSearch}/>
                 <div>
                     {searchResults.map((result:any, i) => {
-                        return <Post key={i} id={result.post_id} posts={searchResults} setPosts={setSearchResults} sample={false}/>
+                        return <Post key={i} id={result.post_id} posts={searchResults} setPosts={setSearchResults}/>
                     })}
                 </div>
             </div> : <div><p>Pick a search option! </p></div>}       

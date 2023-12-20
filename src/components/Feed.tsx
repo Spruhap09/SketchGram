@@ -62,7 +62,16 @@ export default function Feed() {
                     </div>
                 </div>
                 
-               
+                {/* <div className="flex flex-col items-center justify-center">
+                    <div className="flex items-center justyify-center text-4xl space-x-4 py-10 lg:font-bold">
+                        <p>Top 10 Posts</p>
+                    </div>
+                    <div className="flex flex-col items-center justify-center h-screen">
+                        <div className="flex-1/3 h-200 overflow-y-scroll scrollbar-thumb-blue-gray-800 scrollbar-thin shadow-md">
+                            {<TopFeed />}
+                        </div>
+                    </div>
+                </div> */}
             </>
             ) : <div>Loading</div>}
 

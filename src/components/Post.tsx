@@ -20,12 +20,10 @@ export default function Post({
   id,
   posts,
   setPosts = "default",
-  sample = false,
 }: {
   id: string;
   posts: any;
   setPosts: any;
-  sample: boolean;
 }) {
 
   const [src, setSrc] = useState<string>("");
@@ -299,7 +297,7 @@ export default function Post({
         ) : (<div>loading</div>)}
 
 
-        {!sample && 
+        {
                   <div className="flex space-x-4 p-4">
          
                   {(!likes.includes(user?.uid) 
@@ -367,7 +365,7 @@ export default function Post({
 
         {/* Input Box */}
 
-        {!sample && (post?.comments && (!commentCount(user?.uid, post.comments)) ? (
+        {(post?.comments && (!commentCount(user?.uid, post.comments)) ? (
           <form onSubmit={handleSubmit} className="flex items-center space-x-3 p-4">
             <FaceSmileIcon className='h-7'/>
             <input 
