@@ -87,7 +87,7 @@ export default function EditProfile ({setChangedValue, changedValue} : {setChang
     if(editName){
         return(
             <div className="flex-grow box-border w-32 p-4 border-4 mr-4 rounded-lg flex flex-col items-center justify-center">
-                <Avatar className="my-2" src={userObj?.profile_img|| '../empty-profile.png'} alt="avatar" size="xxl"/>
+                <Avatar className="my-2" src={userObj?.profile_img|| noAvatar.src} alt="avatar" size="xxl"/>
                 <form onSubmit={handleSubmit}>
                     <Typography variant="h6" color="blue-gray" className="my-2">Your Name</Typography>
                     <Input
@@ -120,7 +120,7 @@ export default function EditProfile ({setChangedValue, changedValue} : {setChang
     else if(editPassword){
         return(
             <div className="flex-grow box-border w-32 p-4 border-4 mr-4 rounded-lg flex flex-col items-center justify-center">
-                <Avatar className="my-2"src={userObj?.profile_img || '../empty-profile.png'} alt="avatar" size="xxl"/>
+                <Avatar className="my-2"src={userObj?.profile_img || noAvatar.src} alt="avatar" size="xxl"/>
                 <form onSubmit={handleSubmit}>
                     <Typography variant="h6" color="blue-gray" className="my-2">Your Name</Typography>
                     <Input
@@ -179,7 +179,7 @@ export default function EditProfile ({setChangedValue, changedValue} : {setChang
         <>
             {ready ? (
                 <div className="flex-grow box-border w-32 p-4 border-4 mr-4 rounded-lg flex flex-col items-center justify-center">
-                <Avatar className="my-2"src={userObj?.profile_img || '../empty-profile.png'} alt="avatar" size="xxl"/>
+                <Avatar className="my-2"src={userObj?.profile_img || noAvatar.src} alt="avatar" size="xxl"/>
                 <Typography variant="h5" className="">{`Your Name: ${user?.displayName}`} </Typography>
                 <Typography variant="h5" className="">{`Your email: ${user?.email}`} </Typography>
                 <Button color="blue-gray" variant="gradient" className="my-2" onClick={() => setEditName(true)}>Edit Display Name</Button>
