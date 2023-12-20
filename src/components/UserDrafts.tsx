@@ -11,8 +11,15 @@ export default function UserDrafts() {
     useEffect(() => {
         const getDrafts = async () => {
             if(user){
-                const drafts = await getUserDrafts(user.uid);
-                setDrafts(drafts);
+                try {
+                    let drafts:any = []
+                    let temp = await getUserDrafts(user.uid);
+                    drafts = temp
+                    setDrafts(drafts);
+                } catch (error) {
+                    console.log(error)
+                }
+                
             }
         }
         getDrafts()
@@ -23,7 +30,7 @@ export default function UserDrafts() {
     return (
         <div className="w-full h-1/12 flex flex-row justify-end p-5">
             
-            {drafts && drafts.map((draft) => <Draft key={draft} url={draft} setDrafts={setDrafts}/>)}
+            {drafts && drafts.length != 0 && drafts.map((draft:any) => <Draft key={draft} url={draft} setDrafts={setDrafts}/>)}
             <SaveDraft setDrafts={setDrafts}/>
         </div>
     )

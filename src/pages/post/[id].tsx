@@ -11,10 +11,10 @@ import { DocumentData } from "firebase/firestore";
 
 export default function IndividualPost(){
     const router = useRouter();
-    const {id} = router.query;
+    const {id}:any = router.query;
     const user = useContext(AuthContext);
     const [ready, setReady] = useState(false);
-    const [post, setPost] = useState<DocumentData | null>(null);
+    const [post, setPost]:any = useState([])
     const posts: DocumentData[] = [];
     
 
@@ -24,21 +24,15 @@ export default function IndividualPost(){
 
 <<<<<<< Updated upstream
             if (user){
-<<<<<<< Updated upstream
-=======
               try {
-=======
-            if (user && typeof id === 'string'){
->>>>>>> Stashed changes
->>>>>>> Stashed changes
                 const individualPost = await getPost(id)
-                setPost(individualPost)
+                setPost([individualPost])
+                
+                
+              } catch (error) {
+                console.log(error + " big error man")
                 setReady(true)
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
               }
->>>>>>> Stashed changes
 
                 
 =======
@@ -46,22 +40,14 @@ export default function IndividualPost(){
             }   
         }
         getIndividualPost()
+        setReady(true)
     }, [user, id])
-
 
     return (
         <Layout>
           {ready ? (
             <div>
-<<<<<<< Updated upstream
-              <Post id={post?.post_id} posts={[post]} />
-=======
-<<<<<<< Updated upstream
               <Post id={post[0]?.post_id} posts={post} setPosts={setPost} sample={false} />
-=======
-              <Post id={post?.post_id} posts={[post]} setPosts={undefined} sample={undefined} />
->>>>>>> Stashed changes
->>>>>>> Stashed changes
             </div>
           ) : (
             <div>Loading</div>

@@ -2,32 +2,39 @@ import Post from "./Post";
 import { getPost, getImageFromUrl, getUserPostsLimit } from "@/firebase/functions"
 import { AuthContext } from "@/context/AuthContext";
 import { useContext, useEffect, useState } from "react";
+import UserPosts from "./UserPosts";
 
 
 
 
 
-export default function Home({userObj}: {userObj: any}){
+export default function Home({userObj, posts, setPosts}: {userObj: any, posts:any, setPosts:any}){
 
     const user = useContext(AuthContext);
-    const [posts, setPosts] = useState<any[] | null>(null);
+    const [homePosts, setHomePosts]:any = useState(null)
 
     useEffect(() => {
         const getPosts = async () => {
-                if(user && userObj){
+                if(user && posts && userObj){
 
                     //get all the uids of the people the user is following
                     const following = userObj.following;
-
                     //get all posts from today from the people the user is following
-                    let userPosts: any[] = [];
+                    let userPosts:any = [];
                     for(let i = 0; i < following.length; i++){
-                        const temp = await getUserPostsLimit(following[i], 10);
-                        userPosts = userPosts.concat(temp);
+                        for (let j=0; j < posts?.length; j++){
+                            if (following[i] === posts[j].userid){
+                                userPosts = userPosts.concat(posts[j])
+                            }
+                        }
                     }
-
                     //add users own posts
-                    userPosts = userPosts.concat(await getUserPostsLimit(user.uid, 10));
+                 
+                    for(let i=0; i<posts?.length; i++){
+                        if (userObj?.posts?.includes(posts[i].post_id)){
+                            userPosts = userPosts.concat(posts[i])
+                        }
+                    }
 
                     //sort the posts by timestamp field
                     userPosts.sort((a: { timestamp: string; }, b: { timestamp: string; }) => {
@@ -35,7 +42,7 @@ export default function Home({userObj}: {userObj: any}){
                     });
 
                     //set the posts
-                    setPosts(userPosts || null);
+                    setHomePosts(userPosts || null);
                 }
             }
             getPosts();
@@ -43,18 +50,10 @@ export default function Home({userObj}: {userObj: any}){
 
     return(
         <div>
-            {posts && posts.map((post) =>
+            {homePosts && homePosts.map((post:any) =>
             <div key={post.post_id} className="px-3">
             
-<<<<<<< Updated upstream
-             <Post id={post.post_id} posts={posts}/>
-=======
-<<<<<<< Updated upstream
              <Post id={post.post_id} posts={homePosts} setPosts={setPosts} sample={false}/>
-=======
-             <Post id={post.post_id} posts={posts} setPosts={undefined} sample={undefined}/>
->>>>>>> Stashed changes
->>>>>>> Stashed changes
             </div> 
             )}
         </div>

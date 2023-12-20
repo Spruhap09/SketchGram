@@ -1,17 +1,8 @@
 import Image from "next/image";
-<<<<<<< Updated upstream
-import { useContext, useEffect, useRef, useState } from "react";
 import { getUserbyUid, deletePost, updatePostLikes, updatePostComments } from "@/firebase/functions";
-=======
-<<<<<<< Updated upstream
 import noAvatar from 'public/noAvatar.jpeg'
 import { useContext, useEffect, useRef, useState } from "react";
 import { getUserbyUid, deletePost, updatePostLikes, updatePostComments, deleteComment } from "@/firebase/functions";
-=======
-import { use, useContext, useEffect, useRef, useState } from "react";
-import { getUserbyUid, deletePost, updatePostLikes, updatePostComments } from "@/firebase/functions";
->>>>>>> Stashed changes
->>>>>>> Stashed changes
 import { DocumentData } from "firebase/firestore";
 import { Button, IconButton, Input, Typography, input } from "@material-tailwind/react";
 import { TrashIcon } from "@heroicons/react/20/solid";
@@ -33,12 +24,12 @@ export default function Post({
   id,
   posts,
   setPosts = "default",
-  sample,
+  sample = false,
 }: {
   id: string;
   posts: any;
   setPosts: any;
-  sample:any
+  sample: boolean;
 }) {
 
   const [src, setSrc] = useState<string>("");
@@ -59,6 +50,18 @@ export default function Post({
   const router = useRouter()
   const currentUrl = router.asPath
 
+  const commentCount = (user:any, comments:any) => {
+    let count = 0;
+    for (let i=0; i<comments.length; i++){
+      if (comments[i].userid === user){
+        count++;
+      }
+    }
+    if (count >= 3){
+      return true
+    }
+    return false
+  }
   useEffect(() => {
     setReady(false);
     const getSrc = async () => {
@@ -75,17 +78,24 @@ export default function Post({
         //update usernames on comments
 
         for (let i=0; i<post.comments.length; i++){
-          let ret_user:any = await getUserbyUid(post.comments[i].userid)
-          post.comments[i].username = ret_user.displayName
+          try {
+            let ret_user:any = await getUserbyUid(post.comments[i].userid)
+            post.comments[i].username = ret_user.displayName
+            post.comments[i].profile_img = ret_user.profile_img
+          } catch (error) {
+            console.log(error)
+          }
+         
         }
       }
 
       
 
       try {
-        const res = await fetch(`/api/image?url=${post?.imageURL}`)
+        const res = await fetch(`/api/image?url=${post.imageURL}`)
         const {imageUrl} = await res.json();
         // Set state
+
         setPost(post);
         setSrc(imageUrl);
         setLikes(post?.likes)
@@ -96,7 +106,13 @@ export default function Post({
     };
     async function getUser() {
       if (post?.userid) {
-        const user = await getUserbyUid(post.userid);
+        let user;
+        try {
+          user = await getUserbyUid(post.userid);
+        } catch (error) {
+          console.log(error)
+        }
+      
         if (user){
           setUserObj(user);
           setReady(true);
@@ -234,6 +250,48 @@ export default function Post({
     setComment(e.target.value);
   };
 
+  const delComment = async (comment: any) => {
+    try {
+      if (comment.userid === user?.uid){
+       
+      
+          await deleteComment(post?.post_id, comment, user?.uid, comment.uid)
+          let temp:any = []
+          for (let i=0; i<post?.comments.length; i++){
+            if (post?.comments[i].uid === comment.uid){
+            
+              continue
+            }
+            temp.push(post?.comments[i])
+          }
+          post.comments = temp
+
+            //resort comments by timestamp
+          post?.comments.sort((a: { timestamp: string; }, b: { timestamp: string; }) => {
+            return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+         });
+
+         setPost(post)
+         setComment('');
+        if (setPosts !== "default"){
+          const postIndex = posts.findIndex((postToFind: { post_id: any; }) => postToFind.post_id === post?.post_id);
+
+          if (postIndex !== -1){
+            const newPosts = [...posts];
+            newPosts[postIndex] = post;
+            setPosts(newPosts)
+          }
+        }
+
+        }
+      
+
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -246,13 +304,22 @@ export default function Post({
         if (/^\s*$/.test(comment)){
           throw "comment can't be just spaces"
         }
+
+        let commenting_user;
+        try {
+          commenting_user = await getUserbyUid(user?.uid)
+        } catch (error) {
+          console.log(error)
+        }
+
+        console.log(JSON.stringify(userObj) + " commenting user")
         //create comment object
         const comment_obj:any = {
           uid: uuidv4(),
           comment: comment,
           userid: user?.uid,
           username: user?.displayName,
-          profile_img: userObj?.profile_img,
+          profile_img: commenting_user?.profile_img,
           timestamp: new Date().toISOString(),
         };
         await updatePostComments(post?.post_id, comment_obj, user?.uid);
@@ -285,7 +352,7 @@ export default function Post({
       <div className="bg-blue-gray-800 my-7 border rounded-xl text-white !important max-w-500 overflow-x-hidden">
         <div className="flex items-center p-5">
           <Image 
-            src={userObj?.profile_img === 'empty-profile.png' ? '/../empty-profile.png' : `/${userObj?.profile_img}`}
+            src={userObj?.profile_img === 'empty-profile.png' ? '/empty-profile.png' : `${userObj?.profile_img}`}
             width={500} 
             height={500} 
             className="rounded-full h-12 w-12 object-contain border-2 p-1 mr-3" 
@@ -306,7 +373,7 @@ export default function Post({
         ) : (<div>loading</div>)}
 
 
-        {(!sample ? (
+        {!sample && 
                   <div className="flex space-x-4 p-4">
          
                   {(!likes.includes(user?.uid) 
@@ -314,12 +381,6 @@ export default function Post({
                   <HeartIconFilled onClick={handleUnLike} className='btn text-red-500'/>
                   )}
                   <ChatBubbleBottomCenterIcon onClick={focusInput} className='btn text-white'/>
-<<<<<<< Updated upstream
-                  <PaperAirplaneIcon onClick={() => (handleDownload(src))} className='btn text-white'/>
-=======
-<<<<<<< Updated upstream
-                  <ArrowDownCircleIcon onClick={() => (handleDownload(src))} className='btn text-white'/>
-=======
                   <PaperAirplaneIcon onClick={() => (openModal())} className='btn text-white'/>
                   <UserModal isOpen={isModalOpen} onClose={closeModal}>
                     <div className="flex flex-col">
@@ -332,10 +393,8 @@ export default function Post({
                       </div>
                     </div>
                   </UserModal>
->>>>>>> Stashed changes
->>>>>>> Stashed changes
                 </div>
-        ) : (<div></div>))}
+        }
        
           
         {/* Caption */}
@@ -355,14 +414,14 @@ export default function Post({
 
         {/* Comments */}
 
-        {(!sample ? (
+        {
           <div className="ml-10 h-20 overflow-y-scroll scrollbar-thumb-white scrollbar-thin">
             {(post && post?.comments) && (
                 <div>
                   {post.comments.map((postComment: any) => (
                     <div key={postComment.uid} className="flex items-center space-x-2 ab-3 p-2 block">
                       <Image 
-                        src={postComment?.profile_img === 'empty-profile.png' ? '/../empty-profile.png' : '/' + postComment?.profile_img}
+                        src={postComment?.profile_img === 'empty-profile.png' ? '/../empty-profile.png' : postComment?.profile_img}
                         alt={"comment profile picture for user " + postComment?.username}
                         className="rounded-full h-8 w-8 object-contain"
                         width={500} 
@@ -373,6 +432,10 @@ export default function Post({
                         {postComment?.comment}
                       </p>
 
+                      {user?.uid === postComment.userid && (
+                        <TrashIcon onClick={() => delComment(postComment)} title="Delete Post" className="btn w-4 h-5 p-0 m-0 text-white" />
+                      )}
+
                       <Moment fromNow className="pr-5 text-xs">
                         {postComment?.timestamp}
                       </Moment>
@@ -382,14 +445,14 @@ export default function Post({
                 </div>)
             } 
          </div>
-        ) : (<div></div>))}
+        }
         
 
 
 
         {/* Input Box */}
 
-        {(!sample ? (
+        {!sample && (post?.comments && (!commentCount(user?.uid, post.comments)) ? (
           <form onSubmit={handleSubmit} className="flex items-center space-x-3 p-4">
             <FaceSmileIcon className='h-7'/>
             <input 
@@ -401,7 +464,7 @@ export default function Post({
               className="bg-blue-gray-400 p-1 border-none flex-1 focus:ring-0 outline=none text-sm" />
             <button disabled={!comment.trim()} type='submit' className="font-semibold btn">Post</button>
           </form>
-        ) : (<div></div>))}
+        ) : (<div className="pb-10"></div>))}
 
 
         <div className="flex justify-center">

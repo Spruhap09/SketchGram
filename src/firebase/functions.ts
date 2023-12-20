@@ -69,7 +69,7 @@ async function signUpWithEmailAndPassword(
       following: [],
       posts: [],
       drafts: [],
-      profile_img: "empty-profile.png"
+      profile_img: "/empty-profile.png"
     });
   } catch (e) {
     console.error("Error adding document: ", e);
@@ -275,6 +275,48 @@ async function postCanvasToProfile(
 
 }
 
+
+
+async function uploadPofileImg(imageFile: File): Promise<string> {
+  try {
+    // Get Firebase Storage
+    const {db, auth, storage } = initFirebaseConfig();
+
+    if (!auth.currentUser || !auth.currentUser.uid)
+      throw new Error("User not logged in");
+
+    // Store image file in Firebase Storage
+    const storageRef = ref(storage, `profile_images/${auth.currentUser.uid}`);
+    await uploadBytes(storageRef, imageFile);
+
+    
+
+    // Get download URL of the uploaded image
+    const downloadURL = await getDownloadURL(storageRef);
+
+    // Find user in database
+    const q = query(
+      collection(db, "users"),
+      where("uid", "==", auth?.currentUser?.uid)
+    );
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.empty)
+      throw "User does not exist in database";
+    const userRef = doc(db, "users", querySnapshot.docs[0].id);
+
+    // Add post to user's posts array
+    await updateDoc(userRef, {
+      profile_img: downloadURL
+    });
+
+  
+    return downloadURL;
+  } catch (error) {
+    console.error('Error uploading image to storage: ', error);
+    throw error;
+  }
+}
+
 // Reset user password
 // Not implemented anywhere yet
 async function resetPassword(email: string) {
@@ -350,12 +392,11 @@ async function getUserPostsLimit(uid: string, limitValue: number | null = null) 
     const querySnapshot = await getDocs(q);
     if (querySnapshot.empty) throw "No posts exist in database";
     const posts = querySnapshot.docs.map((doc) => {
-      //console.log(JSON.stringify(doc));
       let ret = doc.data();
       ret.post_id = doc.id
       return ret
     });
-    //console.log(posts)
+    
     if (!posts) throw "User has no posts";
     return posts;
   } catch (error) {
@@ -725,6 +766,43 @@ async function searchUsers(searchTerm: string) {
   }
 }
 
+async function deleteComment(postId: string, comment: string, userUid: string, commentId:string){
+  try {
+     // Get Firebase Firestore
+     const {db} = initFirebaseConfig();
+
+     const postRef = doc(collection(db, "posts"), postId);
+     const q = query(collection(db, "users"), where("uid", "==", userUid));
+     const querySnapshot = await getDocs(q);
+     if (querySnapshot.empty) throw "User does not exist in database";
+ 
+      
+     const postDoc = await getDoc(postRef);
+ 
+     if (postDoc.exists()) {
+       const oldComments = postDoc.data()?.comments || [];
+ 
+       //check if user has commented more than 3 times
+       let temp:any = []
+       for (let i=0; i<oldComments.length; i++){
+         if (oldComments[i].uid === commentId){
+          continue
+         }
+         temp.push(oldComments[i])
+       }
+       const newComments:any = temp
+ 
+       
+       await updateDoc(postDoc.ref, { comments: newComments });
+     } else {
+       throw 'Post not found';
+     }
+  } catch (error) {
+    console.error("Error updating post comments: ", error);
+    throw error;
+  }
+}
+
 async function updatePostComments(postId: string, comment: string, userUid: string) {
   try {
     // Get Firebase Firestore
@@ -740,13 +818,23 @@ async function updatePostComments(postId: string, comment: string, userUid: stri
       // const post = await getDoc(postRef);
       // if (!post || !post.data()) throw "Post does not exist in database";
       // const ret = post.data();
-
-    console.log(postRef);
     const postDoc = await getDoc(postRef);
-    console.log("from updatepost " + postDoc.data())
 
     if (postDoc.exists()) {
       const oldComments = postDoc.data()?.comments || [];
+
+      //check if user has commented more than 3 times
+      let count = 0;
+      for (let i=0; i<oldComments.length;i++){
+        if (userUid === oldComments[i].uid){
+          count++;
+        }
+      }
+
+      if (count >= 3){
+        throw "too many comments for user"
+      }
+
       const newComments = [...oldComments, comment];
       await updateDoc(postDoc.ref, { comments: newComments });
     } else {
@@ -898,9 +986,53 @@ async function unfollowUser(otherUid: string, userUid: string){
   }
 }
 
-<<<<<<< Updated upstream
-=======
-<<<<<<< Updated upstream
+async function searchPosts(searchTerm: string) {
+  try {
+
+    // Get Firebase Firestore
+    const {db} = initFirebaseConfig();
+
+    let posts: any = [] // todo figure out proper typescript
+    let uniquePostIds = new Set();
+
+    //Find posts by description
+    const postQ = query(
+      collection(db, "posts"),
+      where("description", ">=", searchTerm ),
+      where("description", "<=", searchTerm + "\uf8ff"),
+      orderBy("description")
+    );    
+    
+    const nameSnapshot = await getDocs(postQ);
+    nameSnapshot.forEach((doc) => {
+      let data = doc.data();
+      data.post_id = doc.id
+      posts.push(data);
+      
+    });
+
+    //find the post by tags
+    const postQuery = collection(db, "posts");
+    const snapshot = await getDocs(postQuery);
+
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const tags = data.tags || [];
+      for (let tag of tags) {
+        if (tag === searchTerm || tag.includes(searchTerm)){
+          data.post_id = doc.id
+          posts.push(data);
+        }
+      }
+    })
+    return posts;
+  }
+  catch (e) {
+    console.error("Error searching for posts: ", e);
+    throw e;
+  }
+}
+
 const uploadProfilePic = async (file: File) => {
   if (!file) throw new Error("No file to upload");
 
@@ -953,53 +1085,7 @@ const uploadProfilePic = async (file: File) => {
   }
 };
 
-async function searchPosts(searchTerm: string) {
-  try {
 
-    // Get Firebase Firestore
-    const {db} = initFirebaseConfig();
-
-    let posts: any = [] // todo figure out proper typescript
-    let uniquePostIds = new Set();
-
-    //Find posts by description
-    const postQ = query(
-      collection(db, "posts"),
-      where("description", ">=", searchTerm ),
-      where("description", "<=", searchTerm + "\uf8ff"),
-      orderBy("description")
-    );
-
-    const nameSnapshot = await getDocs(postQ);
-    nameSnapshot.forEach((doc) => {
-      let data = doc.data();
-      data.post_id = doc.id
-      posts.push(data);
-
-    });
-
-    //find the post by tags
-    const postQuery = collection(db, "posts");
-    const snapshot = await getDocs(postQuery);
-    console.log('this is post before')
-    console.log(posts)
-
-    snapshot.forEach((doc) => {
-      console.log(doc.data())
-      const data = doc.data();
-      const tags = data.tags || [];
-      for (let tag of tags) {
-        if (tag === searchTerm || tag.includes(searchTerm)){
-          data.post_id = doc.id
-          posts.push(data);
-        }
-      }
-    })
-    return posts;
-  }
-  catch (e) {
-    console.error("Error searching for posts: ", e);
-=======
 // get chatroom's participants
 async function getChatroomParticipants(chatroomId: string, userUid: any) {
   try {
@@ -1018,12 +1104,9 @@ async function getChatroomParticipants(chatroomId: string, userUid: any) {
   }
   catch(e) {
     console.error("Error getting chatroom participants: ", e);
->>>>>>> Stashed changes
     throw e;
   }
 }
-
->>>>>>> Stashed changes
 
 export {
   signUpWithEmailAndPassword,
@@ -1051,18 +1134,16 @@ export {
   getUserbyUid,
   getAllPosts, 
   followUser,
-<<<<<<< Updated upstream
-  unfollowUser
-=======
+
   unfollowUser,
-<<<<<<< Updated upstream
-  uploadProfilePic,
-  updateEmail,
-  searchByTitleFn,
   deleteComment,
-  searchPosts
-=======
+  searchPosts,
+  uploadPofileImg,
+
+  uploadProfilePic,
+  // updateEmail,
+  // searchByTitleFn,
+
   getChatroomParticipants
->>>>>>> Stashed changes
->>>>>>> Stashed changes
+
 };
