@@ -77,8 +77,53 @@ async function signUpWithEmailAndPassword(
   }
 }
 
+function validateEmail(email: string) {
+  const regex = /^[^\s@]+@[^\s@]+\.(com|org|edu|net|gov|mil|biz|info)$/i;
+  return regex.test(email);
+}
+
+async function updateEmail(newEmail: string){
+
+  if (newEmail.trim() == "") throw "Error: email field must have a value"
+  if (!validateEmail(newEmail)) throw "Error: invalid email"
+  try{
+    const {db, auth} = initFirebaseConfig();
+    if (!auth.currentUser) {
+      throw "No user is logged in";
+    }
+
+
+    //get the user collection reference
+    const usersCollectionRef = collection(db, "users"); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference
+
+    // Check if user already exists in database
+    const q = query(usersCollectionRef, where("uid", "==", auth.currentUser.uid));
+    const querySnapshot = await getDocs(q); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.QuerySnapshot
+
+    // If user exists then update the details
+    if (!querySnapshot.empty) {
+
+      const userDocRef = querySnapshot.docs[0].ref;
+      //update the profile for auth
+      await updateProfile(auth.currentUser, { email: newEmail });
+      //update the db for the collection
+      await updateDoc (userDocRef, {email: newEmail});
+
+    }
+    else {
+      throw "This user does not exist";
+    }
+
+  }
+  catch(e){
+    console.error("Error updating the email: ", e);
+    throw e;
+  }
+
+}
+
 async function updateDisplayName(newDisplayName: string){
-  
+  if (newDisplayName.trim() == "") throw "Error: display name field must have a value"
   try{
     const {db, auth} = initFirebaseConfig();
     if (!auth.currentUser) {
@@ -123,6 +168,8 @@ async function changePassword(
   oldPassword: string,
   newPassword: string
 ) {
+  if (oldPassword.trim() == "") throw "Error: current password field must have a value"
+  if (newPassword.trim() == "") throw "Error: new password field must have a value"
   try{
     // Get Firebase Auth
     const {auth} = initFirebaseConfig();
@@ -1032,6 +1079,58 @@ async function searchPosts(searchTerm: string) {
     throw e;
   }
 }
+const uploadProfilePic = async (file: File) => {
+  if (!file) throw new Error("No file to upload");
+
+  const validFileTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+  const maxSize = 5 * 1024 * 1024;
+
+  if (!validFileTypes.includes(file.type)) {
+    throw new Error("Invalid file type. Please upload a JPEG or PNG image.");
+  }
+
+  if (file.size > maxSize) {
+    throw new Error("File size exceeds the limit of 5MB.");
+  }
+
+  const {db, auth} = initFirebaseConfig();
+  if (!auth.currentUser || !auth.currentUser.uid)
+    throw new Error("User not logged in");
+
+  const userId = auth.currentUser.uid;
+  const storage = getStorage();
+
+  // Define a unique path for each user's profile picture
+  const fileRef = ref(storage, `profile_pictures/${userId}/profile_pic`);
+
+  //get the user collection reference
+  const usersCollectionRef = collection(db, "users"); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference
+
+  // Check if user already exists in database
+  const q = query(usersCollectionRef, where("uid", "==", auth.currentUser.uid));
+  const querySnapshot = await getDocs(q);
+
+  try {
+    // Upload the new file to the unique path (overwrites if exists)
+    const snapshot = await uploadBytes(fileRef, file);
+
+    // Get the URL of the uploaded file
+    const url = await getDownloadURL(snapshot.ref);
+
+    // Update the user's profile in Firestore with the new picture URL
+    const userDocRef = querySnapshot.docs[0].ref;
+    //update the profile for auth
+    //update the db for the collection
+    await updateDoc (userDocRef, {profilePicture: url});
+
+    console.log('File uploaded and Firestore reference set:', url);
+    return url
+  } catch (error) {
+    console.error('Error uploading file and setting Firestore document:', error);
+    throw error;
+  }
+};
+
 
 
 export {
@@ -1063,5 +1162,7 @@ export {
   unfollowUser,
   deleteComment,
   searchPosts,
-  uploadPofileImg
+  uploadPofileImg,
+  uploadProfilePic,
+  updateEmail
 };
