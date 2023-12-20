@@ -19,7 +19,6 @@ export default function Home({userObj, posts, setPosts}: {userObj: any, posts:an
 
                     //get all the uids of the people the user is following
                     const following = userObj.following;
-                    console.log(JSON.stringify(posts) + " help please")
                     //get all posts from today from the people the user is following
                     let userPosts:any = [];
                     for(let i = 0; i < following.length; i++){
@@ -29,9 +28,6 @@ export default function Home({userObj, posts, setPosts}: {userObj: any, posts:an
                             }
                         }
                     }
-
-                    console.log(JSON.stringify(userPosts) + "help help")
-
                     //add users own posts
                  
                     for(let i=0; i<posts?.length; i++){

@@ -16,9 +16,9 @@ export default function UserPosts({ setPosts, posts }: { setPosts:any, posts: an
           {/* if user exists but post doesn't exist, return a div saying no current posts */}
           {user ? (
             posts ? (
-                    console.log(posts),
+                   
                 posts.map((post: any) => { // Add type annotation for 'post'
-                    console.log(post);
+                    
                     return <Post key={post.post_id} id={post.post_id} posts={posts} setPosts={setPosts} sample={false}/>;
                 })
             ) : (

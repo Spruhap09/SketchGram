@@ -12,6 +12,7 @@ export default function SamplePost(){
         const getPosts = async () => {
             //gets all the posts from the database
             const data = await getAllPosts();
+            console.log(JSON.stringify(data) + "all posts")
 
             // sorts the posts from most to least likes
             const sortedPosts = data.sort((a, b) => b.likes.length - a.likes.length);

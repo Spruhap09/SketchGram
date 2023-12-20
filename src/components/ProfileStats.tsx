@@ -29,11 +29,9 @@ export default function ProfileStats ({posts}: { posts: any }) {
     }
 
     const handleClickOutside = (e:any) => {
-        console.log(popRef.current)
 
         //will close followers list menu when clicking outside of it
         if (popRef.current && !popRef.current.contains(e.target)){
-            console.log("handleclick fired")
             setOpen(false)
         }
 
@@ -65,7 +63,6 @@ export default function ProfileStats ({posts}: { posts: any }) {
                 }
                 
                 
-                console.log(JSON.stringify(followers_info))
                 setFollowers(followers_info);
                 setFollowing(following_info);
                 setDrafts(stats.drafts);

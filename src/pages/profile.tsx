@@ -22,7 +22,6 @@ export default function Profile() {
         const getPosts = async () => {
                 if(user){
                     const userPosts = await getUserPostsLimit(user.uid);
-                    console.log(userPosts)
                     if (userPosts) setReady(true);
                     setPosts(userPosts || null);
                 }

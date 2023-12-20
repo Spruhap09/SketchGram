@@ -2,8 +2,11 @@ import { AuthContext } from "@/context/AuthContext";
 import { changePassword, updateDisplayName, getUserbyUid } from "@/firebase/functions";
 import { Avatar, Button, Input, Typography } from "@material-tailwind/react";
 import { useRouter } from "next/router";
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useCallback } from "react";
+import { useDropzone } from 'react-dropzone';
 import noAvatar from 'public/noAvatar.jpeg'
+import PhotoUploadButton from "./PhotoUpload";
+import Image from "next/image";
 
 
 
@@ -11,10 +14,12 @@ export default function EditProfile ({setChangedValue, changedValue} : {setChang
     const user = useContext(AuthContext);
     const [editName, setEditName] = useState(false);
     const [editPassword, setEditPassword] = useState(false);
+    const [profileUpload, setProfileUpload] = useState(false)
     const [displayName, setDisplayName] = useState(user?.displayName || '');
     const [oldPassword, setOldPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [ready, setReady] = useState(false);
+    const [image, setImage]:any = useState(null)
     const [userObj, setUserObj] = useState<any | any >();
     const router = useRouter();
     if(!user) router.push('/login');
@@ -42,10 +47,6 @@ export default function EditProfile ({setChangedValue, changedValue} : {setChang
             try{
                 await updateDisplayName(displayName)
                 
-                // if (user?.uid) {
-                //     const ret_user = await getUserbyUid(user.uid);
-                //     setUserObj(ret_user);
-                // }
                 setEditName(false) 
                 setChangedValue(!changedValue)         
             }
@@ -72,6 +73,7 @@ export default function EditProfile ({setChangedValue, changedValue} : {setChang
             }     
         }
     }
+
 
     const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setDisplayName(e.target.value)
@@ -116,6 +118,17 @@ export default function EditProfile ({setChangedValue, changedValue} : {setChang
                 </form>
             </div>
         )
+    }
+
+    else if (profileUpload){
+        return(
+        <div className="flex-grow box-border w-32 p-4 border-4 mr-4 rounded-lg flex flex-col items-center justify-center">
+                <Avatar className="my-2" src={userObj?.profile_img|| noAvatar.src} alt="avatar" size="xxl"/>
+                <PhotoUploadButton setChanged={setChangedValue} changedValue={changedValue}/>
+                <Button className="mt-6" fullWidth type="button"  onClick={() => setProfileUpload(!profileUpload)}>Cancel</Button>
+        </div>
+        )
+
     }
     else if(editPassword){
         return(
@@ -180,10 +193,18 @@ export default function EditProfile ({setChangedValue, changedValue} : {setChang
             {ready ? (
                 <div className="flex-grow box-border w-32 p-4 border-4 mr-4 rounded-lg flex flex-col items-center justify-center">
                 <Avatar className="my-2"src={userObj?.profile_img || noAvatar.src} alt="avatar" size="xxl"/>
-                <Typography variant="h5" className="">{`Your Name: ${user?.displayName}`} </Typography>
-                <Typography variant="h5" className="">{`Your email: ${user?.email}`} </Typography>
-                <Button color="blue-gray" variant="gradient" className="my-2" onClick={() => setEditName(true)}>Edit Display Name</Button>
-                <Button color="blue-gray" variant="gradient" className="my-2" onClick={() => setEditPassword(true)}>Edit Password</Button>
+                <Typography className="">{`Your Name`} </Typography>
+                <Typography variant="h5" className="font-bold text-xl">{user?.displayName}</Typography>
+                <Typography className="">{`Your Email`} </Typography>
+                <Typography variant="h5" className="font-bold text-xl">{user?.email}</Typography>
+                <br></br>
+                <div className="flex space-x-4">
+                    <Button color="blue-gray" variant="gradient" className="my-2" onClick={() => setEditName(true)}>Edit Display Name</Button>
+                    <Button color="blue-gray" variant="gradient" className="my-2" onClick={() => setEditPassword(true)}>Edit Password</Button>
+                </div>
+                <Button color="blue-gray" variant="gradient" className="my-2" onClick={() => setProfileUpload(true)}>Edit Profile Image</Button>
+                
+                
             </div>
             ) : <div>Loading</div>}
         </>
