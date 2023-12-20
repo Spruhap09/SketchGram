@@ -34,7 +34,7 @@ export default function TopFeed() {
             {posts && posts.map((post: { post_id: Key | null | undefined | any; }) =>
             <div key={post.post_id} className="px-3">
             
-            <Post id={post.post_id} posts={posts} setPosts="default"/>
+            <Post id={post.post_id} posts={posts} setPosts="default" sample={false}/>
             </div> 
             )}
         </div>

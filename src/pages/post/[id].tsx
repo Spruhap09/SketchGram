@@ -44,7 +44,7 @@ export default function IndividualPost(){
         <Layout>
           {ready ? (
             <div>
-              <Post id={post[0]?.post_id} posts={post} setPosts={setPost} />
+              <Post id={post[0]?.post_id} posts={post} setPosts={setPost} sample={false} />
             </div>
           ) : (
             <div>Loading</div>
