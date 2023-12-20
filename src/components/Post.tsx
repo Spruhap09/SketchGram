@@ -70,8 +70,14 @@ export default function Post({
         //update usernames on comments
 
         for (let i=0; i<post.comments.length; i++){
-          let ret_user:any = await getUserbyUid(post.comments[i].userid)
-          post.comments[i].username = ret_user.displayName
+          try {
+            let ret_user:any = await getUserbyUid(post.comments[i].userid)
+            post.comments[i].username = ret_user.displayName
+            post.comments[i].profile_img = ret_user.profile_img
+          } catch (error) {
+            console.log(error)
+          }
+         
         }
       }
 
@@ -81,6 +87,7 @@ export default function Post({
         const res = await fetch(`/api/image?url=${post.imageURL}`)
         const {imageUrl} = await res.json();
         // Set state
+
         setPost(post);
         setSrc(imageUrl);
         setLikes(post?.likes)
@@ -91,7 +98,13 @@ export default function Post({
     };
     async function getUser() {
       if (post?.userid) {
-        const user = await getUserbyUid(post.userid);
+        let user;
+        try {
+          user = await getUserbyUid(post.userid);
+        } catch (error) {
+          console.log(error)
+        }
+      
         if (user){
         
         setUserObj(user);
@@ -239,13 +252,22 @@ export default function Post({
         if (/^\s*$/.test(comment)){
           throw "comment can't be just spaces"
         }
+
+        let commenting_user;
+        try {
+          commenting_user = await getUserbyUid(user?.uid)
+        } catch (error) {
+          console.log(error)
+        }
+
+        console.log(JSON.stringify(userObj) + " commenting user")
         //create comment object
         const comment_obj:any = {
           uid: uuidv4(),
           comment: comment,
           userid: user?.uid,
           username: user?.displayName,
-          profile_img: userObj?.profile_img,
+          profile_img: commenting_user?.profile_img,
           timestamp: new Date().toISOString(),
         };
         await updatePostComments(post?.post_id, comment_obj, user?.uid);
@@ -278,7 +300,7 @@ export default function Post({
       <div className="bg-blue-gray-800 my-7 border rounded-xl text-white !important max-w-500 overflow-x-hidden">
         <div className="flex items-center p-5">
           <Image 
-            src={userObj?.profile_img === 'empty-profile.png' ? '/../empty-profile.png' : `/${userObj?.profile_img}`}
+            src={userObj?.profile_img === 'empty-profile.png' ? '/empty-profile.png' : `${userObj?.profile_img}`}
             width={500} 
             height={500} 
             className="rounded-full h-12 w-12 object-contain border-2 p-1 mr-3" 
@@ -336,7 +358,7 @@ export default function Post({
                   {post.comments.map((postComment: any) => (
                     <div key={postComment.uid} className="flex items-center space-x-2 ab-3 p-2 block">
                       <Image 
-                        src={postComment?.profile_img === 'empty-profile.png' ? '/../empty-profile.png' : '/' + postComment?.profile_img}
+                        src={postComment?.profile_img === 'empty-profile.png' ? '/../empty-profile.png' : postComment?.profile_img}
                         alt={"comment profile picture for user " + postComment?.username}
                         className="rounded-full h-8 w-8 object-contain"
                         width={500} 

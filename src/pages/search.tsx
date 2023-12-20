@@ -1,19 +1,26 @@
 import Layout from "@/components/Layout";
 import { searchPosts, searchUsers } from "@/firebase/functions";
 import { Input, Typography } from "@material-tailwind/react";
+import { AuthContext } from "@/context/AuthContext";
 import { User } from "firebase/auth";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import UserProfile from "@/components/UserProfile";
 import Post from "@/components/Post";
+import { useRouter } from "next/router";
+
 
 export default function Search() {
     const [searchTerm, setSearchTerm] = useState<string>("")
     const [searchResults, setSearchResults] = useState<User[]>([])
     const [activeTab, setTab] = useState('none');
+    const router = useRouter();
+    const user = useContext(AuthContext);
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchResults([])
         setSearchTerm(e.target.value);
     }
+
+    if(!user) router.push('login')
 
     useEffect(() => {
         const trimmedSearch = searchTerm.trim();

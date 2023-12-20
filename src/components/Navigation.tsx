@@ -22,7 +22,6 @@ export default function Navigation() {
     
 
     useEffect(() => {
-      console.log('useEffect')
       async function getPageName(){
 
         if (router.asPath.startsWith('/user/')){
