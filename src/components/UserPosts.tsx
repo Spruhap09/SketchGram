@@ -19,7 +19,15 @@ export default function UserPosts({ setPosts, posts }: { setPosts:any, posts: an
                     console.log(posts),
                 posts.map((post: any) => { // Add type annotation for 'post'
                     console.log(post);
+<<<<<<< Updated upstream
                     return <Post key={post.post_id} id={post.post_id} posts={posts} setPosts={setPosts} />;
+=======
+<<<<<<< Updated upstream
+                    return <Post key={post.post_id} id={post.post_id} posts={posts} setPosts={setPosts} sample={false}/>;
+=======
+                    return <Post key={post.post_id} id={post.post_id} posts={posts} setPosts={setPosts} sample={undefined} />;
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
                 })
             ) : (
               <div>No current posts</div>

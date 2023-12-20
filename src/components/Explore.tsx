@@ -30,13 +30,13 @@ export default function Explore({userObj}: {userObj: any}){
                     })
 
                     //sort by likes
-                    userPosts.sort((a: { likes: string[]; }, b: { likes: string[]; }) => {
+                    userPosts.sort((a, b) => {
                         return b.likes.length - a.likes.length;
                     });
 
                     //if there are less than 10 posts, add the rest of posts sorted by most liked
                     if(userPosts.length < 10){
-                        userPostsCopy.sort((a: { likes: string[]; }, b: { likes: string[]; }) => {
+                        userPostsCopy.sort((a, b) => {
                             return b.likes.length - a.likes.length;
                         });
                         userPosts = userPosts.concat(userPostsCopy.slice(0, 10 - userPosts.length));
@@ -62,7 +62,15 @@ export default function Explore({userObj}: {userObj: any}){
             {posts && posts.map((post) =>
             <div key={post.post_id} className="px-3">
             
+<<<<<<< Updated upstream
                 <Post id={post.post_id} posts={posts}/>
+=======
+<<<<<<< Updated upstream
+                <Post id={post.post_id} posts={explorePosts} setPosts={setPosts} sample={false}/>
+=======
+                <Post id={post.post_id} posts={posts} setPosts={undefined} sample={undefined}/>
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
             </div> 
             )}
         </div>

@@ -22,12 +22,27 @@ export default function IndividualPost(){
         setReady(false);
         const getIndividualPost = async () => {
 
+<<<<<<< Updated upstream
             if (user){
+<<<<<<< Updated upstream
+=======
+              try {
+=======
+            if (user && typeof id === 'string'){
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
                 const individualPost = await getPost(id)
                 setPost(individualPost)
                 setReady(true)
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+              }
+>>>>>>> Stashed changes
 
                 
+=======
+>>>>>>> Stashed changes
             }   
         }
         getIndividualPost()
@@ -38,7 +53,15 @@ export default function IndividualPost(){
         <Layout>
           {ready ? (
             <div>
+<<<<<<< Updated upstream
               <Post id={post?.post_id} posts={[post]} />
+=======
+<<<<<<< Updated upstream
+              <Post id={post[0]?.post_id} posts={post} setPosts={setPost} sample={false} />
+=======
+              <Post id={post?.post_id} posts={[post]} setPosts={undefined} sample={undefined} />
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
             </div>
           ) : (
             <div>Loading</div>

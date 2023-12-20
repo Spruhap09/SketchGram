@@ -1,5 +1,5 @@
 import { useRouter } from "next/router";
-import { MagnifyingGlassIcon, PencilSquareIcon, RectangleStackIcon, UserCircleIcon, HomeIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon, PencilSquareIcon, RectangleStackIcon, UserCircleIcon, HomeIcon, ChatBubbleBottomCenterIcon } from "@heroicons/react/24/outline";
 import {
   Navbar,
   Typography,
@@ -9,17 +9,18 @@ import {
 } from "@material-tailwind/react";
 import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "@/context/AuthContext";
-import { getPost, getUserbyUid, logOutUser } from "@/firebase/functions";
+import { getPost, getUserbyUid, logOutUser, getChatroomParticipants} from "@/firebase/functions";
 import Head from "next/head";
 import Home from "./Home";
 import ToggleButton from './ToggleButton';
+import { get } from "http";
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
 export default function Navigation() {
     const router = useRouter();
     const user = useContext(AuthContext);
     const [pageName, setPageName] = useState("");
-    
+    const userId = user?.uid;
 
     useEffect(() => {
       console.log('useEffect')
@@ -33,6 +34,11 @@ export default function Navigation() {
           const id = router.asPath.split('/')[2]
           const viewPost = await getPost(id);
           setPageName(`Post titled ${viewPost.description}`)
+        } else if(router.asPath.startsWith('/chatrooms/')){
+          const id = router.asPath.split('/')[2]
+          let viewUser = await getChatroomParticipants(id, userId);
+          viewUser = await getUserbyUid(viewUser[0]);
+          setPageName(`Chatroom with ${viewUser?.displayName}`)
         }
         else{
           setPageName(router.asPath.slice(1, router.asPath.length));
@@ -70,6 +76,9 @@ export default function Navigation() {
 
           {user && (
             <>
+            <IconButton title="Chatrooms" variant="text" color="white" onClick={() => router.push('/chatrooms')}>
+              <ChatBubbleBottomCenterIcon className="h-4 w-4" /> 
+            </IconButton>
             <IconButton title="Feed" variant="text" color="white" onClick={() => router.push('/feed')}>
               <RectangleStackIcon className="h-4 w-4" />
             </IconButton>

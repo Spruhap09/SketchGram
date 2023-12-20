@@ -898,6 +898,132 @@ async function unfollowUser(otherUid: string, userUid: string){
   }
 }
 
+<<<<<<< Updated upstream
+=======
+<<<<<<< Updated upstream
+const uploadProfilePic = async (file: File) => {
+  if (!file) throw new Error("No file to upload");
+
+  const validFileTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+  const maxSize = 5 * 1024 * 1024;
+
+  if (!validFileTypes.includes(file.type)) {
+    throw new Error("Invalid file type. Please upload a JPEG or PNG image.");
+  }
+
+  if (file.size > maxSize) {
+    throw new Error("File size exceeds the limit of 5MB.");
+  }
+
+  const {db, auth} = initFirebaseConfig();
+  if (!auth.currentUser || !auth.currentUser.uid)
+    throw new Error("User not logged in");
+
+  const userId = auth.currentUser.uid;
+  const storage = getStorage();
+
+  // Define a unique path for each user's profile picture
+  const fileRef = ref(storage, `profile_pictures/${userId}/profile_pic`);
+
+  //get the user collection reference
+  const usersCollectionRef = collection(db, "users"); // https://firebase.google.com/docs/reference/js/v8/firebase.firestore.CollectionReference
+
+  // Check if user already exists in database
+  const q = query(usersCollectionRef, where("uid", "==", auth.currentUser.uid));
+  const querySnapshot = await getDocs(q);
+
+  try {
+    // Upload the new file to the unique path (overwrites if exists)
+    const snapshot = await uploadBytes(fileRef, file);
+
+    // Get the URL of the uploaded file
+    const url = await getDownloadURL(snapshot.ref);
+
+    // Update the user's profile in Firestore with the new picture URL
+    const userDocRef = querySnapshot.docs[0].ref;
+    //update the profile for auth
+    //update the db for the collection
+    await updateDoc (userDocRef, {profilePicture: url});
+
+    console.log('File uploaded and Firestore reference set:', url);
+    return url
+  } catch (error) {
+    console.error('Error uploading file and setting Firestore document:', error);
+    throw error;
+  }
+};
+
+async function searchPosts(searchTerm: string) {
+  try {
+
+    // Get Firebase Firestore
+    const {db} = initFirebaseConfig();
+
+    let posts: any = [] // todo figure out proper typescript
+    let uniquePostIds = new Set();
+
+    //Find posts by description
+    const postQ = query(
+      collection(db, "posts"),
+      where("description", ">=", searchTerm ),
+      where("description", "<=", searchTerm + "\uf8ff"),
+      orderBy("description")
+    );
+
+    const nameSnapshot = await getDocs(postQ);
+    nameSnapshot.forEach((doc) => {
+      let data = doc.data();
+      data.post_id = doc.id
+      posts.push(data);
+
+    });
+
+    //find the post by tags
+    const postQuery = collection(db, "posts");
+    const snapshot = await getDocs(postQuery);
+    console.log('this is post before')
+    console.log(posts)
+
+    snapshot.forEach((doc) => {
+      console.log(doc.data())
+      const data = doc.data();
+      const tags = data.tags || [];
+      for (let tag of tags) {
+        if (tag === searchTerm || tag.includes(searchTerm)){
+          data.post_id = doc.id
+          posts.push(data);
+        }
+      }
+    })
+    return posts;
+  }
+  catch (e) {
+    console.error("Error searching for posts: ", e);
+=======
+// get chatroom's participants
+async function getChatroomParticipants(chatroomId: string, userUid: any) {
+  try {
+    // Get Firebase Firestore
+    const {db} = initFirebaseConfig();
+
+    console.log("chatroom id: ", chatroomId);
+    console.log("user id: ", userUid);
+
+    const chatroomRef = doc(db, "chats", chatroomId);
+    const chatroom = await getDoc(chatroomRef);
+    if (!chatroom || !chatroom.data()) throw "Chatroom does not exist in database";
+    const ret = chatroom.data();
+    if (!ret) throw "Chatroom data is undefined";
+    return ret.participants.filter((host: any) => host !== userUid);
+  }
+  catch(e) {
+    console.error("Error getting chatroom participants: ", e);
+>>>>>>> Stashed changes
+    throw e;
+  }
+}
+
+>>>>>>> Stashed changes
 
 export {
   signUpWithEmailAndPassword,
@@ -925,5 +1051,18 @@ export {
   getUserbyUid,
   getAllPosts, 
   followUser,
+<<<<<<< Updated upstream
   unfollowUser
+=======
+  unfollowUser,
+<<<<<<< Updated upstream
+  uploadProfilePic,
+  updateEmail,
+  searchByTitleFn,
+  deleteComment,
+  searchPosts
+=======
+  getChatroomParticipants
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 };

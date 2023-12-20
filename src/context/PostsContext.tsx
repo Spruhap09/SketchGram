@@ -1,13 +1,57 @@
 // postsContext.js
+<<<<<<< Updated upstream
 import React, { ReactNode, createContext, useContext, useReducer } from 'react';
 
 // Initial state for posts
 const initialState = {
+=======
+import React, { Dispatch, ReactNode, createContext, useContext, useReducer } from 'react';
+
+// // Initial state for posts
+// const initialState = {
+//   posts: [],
+// };
+// Define the structure of a post
+interface Post {
+  post_id: string; // replace 'string' with the actual type
+  // ... other post properties
+}
+
+// Define the structure of an action
+interface Action {
+  type: string;
+  payload: Post | string; // replace with specific type based on action
+}
+
+// Define the structure of the state
+interface State {
+  posts: Post[];
+}
+
+// Define the structure of the context's value
+interface ContextValue {
+  state: State;
+  dispatch: Dispatch<Action>;
+}
+
+// Initial state for posts
+const initialState: State = {
+>>>>>>> Stashed changes
   posts: [],
 };
 
 // Create a context
+<<<<<<< Updated upstream
 const PostsContext = createContext(initialState);
+=======
+const PostsContext = createContext<ContextValue>({
+  state: initialState,
+  dispatch: () => null, // Dummy dispatch function
+});
+
+// // Create a context
+// const PostsContext = createContext(initialState);
+>>>>>>> Stashed changes
 
 // Define a reducer function to handle state changes
 const postsReducer = (state: { posts: any[]; }, action: { type: any; payload: any; }) => {
@@ -77,7 +121,11 @@ const postsReducer = (state: { posts: any[]; }, action: { type: any; payload: an
 // Create a context provider component
 export const PostsProvider = ({ children }: {children: ReactNode}) => {
   const [state, dispatch] = useReducer(postsReducer, initialState);
+<<<<<<< Updated upstream
 
+=======
+  
+>>>>>>> Stashed changes
   return (
     <PostsContext.Provider value={{ state, dispatch }}>
       {children}

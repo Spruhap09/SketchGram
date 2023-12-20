@@ -1,6 +1,17 @@
 import Image from "next/image";
+<<<<<<< Updated upstream
 import { useContext, useEffect, useRef, useState } from "react";
 import { getUserbyUid, deletePost, updatePostLikes, updatePostComments } from "@/firebase/functions";
+=======
+<<<<<<< Updated upstream
+import noAvatar from 'public/noAvatar.jpeg'
+import { useContext, useEffect, useRef, useState } from "react";
+import { getUserbyUid, deletePost, updatePostLikes, updatePostComments, deleteComment } from "@/firebase/functions";
+=======
+import { use, useContext, useEffect, useRef, useState } from "react";
+import { getUserbyUid, deletePost, updatePostLikes, updatePostComments } from "@/firebase/functions";
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
 import { DocumentData } from "firebase/firestore";
 import { Button, IconButton, Input, Typography, input } from "@material-tailwind/react";
 import { TrashIcon } from "@heroicons/react/20/solid";
@@ -15,6 +26,8 @@ import {
 } from "@heroicons/react/24/outline";
 import {HeartIcon as HeartIconFilled} from "@heroicons/react/20/solid"
 import Moment from "react-moment"
+import { useSocket } from "@/context/SocketContext";
+import UserModal from "./UserModal";
 
 export default function Post({
   id,
@@ -35,6 +48,10 @@ export default function Post({
   const [ready, setReady] = useState(false);
   const [userObj, setUserObj] = useState<any | any >();
   const [likes, setLikes] = useState<string[]>([]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [followering, setFollowering] = useState<string[] | undefined>();
+
 
   //this is used to set the cursor to comment box when clicking comment button
   const inputRef = useRef<HTMLInputElement>(null);
@@ -81,9 +98,8 @@ export default function Post({
       if (post?.userid) {
         const user = await getUserbyUid(post.userid);
         if (user){
-        
-        setUserObj(user);
-        setReady(true);
+          setUserObj(user);
+          setReady(true);
         }
       }
     }
@@ -91,12 +107,57 @@ export default function Post({
     if (post != false){
       getUser();
       getSrc();
+      handleFollowingNames();
     }
    
     
 
   }, [id, user, post]);
 
+
+  //Access socket context
+  const { socket } = useSocket();
+
+  const handleSendToUser = async (recipientId: any) => {
+    // Defining the data to send
+    const dataToSend = {
+      postId: id,
+      recipientId: recipientId, 
+      post: post
+    };
+
+    socket?.emit('send_post_to_user', dataToSend);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  }
+
+  const openModal = () => {
+    setIsModalOpen(true);
+    // console.log("open modal");
+  }
+
+  const handleSendToFollower = async (followerid: string) => {
+    handleSendToUser(followerid);
+    closeModal();
+  };
+
+  const handleFollowingNames = async () => {
+    if (user){
+      const userObj = await getUserbyUid(user?.uid);
+      // console.log(userObj?.displayName);
+      if (userObj){
+        let followingNames = await Promise.all(userObj.following.map(async (following: any) =>{ 
+          const person = await getUserbyUid(following);
+          return person?.displayName;
+        }));
+        setFollowering(followingNames)
+      }
+    }
+  }
+  // handleFollowingNames();
+  
   const handleLike = async () => {
     try {
       if (user){
@@ -253,7 +314,26 @@ export default function Post({
                   <HeartIconFilled onClick={handleUnLike} className='btn text-red-500'/>
                   )}
                   <ChatBubbleBottomCenterIcon onClick={focusInput} className='btn text-white'/>
+<<<<<<< Updated upstream
                   <PaperAirplaneIcon onClick={() => (handleDownload(src))} className='btn text-white'/>
+=======
+<<<<<<< Updated upstream
+                  <ArrowDownCircleIcon onClick={() => (handleDownload(src))} className='btn text-white'/>
+=======
+                  <PaperAirplaneIcon onClick={() => (openModal())} className='btn text-white'/>
+                  <UserModal isOpen={isModalOpen} onClose={closeModal}>
+                    <div className="flex flex-col">
+                      <div className="flex flex-col space-y-2">
+                        {followering?.map((follower: any) => (
+                          <Button key={follower} color="blue" onClick={() => handleSendToFollower(follower)}>
+                            {follower}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </UserModal>
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
                 </div>
         ) : (<div></div>))}
        

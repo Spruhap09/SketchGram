@@ -46,7 +46,15 @@ export default function Home({userObj}: {userObj: any}){
             {posts && posts.map((post) =>
             <div key={post.post_id} className="px-3">
             
+<<<<<<< Updated upstream
              <Post id={post.post_id} posts={posts}/>
+=======
+<<<<<<< Updated upstream
+             <Post id={post.post_id} posts={homePosts} setPosts={setPosts} sample={false}/>
+=======
+             <Post id={post.post_id} posts={posts} setPosts={undefined} sample={undefined}/>
+>>>>>>> Stashed changes
+>>>>>>> Stashed changes
             </div> 
             )}
         </div>
