@@ -1,21 +1,26 @@
 import Layout from "@/components/Layout";
 import { searchPosts, searchUsers } from "@/firebase/functions";
 import { Input, Typography } from "@material-tailwind/react";
+import { AuthContext } from "@/context/AuthContext";
 import { User } from "firebase/auth";
-import PhotoGrid from "@/components/profile/PhotoGrid";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import UserProfile from "@/components/UserProfile";
 import Post from "@/components/Post";
+import { useRouter } from "next/router";
+
 
 export default function Search() {
     const [searchTerm, setSearchTerm] = useState<string>("")
     const [searchResults, setSearchResults] = useState<User[]>([])
     const [activeTab, setTab] = useState('none');
-    const [posts, setPosts] = useState<any[] | null>(null);
+    const router = useRouter();
+    const user = useContext(AuthContext);
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchResults([])
         setSearchTerm(e.target.value);
     }
+
+    if(!user) router.push('login')
 
     useEffect(() => {
         const trimmedSearch = searchTerm.trim();
@@ -30,10 +35,9 @@ export default function Search() {
                     (post: { post_id: any; }, index: any, self: any[]) =>
                       index === self.findIndex((p) => p.post_id === post.post_id)
                   );
-
+                  
             setSearchResults(results);
-            setPosts(results|| null);
-
+            
         }
 
         fetchResults();
@@ -52,8 +56,8 @@ export default function Search() {
                 <button className="btn bg-blue-gray-800 text-white font-bold py-6 px-6 rounded-full flex items-center justify-center" onClick={() => handleSwitch('user')}>Search Users</button>
                 <button className="btn bg-blue-gray-800 text-white font-bold py-6 px-6 rounded-full flex items-center justify-center" onClick={() => handleSwitch('post')}>Search Posts</button>
             </div>
-
-            {activeTab === 'user' ?
+            
+            {activeTab === 'user' ? 
             <div>
                 <Typography className='p-5'variant="h1">Search Users</Typography>
                 <Input label="Search" crossOrigin="anonymous" onChange={handleSearch}/>
@@ -67,9 +71,11 @@ export default function Search() {
                 <Typography className='p-5'variant="h1">Search Posts</Typography>
                 <Input label="Search" crossOrigin="anonymous" onChange={handleSearch}/>
                 <div>
-                    <PhotoGrid posts={searchResults} setPosts={setPosts} />
+                    {searchResults.map((result:any, i) => {
+                        return <Post key={i} id={result.post_id} posts={searchResults} setPosts={setSearchResults} sample={false}/>
+                    })}
                 </div>
-            </div> : <div><p>Pick a search option! </p></div>}
+            </div> : <div><p>Pick a search option! </p></div>}       
         </Layout>
     )
 }
