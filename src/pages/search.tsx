@@ -11,6 +11,7 @@ export default function Search() {
     const [searchTerm, setSearchTerm] = useState<string>("")
     const [searchResults, setSearchResults] = useState<User[]>([])
     const [activeTab, setTab] = useState('none');
+    const [posts, setPosts] = useState<any[] | null>(null);
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchResults([])
         setSearchTerm(e.target.value);
@@ -31,6 +32,7 @@ export default function Search() {
                   );
 
             setSearchResults(results);
+            setPosts(results|| null);
 
         }
 
@@ -65,7 +67,7 @@ export default function Search() {
                 <Typography className='p-5'variant="h1">Search Posts</Typography>
                 <Input label="Search" crossOrigin="anonymous" onChange={handleSearch}/>
                 <div>
-                    <PhotoGrid posts={searchResults} />
+                    <PhotoGrid posts={searchResults} setPosts={setPosts} />
                 </div>
             </div> : <div><p>Pick a search option! </p></div>}
         </Layout>
