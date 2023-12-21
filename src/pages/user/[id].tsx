@@ -57,7 +57,7 @@ export default function UserProfile(){
         <div>
             <div>
                 <div className="flex items-center p-5">
-                    <img src={userObj?.profilePicture? userObj?.profilePicture : '../empty-profile.png' }
+                    <img src={userObj?.profile_img === 'empty-profile.png' ? '../empty-profile.png' : userObj?.profile_img}
                     width={500} height={500} className="rounded-full h-12 w-12 object-contain border-2 p-1 mr-3" alt={"profile picture for " + userObj?.displayName} />
                     <div className="flex">
                         <p className="flex-1 font-bold whitespace-nowrap p-2">{userObj?.displayName}</p>
