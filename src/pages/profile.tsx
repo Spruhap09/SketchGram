@@ -12,9 +12,8 @@ import AboutSection from '../components/profile/AboutSection'
 import PhotoGrid from "../components/profile/PhotoGrid"
 export default function Profile() {
 
-
     const user = useContext(AuthContext);
-    const [posts, setPosts] = useState(null);
+    const [posts, setPosts] = useState<any[] | null>(null);
     const [ready, setReady] = useState(false);
     const router = useRouter();
     const [changeValue, setChangedValue] = useState(false);
@@ -25,15 +24,16 @@ export default function Profile() {
         const getPosts = async () => {
                 if(user){
                     const userPosts = await getUserPostsLimit(user.uid);
-                    console.log(userPosts)
                     if (userPosts) setReady(true);
-                    setPosts(userPosts);
+                    setPosts(userPosts || null);
                 }
             }
             getPosts();
     },[changeValue])
 
     return (
+
+
         <Layout>
             {ready? (
                 <>

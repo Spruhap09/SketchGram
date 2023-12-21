@@ -22,6 +22,7 @@ const ChangeDisplayName = () => {
         try {
             await updateDisplayName(displayName);
             setModalOpen(false);
+            window.location.reload()
         } catch (error) {
             alert(error);
         }

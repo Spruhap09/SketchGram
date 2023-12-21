@@ -9,16 +9,12 @@ const ProfileCard = () => {
     const router = useRouter();
     const [error, setError] = useState(null); 
     const fileInputRef = useRef(null);
+    const [imageError, setImageError] = useState(false);
     const [userInformation, setUserInformation] = useState(null);
     const [isLoading, setIsLoading] = useState(true); 
 
-    useEffect(() => {
-      if (!user) {
-        router.push('/login');
-        return;
-      }
 
-      const fetchUserInfo = async () => {
+    const fetchUserInfo = async () => {
         try {
           const info = await getUserbyUid(user.uid);
           setUserInformation(info);
@@ -28,27 +24,59 @@ const ProfileCard = () => {
           setIsLoading(false); 
         }
       };
+
+      useEffect(() => {
+        if (!user) {
+            router.push('/login');
+            return;
+        }
+
+        fetchUserInfo();
+    }, [user, user?.displayName, router]);
+
     
-      fetchUserInfo();
-    }, [user, router]);
+
+    
+
+    const handleImageError = () => {
+        setImageError(true);
+        window.alert('The profile picture is not valid.'); 
+    };
+
+    useEffect(() => {
+        setImageError(false);
+        setError(null);
+    }, [userInformation]);
 
     const handleButtonClick = () => {
       fileInputRef.current.click();
     };
 
     const handleFileChange = async (event) => {
-      const file = event.target.files[0];
-      if (!file) return;
+        const file = event.target.files[0];
+        if (!file) return;
 
-      try {
-        await uploadProfilePic(file);
-      
-        setError(null);
-      } catch (error) {
+        const imageForValidation = new Image();
+        imageForValidation.src = URL.createObjectURL(file);
 
-        setError(error.message);
-      }
+        imageForValidation.onload = async () => {
+            try {
+                setImageError(false);
+                await uploadProfilePic(file);
+    
+                const updatedInfo = await getUserbyUid(user.uid);
+                setUserInformation(updatedInfo);
+            } catch (error) {
+                window.alert(error.message); 
+            }
+        };
+        imageForValidation.onerror = () => {
+            setImageError(true);
+            window.alert('The profile picture is not valid.'); 
+        };
     };
+    
+      
 
 
     if (isLoading) {
@@ -56,13 +84,12 @@ const ProfileCard = () => {
     }
 
     return (
-      <div className="bg-white max-w-lg mx-auto p-4 flex items-center rounded-lg shadow">
-        {console.log("pfp", userInformation)}
-        {error && <div className="error-message text-red-500">{error}</div>}
+        <div className="bg-white max-w-lg mx-auto p-4 flex items-center rounded-lg shadow">
         <img
           src={userInformation?.profilePicture || '../empty-profile.png'}
           alt="Profile"
           className="rounded-full w-16 h-16 border-2 border-gray-300 mr-4"
+          onError={handleImageError}
         />
 
         <div className="flex-1">
