@@ -183,7 +183,7 @@ io.on('connection', (socket => {
 }));
 
 httpServer.listen(2000, () => {
-    console.log(`listening on *:${2000}`);
+    console.log(`socket.io server -> listening on *:${2000}`);
 });
 
 

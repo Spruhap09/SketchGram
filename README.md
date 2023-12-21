@@ -5,19 +5,16 @@ To run this web application you must have [node.js (including npm)](https://node
 
 ## To run
 Create a config file in the firebase directory (@/firebase/config.ts).
+
+In addition, place the config file in the following directory (dist/src/firebase/config.mjs). Make sure to change the extension in this directory so that the server.mjs file will be able to read it.
+
 Place your Firebase configuration settings in there which you can get from Firebase Console.
 You may also have to execute ```firebase login``` in your shell.
 
-Then install node modules
+Then install node modules and run all servers
 ```
 npm i
-```
-
-Then run the following commands in separate terminals:
-```
 npm start
-```
-node server.mjs
 ```
 
 ## Note
@@ -25,8 +22,6 @@ Running npm start will simultaneously start the next.js app as well as the fireb
 The emulators will be automatically seeded with data stored in a top-level directory called 'emulator-data'.
 On exit the firestore emulator will save changes you have made to that same directory so they persist next time you run the app. If you don't want this behavior you can run ```npm run start-no-save```.
 Also all seeded accounts have the password 'password' if you'd like to access them.
-
-Running the 'node server.mjs' will enable socket.io in order to send posts between users and the people they follow.
 
 
 ## Reference Documentation

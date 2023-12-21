@@ -395,6 +395,11 @@ export default function Post({
                   <PaperAirplaneIcon onClick={() => (openModal())} className='btn text-white'/>
                   <UserModal isOpen={isModalOpen} onClose={closeModal}>
                     <div className="flex flex-col">
+                      <div className="flex justify-center">
+                        <Typography color="blue-gray" className="text-lg font-bold p-4">
+                          Send to one of your friends you follow:
+                        </Typography>
+                      </div>
                       <div className="flex flex-col space-y-2">
                         {followering?.map((follower: any, findIndex: any) => (
                           // console.log(follower),
