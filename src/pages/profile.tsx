@@ -7,7 +7,9 @@ import { useContext, useEffect, useState } from "react";
 import EditProfile from "../components/EditProfile";
 import ProfileStats from "../components/ProfileStats";
 import { getUserPostsLimit } from "@/firebase/functions";
-
+import ProfileHeader from "../components/profile/ProfileHeader"
+import AboutSection from '../components/profile/AboutSection'
+import PhotoGrid from "../components/profile/PhotoGrid"
 export default function Profile() {
 
     const user = useContext(AuthContext);
@@ -30,26 +32,17 @@ export default function Profile() {
     },[changeValue])
 
     return (
-        
-        
-        <Layout>
-            {ready ? (
-                <>
-                    <div className="sticky flex flex-col justify-center items-center">
-                        <Typography variant="h2" className="">{'Welcome to your profile page!'} </Typography>
-                    </div>
-                    <div className="flex justify-between py-10 w-full">
-                        <EditProfile setChangedValue={setChangedValue} changedValue={changeValue}/>
-                        <ProfileStats posts={posts} />
 
-                    </div>
-                    <div>
-                        <Typography variant="h4" className="text-center">Your Posts</Typography>
-                        <UserPosts setPosts={setPosts} posts={posts} />
-                    </div>
-                    <Button color="blue-gray" variant="gradient" onClick={() => router.push('/canvas')}>Back to Canvas</Button>
+
+        <Layout>
+            {ready? (
+                <>
+                 <div className="w-full">
+                    <ProfileHeader profile={user} posts={posts}/>
+                    <PhotoGrid posts={posts} setPosts={setPosts}/>
+                 </div>
                 </>
-                ) : <div>Loading</div>}
+            ) : <div>Loading</div>}
         </Layout>
         
     )

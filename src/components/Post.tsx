@@ -68,7 +68,7 @@ export default function Post({
      
       //get post from posts context
       const post = posts.find((post: { post_id: string; }) => post.post_id === id);
-      // console.log(post)
+
       //order comments by timestamp
       if (post?.comments){
         post.comments.sort((a: { timestamp: string; }, b: { timestamp: string; }) => {
@@ -81,11 +81,7 @@ export default function Post({
           try {
             let ret_user:any = await getUserbyUid(post.comments[i].userid)
             post.comments[i].username = ret_user.displayName
-            // if(ret_user.profile_img){
-            //   post.comments[i].profile_img = ret_user.profile_img
-            // } else {
-            //   post.comments[i].profile_img = 'empty-profile.png'
-            // }
+            post.comments[i].profile_img = ret_user.profilePicture? ret_user.profilePicture: '/empty-profile.png'
           } catch (error) {
             console.log(error)
           }
@@ -174,7 +170,7 @@ export default function Post({
       const userObj = await getUserbyUid(user?.uid);
       // console.log(userObj?.displayName);
       if (userObj){
-        let followingNames = await Promise.all(userObj.following.map(async (following: any) =>{ 
+        let followingNames = await Promise.all(userObj.following.map(async (following: any) =>{
           const person = await getUserbyUid(following);
           const personName = person?.displayName;
           return {name: personName, id: following};
@@ -184,7 +180,7 @@ export default function Post({
     }
   }
   // handleFollowingNames();
-  
+
   const handleLike = async () => {
     try {
       if (user){
@@ -203,7 +199,7 @@ export default function Post({
           }
         }
       }
-      
+
     } catch (error) {
       alert(error)
     }
@@ -234,7 +230,7 @@ export default function Post({
           }
         }
       }
-      
+
     } catch (error) {
       alert(error)
     }
@@ -264,13 +260,13 @@ export default function Post({
   const delComment = async (comment: any) => {
     try {
       if (comment.userid === user?.uid){
-       
-      
+
+
           await deleteComment(post?.post_id, comment, user?.uid, comment.uid)
           let temp:any = []
           for (let i=0; i<post?.comments.length; i++){
             if (post?.comments[i].uid === comment.uid){
-            
+
               continue
             }
             temp.push(post?.comments[i])
@@ -295,7 +291,7 @@ export default function Post({
         }
 
         }
-      
+
 
 
     } catch (error) {
@@ -330,7 +326,7 @@ export default function Post({
           comment: comment,
           userid: user?.uid,
           username: user?.displayName,
-          profile_img: commenting_user?.profile_img,
+          profile_img: commenting_user?.profilePicture ? commenting_user?.profilePicture : '/empty-profile.png',
           timestamp: new Date().toISOString(),
         };
         await updatePostComments(post?.post_id, comment_obj, user?.uid);
@@ -362,21 +358,21 @@ export default function Post({
 
       <div className="bg-blue-gray-800 my-7 border rounded-xl text-white !important max-w-500 overflow-x-hidden">
         <div className="flex items-center p-5">
-          <Image 
-            src={userObj?.profile_img === 'empty-profile.png' ? '/../empty-profile.png' : userObj?.profile_img}
-            width={500} 
-            height={500} 
-            className="rounded-full h-12 w-12 object-contain border-2 p-1 mr-3" 
+          <Image
+            src={userObj?.profilePicture ?`${userObj?.profilePicture}` :  '/empty-profile.png' }
+            width={500}
+            height={500}
+            className="rounded-full h-12 w-12 object-contain border-2 p-1 mr-3"
             alt={"profile picture for " + userObj?.displayName}
           />
           <p className="flex-1 font-bold text-white">{userObj?.displayName}</p>
         </div>
-        {src.length ? 
+        {src.length ?
         (
-        
-          <Image 
-          src={src} 
-          alt="user post" 
+
+          <Image
+          src={src}
+          alt="user post"
           className="object-cover w-full bg-white"
           height={750}
           width={750}
@@ -412,8 +408,8 @@ export default function Post({
                   </UserModal>
                 </div>
         }
-       
-          
+
+
         {/* Caption */}
 
         <div className="px-5 py-3 truncate">
@@ -441,8 +437,8 @@ export default function Post({
                         src={postComment?.profile_img === 'empty-profile.png' ? '/../empty-profile.png' : postComment?.profile_img}
                         alt={"comment profile picture for user " + postComment?.username}
                         className="rounded-full h-8 w-8 object-contain"
-                        width={500} 
-                        height={500} 
+                        width={500}
+                        height={500}
                       />
                       <p className="text-sm flex-1 truncate space-x-4 overflow-ellipsis block whitespace-no-wrap">
                         <span className="font-bold mr-2">{postComment?.username}</span>
@@ -460,10 +456,10 @@ export default function Post({
                     </div>
                   ))}
                 </div>)
-            } 
+            }
          </div>
         }
-        
+
 
 
 
