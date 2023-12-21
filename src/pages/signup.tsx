@@ -16,6 +16,9 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useContext, useState, useRef, useEffect } from "react";
+import {isDisplayNameValid} from "@/utilities/displayNameChecker"
+import { isPasswordValid } from "@/utilities/passwordChecker";
+import { isEmailValid } from "@/utilities/emailChecker";
 
 export default function SignUp() {
   const user = useContext(AuthContext);
@@ -54,20 +57,27 @@ export default function SignUp() {
     ) as HTMLInputElement;
 
     try {
-      if (displayName.value.length > 50){
+
+      //checking for display names
+      
+      if (!isDisplayNameValid(displayName.value)){
         displayNameRef.current.focus()
-        throw "Display Name too long!"
       }
-  
-      if (email.value.length > 50){
+
+      //checking for emails
+      if (!isEmailValid(email.value)){
         emailRef.current.focus()
-        throw "Email too long!"
       }
-  
-      if (password.value.length > 60 || passwordConfirmation.value.length > 60){
+
+      //checking for password
+
+      if (password.value !== passwordConfirmation.value){
+        throw "The passwords must be the same!"
+    }
+      if (!isPasswordValid(password.value, passwordConfirmation.value)){
         passwordRef.current.focus()
-        throw "Password too long!"
       }
+
     } catch (error) {
       alert(error)
       return 
@@ -156,6 +166,25 @@ export default function SignUp() {
                 }}
                 crossOrigin="anonymous"
               />
+              <Typography
+                variant="small"
+                color="gray"
+                className="mt-1 flex items-center gap-1 font-normal"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  className="-mt-px h-4 w-4"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm8.706-1.442c1.146-.573 2.437.463 2.126 1.706l-.709 2.836.042-.02a.75.75 0 01.67 1.34l-.04.022c-1.147.573-2.438-.463-2.127-1.706l.71-2.836-.042.02a.75.75 0 11-.671-1.34l.041-.022zM12 9a.75.75 0 100-1.5.75.75 0 000 1.5z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Use at least 8 characters, one uppercase, one lowercase, one number and one special character.
+              </Typography>
               <Typography variant="h6" color="blue-gray" className="-mb-3">
                 Confirm Password
               </Typography>
