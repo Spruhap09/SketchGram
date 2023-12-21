@@ -29,15 +29,16 @@ export default function Search() {
             if(trimmedSearch.length > 0 && activeTab === 'user')
                 results = await searchUsers(trimmedSearch);
 
-            if(trimmedSearch.length > 0 && activeTab === 'post')
+            if(trimmedSearch.length > 0 && activeTab === 'post'){
                 results = await searchPosts(trimmedSearch)
                 results = results.filter(
                     (post: { post_id: any; }, index: any, self: any[]) =>
                       index === self.findIndex((p) => p.post_id === post.post_id)
                   );
                   
-            setSearchResults(results);
-            
+            }
+
+            setSearchResults(results);            
         }
 
         fetchResults();

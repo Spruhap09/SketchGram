@@ -42,5 +42,4 @@ next-env.d.ts
 /src/firebase/config.ts
 firebase-debug.log
 firestore-debug.log
-/emulator-data/
 dist/src/firebase/config.mjs
