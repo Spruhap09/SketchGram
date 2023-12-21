@@ -31,8 +31,14 @@ export default function Login() {
     // Log in
     try {
       await logInWithEmailAndPassword(email.value, password.value);
-    } catch (error) {
-      alert(error);
+    } catch (error: any) {
+        if (error.code === 'auth/user-not-found'){
+          alert('Error: User not found')
+        }
+        else{
+          alert('Error: Invalid login details');
+        }
+      
     }
   };
 
