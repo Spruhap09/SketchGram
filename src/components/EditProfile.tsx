@@ -224,10 +224,10 @@ export default function EditProfile ({setChangedValue, changedValue} : {setChang
             {ready ? (
                 <div className="flex-grow box-border w-32 p-4 border-4 mr-4 rounded-lg flex flex-col items-center justify-center">
                 <Avatar className="my-2"src={userObj?.profile_img || noAvatar.src} alt="avatar" size="xxl"/>
-                <Typography className="">{`Your Name`} </Typography>
-                <Typography variant="h5" className="font-bold text-xl">{user?.displayName}</Typography>
-                <Typography className="">{`Your Email`} </Typography>
-                <Typography variant="h5" className="font-bold text-xl">{user?.email}</Typography>
+                <Typography className="h5">{`Your Name`} </Typography>
+                <Typography className="font-bold text-xl h5">{user?.displayName}</Typography>
+                <Typography className="h5">{`Your Email`} </Typography>
+                <Typography className="font-bold text-xl h5">{user?.email}</Typography>
                 <br></br>
                 <div className="flex space-x-4">
                     <Button color="blue-gray" variant="gradient" className="my-2" onClick={() => setEditName(true)}>Edit Display Name</Button>
