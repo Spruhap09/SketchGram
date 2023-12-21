@@ -54,11 +54,17 @@ export default function ProfileStats ({posts}: { posts: any }) {
                 let following_info:any = []
                 for (let i=0; i < stats.followers.length; i++){
                     const ret_user:any = await getUserbyUid(stats.followers[i]);
+                    if(!ret_user?.profile_img){
+                        ret_user.profile_img = 'empty-profile.png'
+                    }
                     followers_info.push(ret_user)
                 }
 
                 for(let i=0; i < stats.following.length; i++){
                     const ret_user:any = await getUserbyUid(stats.following[i]);
+                    if(!ret_user?.profile_img){
+                        ret_user.profile_img = 'empty-profile.png'
+                    }
                     following_info.push(ret_user)
                 }
                 

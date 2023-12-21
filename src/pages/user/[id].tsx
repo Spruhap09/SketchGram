@@ -19,7 +19,7 @@ export default function UserProfile(){
     useEffect(() => {
         setReady(false);
         const getPosts = async () => {
-                if(user){
+                if(user && typeof id === 'string'){
                     const userPosts = await getUserPostsLimit(id);
                     if (userPosts) {
                         setReady(true)
@@ -35,15 +35,20 @@ export default function UserProfile(){
     },[user, id])
 
     const handleFollow = async () => {
-        await followUser(id, user?.uid);
-        const accountUser = await getUserbyUid(id);
-        setUserObj(accountUser);
+        if(user && typeof id === 'string'){
+
+            await followUser(id, user?.uid);
+            const accountUser = await getUserbyUid(id);
+            setUserObj(accountUser);
+        }
     };
 
     const handleUnfollow = async () => {
-        await unfollowUser(id, user?.uid);
-        const accountUser = await getUserbyUid(id);
-        setUserObj(accountUser);
+        if(user && typeof id === 'string'){
+            await unfollowUser(id, user?.uid);
+            const accountUser = await getUserbyUid(id);
+            setUserObj(accountUser);
+        }
     };
 
     return (

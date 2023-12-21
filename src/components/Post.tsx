@@ -1,4 +1,5 @@
 import Image from "next/image";
+import noAvatar from 'public/noAvatar.jpeg'
 import { useContext, useEffect, useRef, useState } from "react";
 import { getUserbyUid, deletePost, updatePostLikes, updatePostComments, deleteComment } from "@/firebase/functions";
 import { DocumentData } from "firebase/firestore";
@@ -11,10 +12,13 @@ import {
   FaceSmileIcon,
   ChatBubbleBottomCenterIcon,
   HeartIcon,
-  ArrowDownCircleIcon,
+  PaperAirplaneIcon,
 } from "@heroicons/react/24/outline";
 import {HeartIcon as HeartIconFilled} from "@heroicons/react/20/solid"
 import Moment from "react-moment"
+import { useSocket } from "@/context/SocketContext";
+import UserModal from "./UserModal";
+import { set } from "firebase/database";
 
 export default function Post({
   id,
@@ -35,6 +39,10 @@ export default function Post({
   const [ready, setReady] = useState(false);
   const [userObj, setUserObj] = useState<any | any >();
   const [likes, setLikes] = useState<string[]>([]);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [followering, setFollowering] = useState<string[] | undefined>();
+
 
   //this is used to set the cursor to comment box when clicking comment button
   const inputRef = useRef<HTMLInputElement>(null);
@@ -60,7 +68,7 @@ export default function Post({
      
       //get post from posts context
       const post = posts.find((post: { post_id: string; }) => post.post_id === id);
-
+      // console.log(post)
       //order comments by timestamp
       if (post?.comments){
         post.comments.sort((a: { timestamp: string; }, b: { timestamp: string; }) => {
@@ -73,7 +81,11 @@ export default function Post({
           try {
             let ret_user:any = await getUserbyUid(post.comments[i].userid)
             post.comments[i].username = ret_user.displayName
-            post.comments[i].profile_img = ret_user.profile_img
+            // if(ret_user.profile_img){
+            //   post.comments[i].profile_img = ret_user.profile_img
+            // } else {
+            //   post.comments[i].profile_img = 'empty-profile.png'
+            // }
           } catch (error) {
             console.log(error)
           }
@@ -84,13 +96,16 @@ export default function Post({
       
 
       try {
-        const res = await fetch(`/api/image?url=${post.imageURL}`)
-        const {imageUrl} = await res.json();
-        // Set state
+        if(post){
+          const res = await fetch(`/api/image?url=${post.imageURL}`)
+          // console.log(`/api/image?url=${post.imageURL}`)
+          const {imageUrl} = await res.json();
+          // Set state
+          setPost(post);
+          setSrc(imageUrl);
+          setLikes(post?.likes)
+        }
 
-        setPost(post);
-        setSrc(imageUrl);
-        setLikes(post?.likes)
       } catch (error) {
         console.log(error)
       }
@@ -101,14 +116,16 @@ export default function Post({
         let user;
         try {
           user = await getUserbyUid(post.userid);
+          if (user && !user.profile_img) {
+            user.profile_img = 'empty-profile.png';
+          }
         } catch (error) {
           console.log(error)
         }
       
         if (user){
-        
-        setUserObj(user);
-        setReady(true);
+          setUserObj(user);
+          setReady(true);
         }
       }
     }
@@ -116,12 +133,58 @@ export default function Post({
     if (post != false){
       getUser();
       getSrc();
+      handleFollowingNames();
     }
    
     
 
   }, [id, user, post]);
 
+
+  //Access socket context
+  const { socket } = useSocket();
+
+  const handleSendToUser = async (recipientId: any) => {
+    // Defining the data to send
+    const dataToSend = {
+      postId: id,
+      recipientId: recipientId,
+      post: post
+    };
+
+    socket?.emit('send_post_to_user', dataToSend);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  }
+
+  const openModal = () => {
+    setIsModalOpen(true);
+    // console.log("open modal");
+  }
+
+  const handleSendToFollower = async (followerId: string) => {
+    handleSendToUser(followerId);
+    closeModal();
+  };
+
+  const handleFollowingNames = async () => {
+    if (user){
+      const userObj = await getUserbyUid(user?.uid);
+      // console.log(userObj?.displayName);
+      if (userObj){
+        let followingNames = await Promise.all(userObj.following.map(async (following: any) =>{ 
+          const person = await getUserbyUid(following);
+          const personName = person?.displayName;
+          return {name: personName, id: following};
+        }));
+        setFollowering(followingNames)
+      }
+    }
+  }
+  // handleFollowingNames();
+  
   const handleLike = async () => {
     try {
       if (user){
@@ -300,7 +363,7 @@ export default function Post({
       <div className="bg-blue-gray-800 my-7 border rounded-xl text-white !important max-w-500 overflow-x-hidden">
         <div className="flex items-center p-5">
           <Image 
-            src={userObj?.profile_img === 'empty-profile.png' ? '/empty-profile.png' : `${userObj?.profile_img}`}
+            src={userObj?.profile_img === 'empty-profile.png' ? '/../empty-profile.png' : userObj?.profile_img}
             width={500} 
             height={500} 
             className="rounded-full h-12 w-12 object-contain border-2 p-1 mr-3" 
@@ -329,7 +392,24 @@ export default function Post({
                   <HeartIconFilled onClick={handleUnLike} className='btn text-red-500'/>
                   )}
                   <ChatBubbleBottomCenterIcon onClick={focusInput} className='btn text-white'/>
-                  <ArrowDownCircleIcon onClick={() => (handleDownload(src))} className='btn text-white'/>
+                  <PaperAirplaneIcon onClick={() => (openModal())} className='btn text-white'/>
+                  <UserModal isOpen={isModalOpen} onClose={closeModal}>
+                    <div className="flex flex-col">
+                      <div className="flex justify-center">
+                        <Typography color="blue-gray" className="text-lg font-bold p-4">
+                          Send to one of your friends you follow:
+                        </Typography>
+                      </div>
+                      <div className="flex flex-col space-y-2">
+                        {followering?.map((follower: any, findIndex: any) => (
+                          // console.log(follower),
+                          <Button key={follower.id} color="blue" onClick={() => handleSendToFollower(follower.id)}>
+                            {follower.name}
+                          </Button>
+                        ))}
+                      </div>
+                    </div>
+                  </UserModal>
                 </div>
         }
        

@@ -2,6 +2,7 @@ import Post from "./Post";
 import { getPost, getImageFromUrl, getUserPostsLimit, getAllPosts } from "@/firebase/functions"
 import { AuthContext } from "@/context/AuthContext";
 import { Key, SetStateAction, useContext, useEffect, useRef, useState } from "react";
+import { DocumentData } from "firebase/firestore";
 
 
 export default function TopFeed() {
@@ -14,7 +15,7 @@ export default function TopFeed() {
             //gets all the posts from the database
             const data: any = await getAllPosts();
 
-            const newest = data.sort((a: { timestamp: string; }, b: { timestamp: string; }) => {
+            const newest = data.sort((a, b) => {
                 return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
             });
 
@@ -32,10 +33,10 @@ export default function TopFeed() {
     return(
         <div>
             {posts && posts.map((post: { post_id: Key | null | undefined | any; }) =>
-            <div key={post.post_id} className="px-3">
-            
-            <Post id={post.post_id} posts={posts} setPosts="default" sample={false}/>
-            </div> 
+                <div key={post.post_id} className="px-3">
+                    <Post id={post.post_id} posts={posts} setPosts={undefined} sample={undefined} />
+
+                </div> 
             )}
         </div>
     )

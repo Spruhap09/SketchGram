@@ -17,11 +17,11 @@ export default function IndividualPost(){
     const [post, setPost]:any = useState([])
     const posts: DocumentData[] = [];
     
+    if(!user) router.push('/login');
 
     useEffect(() => {
         setReady(false);
         const getIndividualPost = async () => {
-
             if (user){
               try {
                 const individualPost = await getPost(id)
@@ -32,8 +32,6 @@ export default function IndividualPost(){
                 console.log(error + " big error man")
                 setReady(true)
               }
-
-                
             }   
         }
         getIndividualPost()

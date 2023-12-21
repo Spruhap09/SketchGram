@@ -5,6 +5,9 @@ To run this web application you must have [node.js (including npm)](https://node
 
 ## To run
 Create a config file in the firebase directory (@/firebase/config.ts).
+
+In addition, place the config file in the following directory (dist/src/firebase/config.mjs). Make sure to change the extension in this directory so that the server.mjs file will be able to read it.
+
 Place your Firebase configuration settings in there which you can get from Firebase Console.
 You may also have to execute ```firebase login``` in your shell.
 
@@ -21,7 +24,6 @@ On exit the firestore emulator will save changes you have made to that same dire
 Also all seeded accounts have the password 'password' if you'd like to access them.
 
 
-
 ## Reference Documentation
 HTML Canvas:
 https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API
@@ -35,3 +37,5 @@ https://www.material-tailwind.com/
 Firestore:
 https://firebase.google.com/docs/firestore/quickstart
 
+Socket.io:
+https://socket.io/docs/v4/

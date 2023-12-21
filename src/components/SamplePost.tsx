@@ -28,7 +28,6 @@ export default function SamplePost(){
         <div>
         {posts && posts.map((post: { post_id: Key | null | undefined | any; }) =>
         <div key={post.post_id} className="px-3">
-        
             <Post id={post.post_id} posts={posts} setPosts={"default"} sample={true}/>
         </div> 
         )}

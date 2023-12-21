@@ -5,8 +5,10 @@
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
-    "noEmit": true,
+    "noEmit": false,
     "esModuleInterop": true,
+    "outDir": "dist",
+    // "rootDir": "src/firebase",
     "module": "esnext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
@@ -17,6 +19,9 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  // "_moduleAliases": {
+  //   "@": "dist/src"
+  // },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/firebase/*.ts"],
   "exclude": ["node_modules"]
 }
