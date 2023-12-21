@@ -759,6 +759,8 @@ async function searchUsers(searchTerm: string) {
       let data = snapshot.data();
       if (!users.some((user: any) => user.uid === data.uid)) users.push(data);
     })
+
+    console.log('usersFF: ', users) 
     
     return users;
   }
